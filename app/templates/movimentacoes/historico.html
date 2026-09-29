@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Histórico — {{ produto.nome }} — AAPM SENAI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/movimentacoes/historico.css">
+</head>
+
+<body>
+    <div class="historico-container">
+        
+        <!-- Topo / Cabeçalho -->
+        <header class="historico-header">
+            <div>
+                <a href="/produtos/{{ produto.id }}" class="btn-voltar">← Voltar ao produto</a>
+                <h1>Histórico — {{ produto.nome }}[cite: 3]</h1>
+            </div>
+            <a href="/movimentacoes/nova?produto_id={{ produto.id }}" class="btn-novo">
+                + Registrar movimentação[cite: 3]
+            </a>
+        </header>
+
+        <!-- Resumo do produto -->
+        <section class="resumo-grid">
+            <div class="resumo-card">
+                <span class="resumo-label">Estoque atual[cite: 3]</span>
+                <span class="resumo-valor">{{ produto.estoque_atual }}[cite: 3]</span>
+            </div>
+            <div class="resumo-card entrada">
+                <span class="resumo-label">Total de entradas[cite: 3]</span>
+                <span class="resumo-valor">+ {{ total_entradas }}[cite: 3]</span>
+            </div>
+            <div class="resumo-card saida">
+                <span class="resumo-label">Total de saídas[cite: 3]</span>
+                <span class="resumo-valor">- {{ total_saidas }}[cite: 3]</span>
+            </div>
+        </section>
+
+        <!-- Tabela de Movimentações -->
+        <div class="tabela-wrapper">
+            <table class="tabela-mov">
+                <thead>
+                    <tr>
+                        <th>Data[cite: 3]</th>
+                        <th>Tipo[cite: 3]</th>
+                        <th>Quantidade[cite: 3]</th>
+                        <th>Preço unit.[cite: 3]</th>
+                        <th>Total[cite: 3]</th>
+                        <th>Observação[cite: 3]</th>
+                        <th>Registrado por[cite: 3]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in movimentacoes %}
+                    <tr>
+                        <td>{{ m.criado_em.strftime('%d/%m/%Y %H:%M') }}[cite: 3]</td>
+                        <td>
+                            {% if m.tipo.value == 'entrada' %}[cite: 3]
+                            <span class="badge entrada">▲ Entrada[cite: 3]</span>
+                            {% else %}
+                            <span class="badge saida">▼ Saída[cite: 3]</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ m.quantidade }}[cite: 3]</td>
+                        <td>R$ {{ "%.2f"|format(m.preco_unitario) }}[cite: 3]</td>
+                        <td class="font-head">R$ {{ "%.2f"|format(m.valor_total) }}[cite: 3]</td>
+                        <td>{{ m.observacao or "—" }}[cite: 3]</td>
+                        <td>{{ m.usuario.nome if m.usuario else "—" }}[cite: 3]</td>
+                    </tr>
+                    {% endfor %}
+
+                    {% if not movimentacoes %}
+                    <tr>
+                        <td colspan="7" class="vazio">
+                            Nenhuma movimentação registrada.[cite: 3]
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+    <script src="/static/js/movimentacoes/historico.js" defer></script>
+</body>
+
+</html>

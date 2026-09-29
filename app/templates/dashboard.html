@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — AAPM SENAI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,1,0&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+</head>
+<body data-role="{{ usuario.role }}">
+    <div class="spotlight" id="spotlight"></div>
+
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-tag">Sistema</div>
+                <div class="logo-name">AAPM</div>
+                <div class="logo-sub">SENAI — Gestão de Loja</div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">Principal</div>
+                <a href="/" class="nav-link active"><span class="icon">⊞</span> Dashboard</a>
+                <a href="/produtos" class="nav-link"><span class="icon">📦</span> Produtos</a>
+                {% if usuario.role == 'admin' %}
+                <a href="/categorias" class="nav-link"><span class="icon">🏷</span> Categorias</a>
+                <a href="/movimentacoes" class="nav-link"><span class="icon">↕</span> Movimentações</a>
+                {% endif %}
+                <a href="/armarios" class="nav-link"><span class="icon">🔒</span> Armários</a>
+                {% if usuario.role == 'admin' %}
+                <a href="/clientes" class="nav-link"><span class="icon">👥</span> Clientes</a>
+                {% endif %}
+                <a href="/pdv" class="nav-link"><span class="icon">🛒</span> Ponto de venda</a>
+                {% if usuario.role == 'admin' %}
+                <div class="nav-section">Administração</div>
+                <a href="/usuarios" class="nav-link"><span class="icon">👥</span> Usuários</a>
+                {% endif %}
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-card">
+                    <div class="user-avatar">{{ usuario.nome[0].upper() }}</div>
+                    <div class="user-info">
+                        <div class="user-name">{{ usuario.nome }}</div>
+                        <div class="user-role">{{ usuario.role }}</div>
+                    </div>
+                </div>
+                <a href="/auth/logout" class="logout-btn">← Sair</a>
+            </div>
+        </aside>
+
+        <main class="main">
+            <div class="page-header">
+                <div class="greeting">Bem-vindo de volta</div>
+                <h1>{{ usuario.nome.split()[0] }}</h1>
+            </div>
+
+            <section class="dashboard-hero">
+                <div>
+                    <span class="hero-kicker">PAINEL OPERACIONAL</span>
+                    <h2>Visão geral integrada do ecossistema AAPM</h2>
+                </div>
+            </section>
+
+            <div class="cards-grid">
+                <a href="/produtos" class="card blue fade-in">
+                    <span class="card-icon">📦</span>
+                    <div class="card-value">{{ total_produtos }}</div>
+                    <div class="card-label">Produtos ativos</div>
+                    <div class="card-link">Ver todos →</div>
+                </a>
+                <a href="/categorias" class="card green fade-in admin-only">
+                    <span class="card-icon">🏷</span>
+                    <div class="card-value">{{ total_categorias }}</div>
+                    <div class="card-label">Categorias</div>
+                    <div class="card-link">Gerenciar →</div>
+                </a>
+                <a href="/armarios?status=disponivel" class="card {% if armarios_disponiveis == 0 %}amber{% else %}green{% endif %} fade-in">
+                    <span class="card-icon">🔓</span>
+                    <div class="card-value">{{ armarios_disponiveis }}</div>
+                    <div class="card-label">Armários disponíveis</div>
+                    <div class="card-link">Ver mapa →</div>
+                </a>
+                <a href="/produtos?estoque_baixo=true" class="card {% if estoque_baixo %}red{% else %}green{% endif %} fade-in">
+                    <span class="card-icon">⚠</span>
+                    <div class="card-value">{{ estoque_baixo | length }}</div>
+                    <div class="card-label">Estoque baixo</div>
+                    <div class="card-link">Ver produtos →</div>
+                </a>
+                <a href="/clientes" class="card blue fade-in admin-only">
+                    <span class="card-icon">👥</span>
+                    <div class="card-value">{{ total_clientes }}</div>
+                    <div class="card-label">Clientes ativos</div>
+                    <div class="card-link">Consultar clientes</div>
+                </a>
+                <a href="/pdv/historico" class="card green fade-in">
+                    <span class="card-icon">🛒</span>
+                    <div class="card-value">{{ total_vendas }}</div>
+                    <div class="card-label">Vendas registradas</div>
+                    <div class="card-link">Ver histórico</div>
+                </a>
+            </div>
+
+            <div class="bottom-grid">
+                <div class="section admin-only">
+                    <div class="section-header">
+                        <span class="section-title">Movimentações recentes</span>
+                        <a href="/movimentacoes" class="section-link">Ver todas →</a>
+                    </div>
+                    {% if movimentacoes_recentes %}
+                    <table>
+                        <thead>
+                            <tr><th>Produto</th><th>Tipo</th><th>Qtd</th><th>Data</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for m in movimentacoes_recentes %}
+                            <tr>
+                                <td><a href="/produtos/{{ m.produto_id }}" class="td-name">{{ m.produto.nome }}</a></td>
+                                <td>
+                                    {% if m.tipo.value == 'entrada' %}
+                                    <span class="badge badge-green">▲ Entrada</span>
+                                    {% else %}
+                                    <span class="badge badge-red">▼ Saída</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ m.quantidade }}</td>
+                                <td>{{ m.criado_em.strftime('%d/%m %H:%M') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="empty-state">Nenhuma movimentação registrada ainda.</div>
+                    {% endif %}
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:20px;">
+                    <div class="section pie-section">
+                        <div class="section-header">
+                            <span class="section-title">Distribuição do estoque</span>
+                            <a href="/produtos" class="section-link">Ver produtos</a>
+                        </div>
+                        {% if grafico_estoque %}
+                        <div class="pie-chart-wrap">
+                            <div class="stock-pie" style="background: conic-gradient({{ grafico_pizza }});"></div>
+                            <div class="stock-pie-legend">
+                                {% for item in grafico_estoque %}
+                                <div class="stock-pie-item">
+                                    <span><i class="legend-dot" style="background: {{ item.cor }}"></i><em>{{ item.nome }}</em></span>
+                                    <strong>{{ item.quantidade }}</strong>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="empty-state">Cadastre produtos para visualizar.</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/js/dashboard.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Produtos — AAPM SENAI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Ligações aos ficheiros CSS e JS específicos -->
+    <link rel="stylesheet" href="/static/css/produtos/index.css">
+    <script src="/static/js/produtos/index.js" defer></script>
+</head>
+
+<body>
+
+    <div class="container">
+        
+        <div class="page-header">
+            <h1>Produtos</h1>
+            {% if usuario and usuario.role == 'admin' %}
+            <a href="/produtos/novo" class="btn-primary">+ Novo produto</a>
+            {% endif %}
+        </div>
+
+        {% if request.query_params.get('criado') == 'ok' %}
+        <div class="alert alert-success">Produto criado com sucesso!</div>
+        {% endif %}
+
+        {% if request.query_params.get('desativado') == 'ok' %}
+        <div class="alert alert-success">Produto desativado.</div>
+        {% endif %}
+
+        <!-- Filtros -->
+        <form method="get" action="/produtos" class="filters-form">
+            <input type="text" name="busca" placeholder="Buscar por nome..." value="{{ busca }}">
+
+            <select name="categoria_id">
+                <option value="0">Todas as categorias</option>
+                {% for c in categorias %}
+                <option value="{{ c.id }}" {% if categoria_id == c.id %}selected{% endif %}>
+                    {{ c.nome }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <select name="possui_variacao">
+                <option value="">Todos os produtos</option>
+                <option value="sim" {{ 'selected' if possui_variacao == 'sim' else '' }}>Com variação</option>
+                <option value="nao" {{ 'selected' if possui_variacao == 'nao' else '' }}>Sem variação</option>
+            </select>
+
+            <div class="filter-actions">
+                <button type="submit" class="btn-secondary">Filtrar</button>
+                {% if busca or categoria_id or possui_variacao %}
+                <a href="/produtos" class="btn-clear">Limpar</a>
+                {% endif %}
+            </div>
+        </form>
+
+        <!-- Tabela de produtos -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Variação</th>
+                        <th>Imagem</th>
+                        <th>Nome</th>
+                        <th>Categoria</th>
+                        <th>Preço</th>
+                        <th>Estoque</th>
+                        {% if usuario and usuario.role == 'admin' %}
+                        <th>Ações</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in produtos %}
+                    <tr>
+                        <td><span class="badge {{ 'badge-yes' if p.variacao else 'badge-no' }}">{{ 'Sim' if p.variacao else 'Não' }}</span></td>
+                        <td>
+                            <img src="{{ p.imagem_url }}" alt="{{ p.nome }}" class="produto-thumb">
+                        </td>
+                        <td>
+                            <a href="/produtos/{{ p.id }}" class="produto-link">
+                                {{ p.nome }}
+                            </a>
+                        </td>
+                        <td>{{ p.categoria.nome if p.categoria else "—" }}</td>
+                        <td class="preco">R$ {{ "%.2f"|format(p.preco) }}</td>
+                        <td>
+                            <span class="estoque-badge {{ 'estoque-baixo' if p.estoque_atual <= 5 else '' }}">
+                                {{ p.estoque_atual }}
+                            </span>
+                        </td>
+                        {% if usuario and usuario.role == 'admin' %}
+                        <td>
+                            <div class="action-buttons">
+                                <a href="/produtos/{{ p.id }}/editar" class="btn-action btn-edit">Editar</a>
+                                <form action="/produtos/{{ p.id }}/desativar" method="post" class="inline-form"
+                                    onsubmit="return confirm('Confirma a desativação do produto {{ p.nome }} no sistema AAPM SENAI?')">
+                                    <button type="submit" class="btn-action btn-delete">Desativar</button>
+                                </form>
+                            </div>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+
+                    {% if not produtos %}
+                    <tr>
+                        <td colspan="7" class="empty-row">
+                            Nenhum produto encontrado.
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginação -->
+        {% if total_paginas > 1 %}
+        <nav class="pagination" aria-label="Paginação">
+            <p class="pagination-info">
+                Página {{ pagina }} de {{ total_paginas }} ({{ total_produtos }} produtos)
+            </p>
+            <div class="pagination-links">
+                {% if pagina > 1 %}
+                <a href="/produtos?pagina={{ pagina - 1 }}&busca={{ busca|urlencode }}&categoria_id={{ categoria_id }}&possui_variacao={{ possui_variacao }}" class="btn-secondary">
+                    ← Anterior
+                </a>
+                {% endif %}
+
+                {% if pagina < total_paginas %}
+                <a href="/produtos?pagina={{ pagina + 1 }}&busca={{ busca|urlencode }}&categoria_id={{ categoria_id }}&possui_variacao={{ possui_variacao }}" class="btn-secondary">
+                    Próximo →
+                </a>
+                {% endif %}
+            </div>
+        </nav>
+        {% endif %}
+
+        <div class="footer-back">
+            <a href="/" class="back-link">← Dashboard</a>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,220 @@
+/* ==========================================================================
+   ESTILOS DO EXTRATO DO PDV (Tema SaaS Escuro & Âmbar)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+:root {
+    --bg-color: #0c0a09;
+    --card-bg: rgba(24, 20, 18, 0.75);
+    --surface-2: rgba(33, 27, 26, 0.85);
+    --border-color: rgba(68, 54, 51, 0.5);
+    --primary-color: #d97706;
+    --primary-hover: #b45309;
+    --green: #22c55e;
+    --text-main: #f5f5f4;
+    --text-muted: #a8a29e;
+    --font-head: 'Space Grotesk', system-ui, sans-serif;
+    --font-body: 'DM Sans', system-ui, sans-serif;
+    --radius: 16px;
+    --radius-sm: 10px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: var(--font-body);
+    font-size: 14px;
+    min-height: 100vh;
+    padding: 32px 16px;
+    display: flex;
+    justify-content: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Cabeçalho */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+h1 {
+    font-family: var(--font-head);
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-top: 0.2rem;
+}
+
+h2 {
+    font-family: var(--font-head);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+
+/* Cards de Resumo */
+.resumo {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.resumo-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.resumo-card span {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.resumo-card strong {
+    font-size: 1.5rem;
+    font-family: var(--font-head);
+    color: var(--text-main);
+}
+
+.resumo-card.destaque {
+    background: linear-gradient(135deg, rgba(217, 119, 6, 0.15), var(--card-bg));
+    border-color: rgba(217, 119, 6, 0.4);
+}
+
+.resumo-card.destaque strong {
+    color: var(--primary-color);
+}
+
+/* Tabela */
+.table-container {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    overflow-x: auto;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+th {
+    background: var(--surface-2);
+    padding: 12px 16px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-color);
+}
+
+td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-main);
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+.venda-link {
+    color: var(--primary-color);
+    font-weight: 700;
+    text-decoration: none;
+}
+.venda-link:hover { text-decoration: underline; }
+
+.preco {
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.empty-row {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 2.5rem !important;
+}
+
+/* Botões Globais */
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.65rem 1.25rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3);
+    transition: background 0.2s;
+}
+.btn-primary:hover { background-color: var(--primary-hover); }
+
+.btn-secondary {
+    background: var(--surface-2);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    padding: 0.65rem 1rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-secondary:hover { background: rgba(217, 119, 6, 0.1); border-color: var(--primary-color); }
+
+.footer-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5rem;
+}
+
+/* Impressão */
+@media print {
+    body {
+        background: white;
+        color: black;
+        padding: 0;
+    }
+    .header-actions, .footer-nav {
+        display: none;
+    }
+    .resumo-card, .table-container {
+        background: white;
+        border: 1px solid #ccc;
+        box-shadow: none;
+    }
+    th { background: #eee; color: black; }
+    td { color: black; border-color: #ddd; }
+}

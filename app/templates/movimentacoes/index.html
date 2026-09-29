@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Movimentações — AAPM SENAI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/movimentacoes/index.css">
+</head>
+
+<body>
+    <div class="movimentacoes-container">
+        
+        <!-- Cabeçalho -->
+        <header class="mov-header">
+            <div>
+                <a href="/" class="btn-voltar">← Dashboard</a>
+                <h1>📦 Histórico de movimentações</h1>
+            </div>
+            <a href="/movimentacoes/nova" class="btn-novo">+ Registrar movimentação</a>
+        </header>
+
+        <!-- Filtros -->
+        <section class="filtros-card">
+            <form method="get" action="/movimentacoes" class="filtros-form">
+                
+                <div class="filtro-linha principal">
+                    <input type="text" name="busca" placeholder="🔍 Buscar por produto ou observação..." value="{{ busca }}" class="form-control busca-input">
+                    <button type="submit" class="btn-filtrar">Filtrar</button>
+                    {% if produto_id or tipo or busca %}
+                    <a href="/movimentacoes" class="btn-limpar">Limpar filtros</a>
+                    {% endif %}
+                </div>
+
+                <div class="filtro-linha secundaria">
+                    <select name="produto_id" class="form-control">
+                        <option value="0">Todos os produtos</option>
+                        {% for p in produtos %}
+                        <option value="{{ p.id }}" {{ 'selected' if produto_id == p.id else '' }}>
+                            {{ p.nome }}
+                        </option>
+                        {% endfor %}
+                    </select>
+
+                    <select name="tipo" class="form-control">
+                        <option value="">Todos os tipos</option>
+                        <option value="entrada" {{ 'selected' if tipo == 'entrada' else '' }}>Entrada</option>
+                        <option value="saida" {{ 'selected' if tipo == 'saida' else '' }}>Saída</option>
+                    </select>
+
+                    <select name="ordenar_por" class="form-control">
+                        <option value="data" {{ 'selected' if ordenar_por == 'data' else '' }}>Ordenar por: Data</option>
+                        <option value="produto" {{ 'selected' if ordenar_por == 'produto' else '' }}>Ordenar por: Produto</option>
+                        <option value="tipo" {{ 'selected' if ordenar_por == 'tipo' else '' }}>Ordenar por: Tipo</option>
+                        <option value="quantidade" {{ 'selected' if ordenar_por == 'quantidade' else '' }}>Ordenar por: Quantidade</option>
+                        <option value="valor" {{ 'selected' if ordenar_por == 'valor' else '' }}>Ordenar por: Preço unitário</option>
+                    </select>
+
+                    <select name="direcao" class="form-control">
+                        <option value="desc" {{ 'selected' if direcao == 'desc' else '' }}>Decrescente</option>
+                        <option value="asc" {{ 'selected' if direcao == 'asc' else '' }}>Crescente</option>
+                    </select>
+
+                    <select name="por_pagina" class="form-control">
+                        <option value="10" {{ 'selected' if por_pagina == 10 else '' }}>10 por página</option>
+                        <option value="25" {{ 'selected' if por_pagina == 25 else '' }}>25 por página</option>
+                        <option value="50" {{ 'selected' if por_pagina == 50 else '' }}>50 por página</option>
+                    </select>
+                </div>
+
+            </form>
+        </section>
+
+        <!-- Tabela -->
+        <div class="tabela-wrapper">
+            <table class="tabela-mov">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Produto</th>
+                        <th>Tipo</th>
+                        <th>Quantidade</th>
+                        <th>Preço unit.</th>
+                        <th>Total</th>
+                        <th>Observação</th>
+                        <th>Registrado por</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in movimentacoes %}
+                    <tr>
+                        <td>{{ m.criado_em.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td>
+                            <a href="/produtos/{{ m.produto_id }}" class="produto-link">
+                                {{ m.produto.nome }}
+                            </a>
+                        </td>
+                        <td>
+                            {% if m.tipo.value == 'entrada' %}
+                            <span class="badge entrada">▲ Entrada</span>
+                            {% else %}
+                            <span class="badge saida">▼ Saída</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ m.quantidade }}</td>
+                        <td>R$ {{ "%.2f"|format(m.preco_unitario) }}</td>
+                        <td class="font-head">R$ {{ "%.2f"|format(m.valor_total) }}</td>
+                        <td>{{ m.observacao or "—" }}</td>
+                        <td>{{ m.usuario.nome if m.usuario else "—" }}</td>
+                    </tr>
+                    {% endfor %}
+
+                    {% if not movimentacoes %}
+                    <tr>
+                        <td colspan="8" class="vazio">
+                            Nenhuma movimentação encontrada.
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginação e Rodapé -->
+        <div class="paginacao-footer">
+            <p class="info-paginacao">Página {{ pagina }} de {{ total_paginas }} ({{ total_movimentacoes }} movimentações)</p>
+            {% set total_registros = total_movimentacoes %}
+            {% include "_pagination.html" %}
+        </div>
+
+    </div>
+    <script src="/static/js/movimentacoes/index.js" defer></script>
+</body>
+
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrar — AAPM SENAI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/auth/login.css">
+</head>
+<body>
+    <div class="spotlight" id="spotlight"></div>
+
+    <div class="auth-page-wrapper">
+        <header class="site-header">
+            <div class="nav-brand">
+                <strong>SENAI</strong>
+                <span class="divider">•</span>
+                <span>Educação profissional • Tecnologia</span>
+            </div>
+            <span class="brand-badge">AAPM • SENAI</span>
+        </header>
+
+        <main class="auth-content-center">
+            <div class="auth-box">
+                <div class="auth-titles">
+                    <span class="auth-kicker">AUTENTICAÇÃO</span>
+                    <h1>Entrar no sistema</h1>
+                    <p>Introduza as suas credenciais para aceder ao painel.</p>
+                </div>
+
+                {% if erro %}
+                <div class="alert alert-danger">{{ erro }}</div>
+                {% endif %}
+                {% if request.query_params.get('cadastro') == 'ok' %}
+                <div class="alert alert-success">Cadastro realizado com sucesso! Faça login.</div>
+                {% endif %}
+                {% if request.query_params.get('mensagem') == 'sessao_expirada' %}
+                <div class="alert alert-warning">Sua sessão expirou. Entre novamente para continuar.</div>
+                {% endif %}
+                {% if request.query_params.get('mensagem') == 'cadastro_restrito' %}
+                <div class="alert alert-info">Os usuários são cadastrados pelo administrador.</div>
+                {% endif %}
+
+                <form action="/auth/login" method="post" class="auth-form">
+                    <div class="input-field-group">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" name="email" placeholder="seu.email@senai.br" required autocomplete="email">
+                    </div>
+
+                    <div class="input-field-group">
+                        <label for="senha">Palavra-passe</label>
+                        <input type="password" id="senha" name="senha" placeholder="••••••••" required autocomplete="current-password">
+                    </div>
+
+                    <button type="submit" class="btn-primary">Entrar</button>
+                </form>
+
+                <div class="auth-redirect">
+                    <p><a href="/">← Voltar à página inicial</a></p>
+                </div>
+            </div>
+        </main>
+
+        <footer class="welcome-footer">
+            <div class="footer-info">
+                <p><strong>Associação de Pais e Mestres</strong> • SENAI</p>
+                <p class="footer-sub">Plataforma interna de gestão acadêmica e operacional.</p>
+            </div>
+            <div class="footer-links">
+                <span>Suporte T.I.</span>
+                <span>•</span>
+                <span>Termos de Uso</span>
+            </div>
+        </footer>
+    </div>
+
+    <script src="/static/js/auth/login.js" defer></script>
+</body>
+</html>

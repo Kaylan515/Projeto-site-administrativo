@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Armários — AAPM SENAI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/armarios/index.css">
+</head>
+<body>
+    <div class="spotlight" id="spotlight"></div>
+
+    <div class="page-wrapper">
+        <header class="site-header">
+            <div class="nav-brand">
+                <strong>SENAI</strong>
+                <span class="divider">•</span>
+                <span>Gestão de Armários</span>
+            </div>
+            <span class="brand-badge">AAPM • SENAI</span>
+        </header>
+
+        <main class="content-container">
+            <!-- Cabeçalho Principal -->
+            <div class="dashboard-header-card">
+                <div class="header-titles">
+                    <span class="card-kicker">MÓDULO OPERACIONAL</span>
+                    <h1>Armários</h1>
+                    <p>Controle de atribuição e estado dos armários acadêmicos.</p>
+                </div>
+                <div class="header-actions">
+                    {% if usuario.role == 'admin' %}
+                    <a href="/armarios/novo" class="btn-primary">+ Novo armário</a>
+                    {% endif %}
+                    <a href="/armarios/historico" class="btn-secondary">Histórico de reservas</a>
+                </div>
+            </div>
+
+            <!-- Feedback / Alertas -->
+            {% if request.query_params.get('criado') == 'ok' %}
+            <div class="alert alert-success">Armário cadastrado com sucesso!</div>
+            {% endif %}
+            {% if request.query_params.get('erro') == 'ja_alugado' %}
+            <div class="alert alert-danger">Este armário já foi alugado por outro usuário.</div>
+            {% endif %}
+            {% if request.query_params.get('erro') == 'desativar_alugado' %}
+            <div class="alert alert-danger">Libere o armário antes de desativá-lo.</div>
+            {% endif %}
+
+            <!-- Resumo de Indicadores -->
+            <div class="stats-overview-row">
+                <div class="stat-mini-card">
+                    <span class="stat-label">Total</span>
+                    <span class="stat-value">{{ total }}</span>
+                </div>
+                <div class="stat-mini-card">
+                    <span class="stat-label">Disponíveis</span>
+                    <span class="stat-value text-green">{{ disponiveis }}</span>
+                </div>
+                <div class="stat-mini-card">
+                    <span class="stat-label">Alugados</span>
+                    <span class="stat-value text-amber">{{ alugados }}</span>
+                </div>
+            </div>
+
+            <!-- Filtros de Pesquisa -->
+            <form method="get" action="/armarios" class="filter-toolbar">
+                <div class="input-field-group search-flex">
+                    <label for="busca">Pesquisa rápida</label>
+                    <input type="search" id="busca" name="busca" value="{{ busca }}" placeholder="Armário ou aluno">
+                </div>
+
+                <div class="input-field-group">
+                    <label for="status">Status</label>
+                    <select id="status" name="status">
+                        <option value="">Todos os status</option>
+                        <option value="disponivel" {{ 'selected' if status == 'disponivel' }}>Disponíveis</option>
+                        <option value="alugado" {{ 'selected' if status == 'alugado' }}>Alugados</option>
+                        <option value="inativo" {{ 'selected' if status == 'inativo' }}>Inativos</option>
+                    </select>
+                </div>
+
+                {% if localizacoes %}
+                <div class="input-field-group">
+                    <label for="localizacao">Localização</label>
+                    <select id="localizacao" name="localizacao">
+                        <option value="">Todas as localizações</option>
+                        {% for loc in localizacoes %}
+                        <option value="{{ loc }}" {{ 'selected' if localizacao == loc }}>{{ loc }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+
+                {% if semestres %}
+                <div class="input-field-group">
+                    <label for="semestre">Semestre</label>
+                    <select id="semestre" name="semestre">
+                        <option value="">Todos os semestres</option>
+                        {% for item in semestres %}
+                        <option value="{{ item }}" {{ 'selected' if semestre == item else '' }}>{{ item }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+
+                <div class="filter-action-buttons">
+                    <button type="submit" class="btn-primary">Filtrar</button>
+                    {% if status or localizacao or busca or semestre %}
+                    <a href="/armarios" class="btn-outline">Limpar</a>
+                    {% endif %}
+                </div>
+            </form>
+
+            <!-- Grade de Armários -->
+            <div class="locker-grid">
+                {% for a in armarios %}
+                <div class="locker-card status-{{ a.status.value }}">
+                    <div class="locker-card-top">
+                        <span class="locker-number">{{ a.numero }}</span>
+                        {% if a.status.value == 'disponivel' %}
+                        <span class="badge badge-green">● Disponível</span>
+                        {% elif a.status.value == 'alugado' %}
+                        <span class="badge badge-amber">● Alugado</span>
+                        {% else %}
+                        <span class="badge badge-gray">● Inativo</span>
+                        {% endif %}
+                    </div>
+
+                    {% if a.localizacao %}
+                    <span class="locker-location">{{ a.localizacao }}</span>
+                    {% endif %}
+
+                    {% if a.status.value == 'alugado' %}
+                    <div class="locker-occupant-info">
+                        <strong>{{ a.locatario_nome }}</strong>
+                        <span class="locker-semester">{{ a.semestre }}</span>
+                    </div>
+                    {% endif %}
+
+                    <div class="locker-card-actions">
+                        <a href="/armarios/{{ a.id }}" class="btn-card-details">Ver detalhes</a>
+
+                        {% if usuario.role == 'admin' %}
+                            {% if a.status.value == 'disponivel' %}
+                            <a href="/armarios/{{ a.id }}/alugar" class="btn-card-action">Alugar</a>
+                            {% elif a.status.value == 'alugado' %}
+                            <form action="/armarios/{{ a.id }}/liberar" method="post" onsubmit="return confirm('Confirma a liberação do armário {{ a.numero }} no sistema AAPM SENAI?')">
+                                <button type="submit" class="btn-card-action btn-danger-soft">Liberar</button>
+                            </form>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+
+                {% if not armarios %}
+                <div class="empty-state">
+                    <p>Nenhum armário encontrado com os filtros selecionados.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="back-dashboard-row">
+                <a href="/" class="btn-secondary">← Voltar ao Dashboard</a>
+            </div>
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-info">
+                <p><strong>Associação de Pais e Mestres</strong> • SENAI</p>
+                <p class="footer-sub">Plataforma interna de gestão acadêmica e operacional.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="/static/js/armarios/index.js" defer></script>
+</body>
+</html>

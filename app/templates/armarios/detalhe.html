@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Armário {{ armario.numero }} — AAPM SENAI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/armarios/detalhe.css">
+</head>
+<body>
+    <div class="spotlight" id="spotlight"></div>
+
+    <div class="page-wrapper">
+        <header class="site-header">
+            <div class="nav-brand">
+                <strong>SENAI</strong>
+                <span class="divider">•</span>
+                <span>Gestão de Armários</span>
+            </div>
+            <span class="brand-badge">AAPM • SENAI</span>
+        </header>
+
+        <main class="content-container">
+            <!-- Feedback de ações -->
+            {% if request.query_params.get('alugado') == 'ok' %}
+            <div class="alert alert-success">Armário alugado com sucesso!</div>
+            {% endif %}
+            {% if request.query_params.get('liberado') == 'ok' %}
+            <div class="alert alert-success">Armário liberado com sucesso!</div>
+            {% endif %}
+            {% if request.query_params.get('editado') == 'ok' %}
+            <div class="alert alert-success">Dados atualizados com sucesso!</div>
+            {% endif %}
+
+            <div class="detail-card">
+                <div class="card-header-main">
+                    <div>
+                        <span class="card-kicker">DETALHES DO RECURSO</span>
+                        <h1>Armário {{ armario.numero }}</h1>
+                    </div>
+                    <div>
+                        {% if armario.status.value == 'disponivel' %}
+                        <span class="badge badge-success">● Disponível</span>
+                        {% elif armario.status.value == 'alugado' %}
+                        <span class="badge badge-warning">● Alugado</span>
+                        {% else %}
+                        <span class="badge badge-neutral">● Inativo</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Localização</span>
+                        <span class="info-value">{{ armario.localizacao or "—" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Cadastrado em</span>
+                        <span class="info-value">{{ armario.criado_em.strftime('%d/%m/%Y') }}</span>
+                    </div>
+
+                    {% if armario.status.value == 'alugado' %}
+                    <div class="info-item">
+                        <span class="info-label">Locatário</span>
+                        <span class="info-value">{{ armario.locatario_nome }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Semestre</span>
+                        <span class="info-value">{{ armario.semestre }}</span>
+                    </div>
+                    <div class="info-item full-width">
+                        <span class="info-label">Alugado em</span>
+                        <span class="info-value">{{ armario.alugado_em.strftime('%d/%m/%Y %H:%M') }}</span>
+                    </div>
+                    {% endif %}
+
+                    {% if armario.observacao %}
+                    <div class="info-item full-width">
+                        <span class="info-label">Observação</span>
+                        <span class="info-value">{{ armario.observacao }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Ações de Administrador -->
+                {% if usuario.role == 'admin' %}
+                <div class="admin-actions">
+                    <h3>Painel Administrativo</h3>
+                    <div class="actions-buttons">
+                        {% if armario.status.value == 'disponivel' %}
+                        <a href="/armarios/{{ armario.id }}/alugar" class="btn btn-primary">Alugar Armário</a>
+                        {% endif %}
+
+                        {% if armario.status.value == 'alugado' %}
+                        <form action="/armarios/{{ armario.id }}/liberar" method="post" onsubmit="return confirm('Confirma a liberação do armário {{ armario.numero }} no sistema AAPM SENAI?')">
+                            <button type="submit" class="btn btn-danger">Liberar Armário</button>
+                        </form>
+                        {% endif %}
+
+                        <a href="/armarios/{{ armario.id }}/editar" class="btn btn-secondary">Editar Dados</a>
+
+                        <form action="/armarios/{{ armario.id }}/toggle-ativo" method="post">
+                            <button type="submit" class="btn btn-outline">
+                                {{ "Desativar" if armario.ativo else "Reativar" }}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="card-footer-actions">
+                    <a href="/armarios/{{ armario.id }}/historico" class="link-action">Ver histórico de reservas →</a>
+                    <a href="/armarios" class="link-back">← Voltar ao mapa</a>
+                </div>
+            </div>
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-info">
+                <p><strong>Associação de Pais e Mestres</strong> • SENAI</p>
+                <p class="footer-sub">Plataforma interna de gestão acadêmica e operacional.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="/static/js/armarios/detalhe.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{ produto.nome }} — AAPM SENAI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Ligação ao CSS específico da pasta produtos -->
+    <link rel="stylesheet" href="/static/css/produtos/detalhe.css">
+</head>
+
+<body>
+    <div class="container">
+        {% if request.query_params.get('editado') == 'ok' %}
+        <div class="alert alert-success">Produto atualizado com sucesso!</div>
+        {% endif %}
+
+        <div class="produto-card">
+            <div class="produto-img-wrap">
+                <img src="{{ produto.imagem_url }}" alt="{{ produto.nome }}">
+            </div>
+
+            <div class="produto-info">
+                <h1>{{ produto.nome }}</h1>
+                
+                <p class="categoria">Categoria: <span>{{ produto.categoria.nome if produto.categoria else "—" }}</span></p>
+
+                {% if produto.variacao %}
+                <p class="variacao">Tamanho ou variação: <strong>{{ produto.variacao }}</strong></p>
+                {% endif %}
+
+                <div class="table-box">
+                    <table>
+                        <tr>
+                            <td><strong>Preço</strong></td>
+                            <td class="text-right highlight">R$ {{ "%.2f"|format(produto.preco) }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Estoque atual</strong></td>
+                            <td class="text-right">{{ produto.estoque_atual }}</td>
+                        </tr>
+                    </table>
+                </div>
+
+                {% if request.query_params.get('movimentacao') == 'ok' %}
+                <div class="alert alert-success">Movimentação registrada com sucesso!</div>
+                {% endif %}
+
+                <!-- Links e Ações -->
+                <div class="actions">
+                    <a href="/movimentacoes/nova?produto_id={{ produto.id }}" class="btn-primary">
+                        + Registrar movimentação
+                    </a>
+                    
+                    <a href="/movimentacoes/produto/{{ produto.id }}" class="btn-secondary">
+                        Ver histórico completo
+                    </a>
+
+                    {% if usuario and usuario.role == 'admin' %}
+                    <a href="/produtos/{{ produto.id }}/editar" class="btn-edit">Editar</a>
+                    {% endif %}
+                </div>
+
+                <div class="back-wrap">
+                    <a href="/produtos" class="back-link">← Voltar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/static/js/produtos/detalhe.js" defer></script>
+</body>
+
+</html>

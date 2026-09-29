@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuários — AAPM SENAI</title>
+    
+    <!-- Google Fonts e Ícones -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,1,0&display=swap" rel="stylesheet">
+    
+    <!-- Estilo atualizado com a subpasta CSS de usuários -->
+    <link rel="stylesheet" href="/static/css/usuarios/usuarios.css">
+</head>
+
+<body data-role="{{ usuario.role if usuario else 'admin' }}">
+    <!-- Efeito de Spotlight do Mouse -->
+    <div class="spotlight" id="spotlight"></div>
+
+    <div class="layout">
+
+        <!-- =====================================================
+             SIDEBAR DE NAVEGAÇÃO
+        ===================================================== -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-tag">Sistema</div>
+                <div class="logo-name">AAPM</div>
+                <div class="logo-sub">SENAI — Gestão de Loja</div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">Principal</div>
+                <a href="/" class="nav-link"><span class="icon">⊞</span> Dashboard</a>
+                <a href="/produtos" class="nav-link"><span class="icon">📦</span> Produtos</a>
+                <a href="/categorias" class="nav-link"><span class="icon">🏷</span> Categorias</a>
+                <a href="/movimentacoes" class="nav-link"><span class="icon">↕</span> Movimentações</a>
+                <a href="/armarios" class="nav-link"><span class="icon">🔒</span> Armários</a>
+                <a href="/clientes" class="nav-link"><span class="icon">👥</span> Clientes</a>
+                <a href="/pdv" class="nav-link"><span class="icon">🛒</span> Ponto de venda</a>
+
+                <div class="nav-section">Administração</div>
+                <a href="/usuarios" class="nav-link active"><span class="icon">👥</span> Usuários</a>
+            </nav>
+
+            <div class="sidebar-footer">
+                {% if usuario %}
+                <div class="user-card">
+                    <div class="user-avatar">{{ usuario.nome[0].upper() }}</div>
+                    <div class="user-info">
+                        <div class="user-name">{{ usuario.nome }}</div>
+                        <div class="user-role">{{ usuario.role }}</div>
+                    </div>
+                </div>
+                {% endif %}
+                <a href="/auth/logout" class="logout-btn">← Sair</a>
+            </div>
+        </aside>
+
+        <!-- =====================================================
+             CONTEÚDO PRINCIPAL
+        ===================================================== -->
+        <main class="main">
+            <div class="page-header-row">
+                <div class="page-header">
+                    <div class="greeting">Gestão de Acessos</div>
+                    <h1>Usuários do Sistema</h1>
+                </div>
+                <a href="/usuarios/novo" class="btn-primary">+ Novo usuário</a>
+            </div>
+
+            <!-- Alertas / Mensagens de Feedback -->
+            <div class="alerts-container">
+                {% if request.query_params.get('criado') == 'ok' %}
+                    <div class="alert alert-success">Usuário criado com sucesso!</div>
+                {% endif %}
+                {% if request.query_params.get('editado') == 'ok' %}
+                    <div class="alert alert-success">Usuário atualizado com sucesso!</div>
+                {% endif %}
+                {% if request.query_params.get('erro') == 'autoproprio' %}
+                    <div class="alert alert-danger">Você não pode desativar sua própria conta.</div>
+                {% endif %}
+            </div>
+
+            <!-- Painel de Filtros -->
+            <div class="filter-card">
+                <form method="get" action="/usuarios" class="filter-form">
+                    <div class="filter-field search-box">
+                        <input type="text" name="busca" placeholder="Buscar por nome ou e-mail..." value="{{ busca }}">
+                    </div>
+                    <div class="filter-field">
+                        <select name="role">
+                            <option value="">Todos os perfis</option>
+                            <option value="admin" {{ 'selected' if role == 'admin' else '' }}>Administrador</option>
+                            <option value="operador" {{ 'selected' if role == 'operador' else '' }}>Operador</option>
+                        </select>
+                    </div>
+                    <div class="filter-field">
+                        <select name="status">
+                            <option value="">Todos os status</option>
+                            <option value="ativo" {{ 'selected' if status == 'ativo' else '' }}>Ativos</option>
+                            <option value="inativo" {{ 'selected' if status == 'inativo' else '' }}>Inativos</option>
+                        </select>
+                    </div>
+                    <div class="filter-field">
+                        <select name="ordenar_por">
+                            <option value="nome">Ordenar por Nome</option>
+                            <option value="email">Ordenar por E-mail</option>
+                            <option value="role">Ordenar por Perfil</option>
+                        </select>
+                    </div>
+                    <div class="filter-field">
+                        <select name="direcao">
+                            <option value="asc">Crescente</option>
+                            <option value="desc">Decrescente</option>
+                        </select>
+                    </div>
+                    <div class="filter-field">
+                        <select name="por_pagina">
+                            <option value="10">10 por página</option>
+                            <option value="25">25 por página</option>
+                            <option value="50">50 por página</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-filter">Filtrar</button>
+                </form>
+            </div>
+
+            <!-- Listagem em Tabela -->
+            <div class="section">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>E-mail</th>
+                                <th>Perfil</th>
+                                <th>Status</th>
+                                <th style="text-align: right;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in usuarios %}
+                            <tr>
+                                <td>
+                                    <span class="td-name">{{ u.nome }}</span>
+                                </td>
+                                <td style="color: var(--text-muted);">{{ u.email }}</td>
+                                <td>
+                                    <span class="badge {{ 'badge-blue' if u.role == 'admin' else 'badge-amber' }}">
+                                        {{ u.role | capitalize }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if u.ativo %}
+                                    <span class="badge badge-green">Ativo</span>
+                                    {% else %}
+                                    <span class="badge badge-red">Inativo</span>
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: right;">
+                                    <div class="actions-cell">
+                                        <a href="/usuarios/{{ u.id }}/editar" class="btn-action edit">Editar</a>
+                                        <form action="/usuarios/{{ u.id }}/toggle-ativo" method="post" style="display:inline">
+                                            <button type="submit" class="btn-action {{ 'deactivate' if u.ativo else 'activate' }}">
+                                                {{ "Desativar" if u.ativo else "Ativar" }}
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5">
+                                    <div class="empty-state">Nenhum usuário encontrado.</div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-footer">
+                    <span class="pagination-info">Página {{ pagina }} de {{ total_paginas }} ({{ total_usuarios }} usuários)</span>
+                    {% set total_registros = total_usuarios %}
+                    {% include "_pagination.html" %}
+                </div>
+            </div>
+
+            <div class="back-link-wrap" style="margin-top: 2rem;">
+                <a href="/" class="back-dashboard-link">← Voltar ao dashboard</a>
+            </div>
+        </main>
+    </div>
+
+    <!-- Script atualizado com a subpasta JS de usuários -->
+    <script src="/static/js/usuarios/usuarios.js" defer></script>
+</body>
+
+</html>

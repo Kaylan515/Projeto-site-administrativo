@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDV — AAPM SENAI</title>
+    
+    <!-- Ligações aos ficheiros CSS e JS específicos -->
+    <link rel="stylesheet" href="/static/css/pdv/index.css">
+    <script src="/static/js/pdv/index.js" defer></script>
+</head>
+
+<body data-desconto-associado="{{ desconto_associado }}">
+
+    <!-- ── TOPO ── -->
+    <header class="topbar">
+        <span class="topbar-title">🏪 PDV — AAPM SENAI</span>
+        <nav class="topbar-links">
+            <a href="/pdv/historico">Histórico de vendas</a>
+            <a href="/pdv/extrato">Extrato</a>
+            <a href="/clientes">Clientes</a>
+            <a href="/">Dashboard</a>
+        </nav>
+    </header>
+
+    <!-- ── Alertas vindos da query string ── -->
+    {% set erro = request.query_params.get('erro') %}
+    {% if erro %}
+    <div class="alerta">
+        {% if erro == 'vazio' %}Carrinho vazio. Adicione produtos antes de finalizar.
+        {% elif erro == 'estoque' %}Estoque insuficiente para: {{ request.query_params.get('produto') }}
+        {% elif erro == 'quantidade' %}Quantidade inválida.
+        {% else %}Ocorreu um erro. Tente novamente.
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="pdv-layout">
+
+        <!-- ════════════════════════════════════════
+          COLUNA ESQUERDA — Grade de produtos
+        ════════════════════════════════════════ -->
+        <section class="produtos-col">
+            <div class="produtos-header">
+                <input class="busca-input" type="text" id="busca-produto" placeholder="🔍 Buscar produto..." autocomplete="off">
+            </div>
+
+            <div class="produtos-grid" id="grade-produtos">
+                {% for p in produtos %}
+                <div class="produto-card {% if p.estoque_atual == 0 %}sem-estoque{% endif %}" data-id="{{ p.id }}"
+                    data-nome="{{ p.nome }}" data-preco="{{ p.preco }}" data-estoque="{{ p.estoque_atual }}"
+                    data-nome-lower="{{ p.nome.lower() }}" onclick="adicionarAoCarrinho(this)">
+
+                    <img src="{{ p.imagem_url }}" alt="{{ p.nome }}">
+                    <div class="produto-card-nome">{{ p.nome }}</div>
+                    <div class="produto-card-preco">
+                        R$ {{ "%.2f"|format(p.preco) }}
+                    </div>
+                    <div class="produto-card-estoque">
+                        Estoque: {{ p.estoque_atual }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- ════════════════════════════════════════
+          COLUNA DIREITA — Carrinho
+        ════════════════════════════════════════ -->
+        <aside class="carrinho-col">
+
+            <div class="carrinho-header">🛒 Carrinho</div>
+
+            <!-- Seleção de cliente -->
+            <div class="cliente-section">
+                <label for="select-cliente">Cliente</label>
+                <select class="cliente-select" id="select-cliente" onchange="atualizarCliente(this)">
+                    <option value="0" data-associado="false">
+                        Sem identificação (sem desconto)
+                    </option>
+                    {% for c in clientes %}
+                    <option value="{{ c.id }}" data-associado="{{ 'true' if c.is_associado else 'false' }}">
+                        {{ c.nome }}
+                        {% if c.matricula %}({{ c.matricula }}){% endif %}
+                        {% if c.is_associado %} — ASSOCIADO{% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+
+                <div class="desconto-badge" id="badge-desconto" style="display:none">
+                    ✓ {{ desconto_associado|int }}% de desconto aplicado
+                </div>
+            </div>
+
+            <!-- Lista de itens -->
+            <div class="carrinho-itens" id="lista-carrinho">
+                <div class="carrinho-vazio" id="msg-vazio">
+                    <span class="carrinho-vazio-icon">🛒</span>
+                    Clique nos produtos para adicionar
+                </div>
+            </div>
+
+            <!-- Totais e finalização -->
+            <div class="carrinho-footer">
+                <div class="totais" id="totais" style="display:none">
+                    <div class="total-linha">
+                        <span>Subtotal</span>
+                        <span id="val-subtotal">R$ 0,00</span>
+                    </div>
+                    <div class="total-linha desconto" id="linha-desconto" style="display:none">
+                        <span id="label-desconto">Desconto (0%)</span>
+                        <span id="val-desconto">— R$ 0,00</span>
+                    </div>
+                    <div class="total-linha final">
+                        <span>Total</span>
+                        <span id="val-total">R$ 0,00</span>
+                    </div>
+                </div>
+
+                <textarea class="obs-input" id="obs-input" rows="2" placeholder="Observação (opcional)..."></textarea>
+
+                <form id="form-venda" action="/pdv/finalizar" method="post">
+                    <input type="hidden" name="carrinho_json" id="input-carrinho">
+                    <input type="hidden" name="cliente_id" id="input-cliente-id" value="0">
+                    <input type="hidden" name="observacao" id="input-obs">
+                    <button class="btn-finalizar" id="btn-finalizar" type="button" disabled onclick="finalizarVenda()">
+                        Finalizar venda
+                    </button>
+                </form>
+            </div>
+        </aside>
+    </div>
+</body>
+
+</html>

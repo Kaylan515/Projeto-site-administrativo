@@ -1,0 +1,190 @@
+/* ==========================================================================
+   ESTILOS DO COMPROVANTE / CUPOM DE VENDA (Tema SaaS Escuro & Âmbar)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+:root {
+    --bg-color: #0c0a09;
+    --card-bg: rgba(24, 20, 18, 0.85);
+    --surface-2: rgba(33, 27, 26, 0.9);
+    --border-color: rgba(68, 54, 51, 0.6);
+    --primary-color: #d97706;
+    --primary-hover: #b45309;
+    --text-main: #f5f5f4;
+    --text-muted: #a8a29e;
+    --green: #22c55e;
+    --font-head: 'Space Grotesk', system-ui, sans-serif;
+    --font-body: 'DM Sans', system-ui, sans-serif;
+    --radius: 14px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: var(--font-body);
+    font-size: 14px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+}
+
+.cupom-wrapper {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+/* O Cupom */
+.cupom {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 2rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    font-family: 'Courier New', Courier, monospace; /* Estilo clássico de recibo */
+    color: var(--text-main);
+}
+
+.titulo {
+    font-family: var(--font-head);
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+    color: var(--primary-color);
+}
+
+.subtitulo {
+    font-size: 0.8rem;
+    text-align: center;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+.linha-sep {
+    border: none;
+    border-top: 1px dashed var(--border-color);
+    margin: 1rem 0;
+}
+
+.item-linha {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+}
+
+.item-desc {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 0.6rem;
+}
+
+.desc-linha {
+    color: var(--green);
+    font-size: 0.85rem;
+}
+
+.total-linha {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+}
+
+.total-final {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-top: 0.5rem;
+}
+
+.obs-texto {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    word-break: break-all;
+}
+
+/* Botões de Ação fora do Cupom */
+.acoes-comprovante {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.btn {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: background 0.2s, transform 0.1s;
+    font-family: var(--font-body);
+}
+
+.btn-print {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3);
+}
+.btn-print:hover { background-color: var(--primary-hover); }
+
+.btn-nova {
+    background: var(--surface-2);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+}
+.btn-nova:hover { background: rgba(217, 119, 6, 0.1); border-color: var(--primary-color); }
+
+.btn-hist {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+}
+.btn-hist:hover { color: var(--text-main); }
+
+/* Estilo para quando mandar imprimir pelo navegador (ignora os botões e fundo escuro) */
+@media print {
+    body {
+        background: white;
+        color: black;
+        padding: 0;
+    }
+    .acoes-comprovante {
+        display: none;
+    }
+    .cupom {
+        background: white;
+        color: black;
+        border: none;
+        box-shadow: none;
+        width: 100%;
+        max-width: 100%;
+        padding: 0;
+    }
+    .titulo { color: black; }
+    .linha-sep { border-color: #ccc; }
+}

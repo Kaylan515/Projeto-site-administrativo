@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registar — AAPM SENAI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/auth/register.css">
+</head>
+<body>
+    <div class="spotlight" id="spotlight"></div>
+
+    <div class="auth-page-wrapper">
+        <header class="site-header">
+            <div class="nav-brand">
+                <strong>SENAI</strong>
+                <span class="divider">•</span>
+                <span>Educação profissional • Tecnologia</span>
+            </div>
+            <span class="brand-badge">AAPM • SENAI</span>
+        </header>
+
+        <main class="auth-content-center">
+            <div class="auth-box">
+                <div class="auth-titles">
+                    <span class="auth-kicker">REGISTO</span>
+                    <h1>Criar nova conta</h1>
+                    <p>Preencha os dados abaixo para registar um novo acesso.</p>
+                </div>
+
+                {% if erro %}
+                <div class="alert alert-danger">{{ erro }}</div>
+                {% endif %}
+
+                <form action="/auth/register" method="post" class="auth-form">
+                    <div class="input-field-group">
+                        <label for="nome">Nome completo</label>
+                        <input type="text" id="nome" name="nome" placeholder="Seu nome" required autocomplete="name">
+                    </div>
+
+                    <div class="input-field-group">
+                        <label for="email">E-mail institucional</label>
+                        <input type="email" id="email" name="email" placeholder="seu.email@senai.br" required autocomplete="email">
+                    </div>
+
+                    <div class="input-field-group">
+                        <label for="senha">Palavra-passe</label>
+                        <input type="password" id="senha" name="senha" placeholder="••••••••" required autocomplete="new-password">
+                    </div>
+
+                    <button type="submit" class="btn-primary">Registar</button>
+                </form>
+
+                <div class="auth-redirect">
+                    <p>Já tem uma conta? <a href="/auth/login">Entrar</a></p>
+                    <p><a href="/">← Voltar à página inicial</a></p>
+                </div>
+            </div>
+        </main>
+
+        <footer class="welcome-footer">
+            <div class="footer-info">
+                <p><strong>Associação de Pais e Mestres</strong> • SENAI</p>
+                <p class="footer-sub">Plataforma interna de gestão acadêmica e operacional.</p>
+            </div>
+            <div class="footer-links">
+                <span>Suporte T.I.</span>
+                <span>•</span>
+                <span>Termos de Uso</span>
+            </div>
+        </footer>
+    </div>
+
+    <script src="/static/js/auth/register.js" defer></script>
+</body>
+</html>

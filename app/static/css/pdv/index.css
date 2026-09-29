@@ -1,0 +1,405 @@
+/* ==========================================================================
+   ESTILOS DO PDV / CAIXA (Tema SaaS Escuro & Âmbar)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+:root {
+    --bg-color: #0c0a09;
+    --card-bg: rgba(24, 20, 18, 0.75);
+    --surface-2: rgba(33, 27, 26, 0.85);
+    --border-color: rgba(68, 54, 51, 0.5);
+    --primary-color: #d97706;
+    --primary-hover: #b45309;
+    --green: #22c55e;
+    --red: #ef4444;
+    --text-main: #f5f5f4;
+    --text-muted: #a8a29e;
+    --font-head: 'Space Grotesk', system-ui, sans-serif;
+    --font-body: 'DM Sans', system-ui, sans-serif;
+    --radius: 16px;
+    --radius-sm: 10px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: var(--font-body);
+    font-size: 14px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Topbar */
+.topbar {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(10px);
+}
+
+.topbar-title {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 1.25k;
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+}
+
+.topbar-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.topbar-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+}
+.topbar-links a:hover {
+    color: var(--primary-color);
+}
+
+/* Alerta */
+.alerta {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid var(--red);
+    color: #fca5a5;
+    padding: 0.85rem 2rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* Layout Geral PDV */
+.pdv-layout {
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    flex: 1;
+    height: calc(100vh - 65px);
+    overflow: hidden;
+}
+
+@media (max-width: 1024px) {
+    .pdv-layout {
+        grid-template-columns: 1fr;
+        height: auto;
+        overflow: auto;
+    }
+}
+
+/* Coluna Esquerda: Produtos */
+.produtos-col {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    gap: 1.25rem;
+    overflow-y: auto;
+}
+
+.produtos-header {
+    display: flex;
+    gap: 1rem;
+}
+
+.busca-input {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    width: 100%;
+    outline: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.busca-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
+}
+
+.produtos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+}
+
+.produto-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.produto-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--primary-color);
+    background: var(--surface-2);
+}
+
+.produto-card.sem-estoque {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.produto-card img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    background: #1c1917;
+}
+
+.produto-card-nome {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.35rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.produto-card-preco {
+    font-family: var(--font-head);
+    font-weight: 700;
+    color: var(--primary-color);
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.produto-card-estoque {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* Coluna Direita: Carrinho */
+.carrinho-col {
+    background: var(--card-bg);
+    border-left: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    gap: 1.25rem;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.4);
+    z-index: 10;
+}
+
+.carrinho-header {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+
+.cliente-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.cliente-section label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.cliente-select {
+    background: var(--surface-2);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    padding: 0.65rem;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.desconto-badge {
+    background: rgba(34, 197, 94, 0.15);
+    border: 1px solid rgba(34, 197, 94, 0.4);
+    color: #4ade80;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    margin-top: 0.35rem;
+    align-self: flex-start;
+}
+
+/* Itens do Carrinho */
+.carrinho-itens {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: calc(100vh - 420px);
+}
+
+.carrinho-vazio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-muted);
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.carrinho-vazio-icon {
+    font-size: 2rem;
+}
+
+.item-carrinho {
+    background: var(--surface-2);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.item-nome {
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.item-preco-unit {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.item-qty-ctrl {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 2px 6px;
+}
+
+.qty-btn {
+    background: none;
+    border: none;
+    color: var(--text-main);
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+.qty-btn:hover { color: var(--primary-color); }
+
+.qty-value {
+    font-size: 0.85rem;
+    font-weight: 600;
+    min-width: 18px;
+    text-align: center;
+}
+
+.item-subtotal {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text-main);
+}
+
+.item-remover {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.item-remover:hover { color: var(--red); }
+
+/* Rodapé do Carrinho */
+.carrinho-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    border-top: 1px solid var(--border-color);
+    padding-top: 0.75rem;
+}
+
+.totais {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.9rem;
+}
+
+.total-linha {
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-muted);
+}
+
+.total-linha.desconto {
+    color: var(--green);
+}
+
+.total-linha.final {
+    font-family: var(--font-head);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-main);
+    border-top: 1px dashed var(--border-color);
+    padding-top: 0.35rem;
+    margin-top: 0.2rem;
+}
+
+.obs-input {
+    background: var(--surface-2);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    padding: 0.5rem;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    resize: none;
+    outline: none;
+}
+.obs-input:focus { border-color: var(--primary-color); }
+
+.btn-finalizar {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.85rem;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    width: 100%;
+    box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3);
+    transition: background 0.2s, opacity 0.2s;
+}
+.btn-finalizar:hover:not(:disabled) { background-color: var(--primary-hover); }
+.btn-finalizar:disabled { opacity: 0.4; cursor: not-allowed; }

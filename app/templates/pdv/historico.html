@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico de Vendas — AAPM SENAI</title>
+    
+    <!-- Ligações aos ficheiros CSS e JS específicos -->
+    <link rel="stylesheet" href="/static/css/pdv/historico.css">
+    <script src="/static/js/pdv/historico.js" defer></script>
+</head>
+
+<body>
+    <div class="container">
+        
+        <!-- Cabeçalho -->
+        <div class="page-header">
+            <div>
+                <h1>Histórico de Vendas</h1>
+                <p class="subtitle">Consulte, filtre e analise todas as transações efetuadas.</p>
+            </div>
+            <div>
+                <a href="/pdv" class="btn-secondary">← Voltar ao PDV</a>
+            </div>
+        </div>
+
+        <!-- Formulário de Filtros Avançados -->
+        <form method="get" action="/pdv/historico" class="filter-form">
+            <div class="filter-grid">
+                
+                <div class="filter-group full-width">
+                    <input type="text" name="busca" placeholder="🔍 Cliente, observação ou nº da venda..." value="{{ busca }}" class="input-field">
+                </div>
+
+                <div class="filter-group">
+                    <label for="cliente_id">Cliente</label>
+                    <select name="cliente_id" id="cliente_id" class="input-field">
+                        <option value="0">Todos os clientes</option>
+                        {% for c in clientes %}
+                        <option value="{{ c.id }}" {{ 'selected' if cliente_id == c.id else '' }}>{{ c.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Período</label>
+                    <div class="date-range">
+                        <input type="date" name="data_inicio" value="{{ data_inicio }}" class="input-field" title="Data Inicial">
+                        <span>até</span>
+                        <input type="date" name="data_fim" value="{{ data_fim }}" class="input-field" title="Data Final">
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label for="ordenar_por">Ordenar por</label>
+                    <select name="ordenar_por" id="ordenar_por" class="input-field">
+                        <option value="data" {{ 'selected' if ordenar_por == 'data' else '' }}>Data</option>
+                        <option value="id" {{ 'selected' if ordenar_por == 'id' else '' }}>Número</option>
+                        <option value="total" {{ 'selected' if ordenar_por == 'total' else '' }}>Total</option>
+                        <option value="desconto" {{ 'selected' if ordenar_por == 'desconto' else '' }}>Desconto</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="direcao">Direção</label>
+                    <select name="direcao" id="direcao" class="input-field">
+                        <option value="asc" {{ 'selected' if direcao == 'asc' else '' }}>Crescente</option>
+                        <option value="desc" {{ 'selected' if direcao == 'desc' else '' }}>Decrescente</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="por_pagina">Resultados por página</label>
+                    <select name="por_pagina" id="por_pagina" class="input-field">
+                        <option value="10" {{ 'selected' if por_pagina|string == '10' else '' }}>10 por página</option>
+                        <option value="25" {{ 'selected' if por_pagina|string == '25' else '' }}>25 por página</option>
+                        <option value="50" {{ 'selected' if por_pagina|string == '50' else '' }}>50 por página</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="filter-actions">
+                <button type="submit" class="btn-primary">Aplicar Filtros</button>
+                <a href="/pdv/historico" class="btn-clear">Limpar Filtros</a>
+            </div>
+        </form>
+
+        <!-- Tabela de Vendas -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Data</th>
+                        <th>Cliente</th>
+                        <th>Itens</th>
+                        <th>Desconto</th>
+                        <th>Total</th>
+                        <th>Operador</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in vendas %}
+                    <tr>
+                        <td><a href="/pdv/venda/{{ v.id }}" class="venda-link">#{{ v.id }}</a></td>
+                        <td>{{ v.criado_em.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td>{{ v.cliente.nome if v.cliente else "Balcão" }}</td>
+                        <td><span class="badge-itens">{{ v.itens | length }} it.</span></td>
+                        <td>
+                            {% if v.desconto_percentual > 0 %}
+                            <span class="discount-tag">
+                                {{ v.desconto_percentual|int }}% (− R$ {{ "%.2f"|format(v.desconto_valor) }})
+                            </span>
+                            {% else %}
+                            <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="preco">R$ {{ "%.2f"|format(v.total_liquido) }}</td>
+                        <td>{{ v.usuario.nome if v.usuario else "—" }}</td>
+                    </tr>
+                    {% endfor %}
+                    {% if not vendas %}
+                    <tr>
+                        <td colspan="7" class="empty-row">Nenhuma venda encontrada com os critérios selecionados.</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Rodapé e Paginação -->
+        <div class="pagination-footer">
+            <p class="pagination-info">Página <strong>{{ pagina }}</strong> de <strong>{{ total_paginas }}</strong> ({{ total_vendas }} vendas encontradas)</p>
+            {% set total_registros = total_vendas %}
+            {% include "_pagination.html" %}
+        </div>
+
+    </div>
+</body>
+
+</html>

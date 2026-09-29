@@ -1,0 +1,138 @@
+/* Importando uma fonte moderna do Google */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+:root {
+    --bg-color: #0c0a09;        /* Fundo bem escuro */
+    --card-bg: #1c1917;         /* Cor do formulário */
+    --primary: #d97706;         /* Laranja/Âmbar para destaque */
+    --primary-hover: #b45309;
+    --text-main: #f5f5f4;
+    --text-muted: #a8a29e;
+    --border: #44403c;
+    --error: #ef4444;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--text-main);
+    text-align: center;
+}
+
+/* Estiliza o parágrafo de erro do seu HTML */
+p[style*="red"] {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--error) !important;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+}
+
+/* O "Card" do Formulário */
+form {
+    background-color: var(--card-bg);
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+/* Esconde as quebras de linha <br> já que usamos Flexbox no form */
+form br {
+    display: none;
+}
+
+label {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    gap: 0.5rem;
+}
+
+input, select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+}
+
+input:focus, select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
+}
+
+input::placeholder {
+    color: #57534e;
+}
+
+button[type="submit"] {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.85rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    margin-top: 0.5rem;
+}
+
+button[type="submit"]:hover {
+    background-color: var(--primary-hover);
+}
+
+button[type="submit"]:active {
+    transform: scale(0.98);
+}
+
+a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    text-align: center;
+    display: block;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: var(--text-main);
+    text-decoration: underline;
+}

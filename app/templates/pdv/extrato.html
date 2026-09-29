@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extrato do PDV — AAPM SENAI</title>
+
+    <!-- Ligações aos ficheiros CSS e JS específicos -->
+    <link rel="stylesheet" href="/static/css/pdv/extrato.css">
+    <script src="/static/js/pdv/extrato.js" defer></script>
+</head>
+
+<body>
+    <div class="container">
+
+        <div class="page-header">
+            <div>
+                <h1>Extrato do PDV</h1>
+                <p class="subtitle">Resumo das vendas realizadas hoje.</p>
+            </div>
+            <div class="header-actions">
+                <button onclick="window.print()" class="btn-secondary">🖨️ Imprimir</button>
+            </div>
+        </div>
+
+        <!-- Cards de Resumo -->
+        <section class="resumo">
+            <article class="resumo-card">
+                <span>Vendas realizadas</span>
+                <strong>{{ quantidade_vendas }}</strong>
+            </article>
+            <article class="resumo-card">
+                <span>Total bruto</span>
+                <strong>R$ {{ '%.2f'|format(total_bruto) }}</strong>
+            </article>
+            <article class="resumo-card">
+                <span>Descontos associados</span>
+                <strong>R$ {{ '%.2f'|format(total_descontos) }}</strong>
+            </article>
+            <article class="resumo-card destaque">
+                <span>Total líquido</span>
+                <strong>R$ {{ '%.2f'|format(total_liquido) }}</strong>
+            </article>
+        </section>
+
+        <h2>Últimas vendas</h2>
+
+        <!-- Tabela -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Venda</th>
+                        <th>Horário</th>
+                        <th>Cliente</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for venda in ultimas_vendas %}
+                    <tr>
+                        <td><a href="/pdv/venda/{{ venda.id }}" class="venda-link">#{{ venda.id }}</a></td>
+                        <td>{{ venda.criado_em.strftime('%H:%M') }}</td>
+                        <td>{{ venda.cliente.nome if venda.cliente else 'Balcão' }}</td>
+                        <td class="preco">R$ {{ '%.2f'|format(venda.total_liquido) }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="empty-row">Nenhuma venda registrada hoje.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Navegação de Rodapé -->
+        <div class="footer-nav">
+            <a href="/pdv" class="btn-primary">← Voltar ao PDV</a>
+            <a href="/pdv/historico" class="btn-secondary">Histórico completo →</a>
+        </div>
+
+    </div>
+</body>
+
+</html>

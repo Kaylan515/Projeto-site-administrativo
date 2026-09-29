@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Nova Movimentação — AAPM SENAI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/movimentacoes/form.css">
+    <script src="/static/js/movimentacoes/form.js" defer></script>
+</head>
+
+<body>
+    <div class="form-container">
+        <header class="form-header">
+            <h1>📦 Registrar movimentação</h1>
+            <p>Adicione entradas ou saídas de stock manualmente</p>
+        </header>
+
+        {% if erro %}
+        <div class="alerta">
+            {{ erro }}
+        </div>
+        {% endif %}
+
+        <form action="/movimentacoes/nova" method="post" class="mov-form">
+
+            <div class="input-group">
+                <label for="select-produto">Produto</label>
+                <select name="produto_id" required id="select-produto" class="form-control">
+                    <option value="">Selecione um produto...</option>
+                    {% for p in produtos %}
+                    <option value="{{ p.id }}" data-estoque="{{ p.estoque_atual }}" data-preco="{{ p.preco }}"
+                        {{ 'selected' if produto_id==p.id else '' }}>
+                        {{ p.nome }} — estoque: {{ p.estoque_atual }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div id="info-estoque" class="info-box" style="display:none">
+                Estoque atual: <strong id="valor-estoque">0</strong> unidade(s)
+            </div>
+
+            <div class="input-group">
+                <label for="select-tipo">Tipo de Movimentação</label>
+                <select name="tipo" required id="select-tipo" class="form-control">
+                    <option value="">Selecione o tipo...</option>
+                    {% for t in tipos %}
+                    <option value="{{ t.value }}">
+                        {{ "▲ Entrada" if t.value == 'entrada' else "▼ Saída" }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="input-quantidade">Quantidade</label>
+                    <input type="number" name="quantidade" min="1" required id="input-quantidade" class="form-control"
+                        placeholder="Ex: 10">
+                </div>
+
+                <div class="input-group">
+                    <label for="input-preco">Preço unitário (R$)</label>
+                    <input type="number" name="preco_unitario" step="0.01" min="0" required id="input-preco"
+                        class="form-control" placeholder="0,00">
+                </div>
+            </div>
+
+            <div id="info-subtotal" class="subtotal-box" style="display:none">
+                Subtotal estimado: <strong id="valor-subtotal">R$ 0,00</strong>
+            </div>
+
+            <div class="input-group">
+                <label for="input-obs">Observação (opcional)</label>
+                <input type="text" name="observacao" maxlength="255" id="input-obs" class="form-control"
+                    placeholder="Ex: Compra fornecedor X, Venda balcão...">
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">Registrar</button>
+                <a href="/movimentacoes" class="btn-cancel">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</body>
+
+</html>

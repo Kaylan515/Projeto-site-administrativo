@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{ "Editar" if editando else "Novo" }} Produto — AAPM SENAI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Ligações aos ficheiros CSS e JS específicos da pasta produtos -->
+    <link rel="stylesheet" href="/static/css/produtos/form.css">
+    <script src="/static/js/produtos/form.js" defer></script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>{{ "Editar produto" if editando else "Novo produto" }}</h1>
+
+        {% if erro %}
+        <div class="alert alert-danger">{{ erro }}</div>
+        {% endif %}
+
+        <!--
+            enctype="multipart/form-data" é obrigatório para envio de arquivos.
+            Sem ele o FastAPI não consegue ler o UploadFile.
+        -->
+        <form action="{{ '/produtos/' + editando.id|string + '/editar' if editando else '/produtos/novo' }}" method="post"
+            enctype="multipart/form-data">
+
+            <label class="form-group">Nome:
+                <input type="text" name="nome"
+                    value="{{ editando.nome if editando else (valores.nome if valores else '') }}" required placeholder="Ex: Caderno Universitário">
+            </label>
+
+            <div class="form-row">
+                <label class="form-group">Preço (R$):
+                    <input type="number" name="preco" step="0.01" min="0"
+                        value="{{ editando.preco if editando else (valores.preco if valores else '0.00') }}" required>
+                </label>
+
+                <label class="form-group">Estoque atual:
+                    <input type="number" name="estoque_atual" min="0"
+                        value="{{ editando.estoque_atual if editando else (valores.estoque_atual if valores else '0') }}"
+                        required>
+                </label>
+            </div>
+
+            <label class="form-group">O produto possui variação?
+                <select name="possui_variacao" id="possui-variacao">
+                    <option value="nao" {{ 'selected' if not (editando and editando.variacao) else '' }}>Não</option>
+                    <option value="sim" {{ 'selected' if (editando and editando.variacao) or (valores and valores.possui_variacao == 'sim') else '' }}>Sim</option>
+                </select>
+            </label>
+
+            <label class="form-group" id="detalhe-variacao-wrap">Detalhe da variação:
+                <input type="text" name="variacao" id="input-variacao" list="variacoes-sugeridas" placeholder="Ex.: M, GG, HB, 2B ou Azul"
+                    value="{{ editando.variacao if editando else (valores.variacao if valores else '') }}">
+                <datalist id="variacoes-sugeridas">
+                    <option value="Único">
+                    <option value="P">
+                    <option value="M">
+                    <option value="G">
+                    <option value="GG">
+                    <option value="HB">
+                    <option value="2B">
+                    <option value="4B">
+                </datalist>
+            </label>
+
+            <label class="form-group">Categoria:
+                <select name="categoria_id">
+                    <option value="0">Sem categoria</option>
+                    {% for c in categorias %}
+                    <option value="{{ c.id }}" {{ 'selected' if (editando and editando.categoria_id == c.id) or (valores and valores.categoria_id == c.id) else '' }}>
+                        {{ c.nome }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </label>
+
+            <!-- Imagem atual na edição -->
+            {% if editando and editando.imagem_path %}
+            <div class="current-image-box">
+                <p>Imagem atual:</p>
+                <img src="{{ editando.imagem_url }}" alt="{{ editando.nome }}">
+            </div>
+            {% endif %}
+
+            <label class="form-group">{{ "Nova imagem (deixe vazio para manter a atual):" if editando else "Imagem:" }}
+                <input type="file" name="imagem" accept=".jpg,.jpeg,.png,.webp">
+            </label>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">
+                    {{ "Salvar alterações" if editando else "Criar produto" }}
+                </button>
+                <a href="/produtos" class="btn-cancel">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</body>
+
+</html>

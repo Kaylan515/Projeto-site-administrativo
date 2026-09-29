@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico — Armário {{ armario.numero }} — AAPM SENAI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/armarios/historico.css">
+</head>
+<body>
+    <div class="spotlight" id="spotlight"></div>
+
+    <div class="page-wrapper">
+        <header class="site-header">
+            <div class="nav-brand">
+                <strong>SENAI</strong>
+                <span class="divider">•</span>
+                <span>Gestão de Armários</span>
+            </div>
+            <span class="brand-badge">AAPM • SENAI</span>
+        </header>
+
+        <main class="content-container">
+            <div class="history-card">
+                <div class="card-header-main">
+                    <div>
+                        <span class="card-kicker">AUDITORIA DO RECURSO</span>
+                        <h1>Histórico do armário {{ armario.numero }}</h1>
+                    </div>
+                    <a href="/armarios/{{ armario.id }}" class="btn-secondary">← Voltar</a>
+                </div>
+
+                <!-- Tabela de Dados -->
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Locatário</th>
+                                <th>Semestre</th>
+                                <th>Início</th>
+                                <th>Encerramento</th>
+                                <th>Observação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reserva in reservas %}
+                            <tr>
+                                <td><strong>{{ reserva.locatario_nome }}</strong></td>
+                                <td>{{ reserva.semestre }}</td>
+                                <td>{{ reserva.iniciado_em.strftime('%d/%m/%Y') }}</td>
+                                <td>
+                                    {% if reserva.encerrado_em %}
+                                    {{ reserva.encerrado_em.strftime('%d/%m/%Y') }}
+                                    {% else %}
+                                    <span class="status-active">● Em andamento</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ reserva.observacao or '—' }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="empty-row">Nenhuma reserva registrada.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-info">
+                <p><strong>Associação de Pais e Mestres</strong> • SENAI</p>
+                <p class="footer-sub">Plataforma interna de gestão acadêmica e operacional.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="/static/js/armarios/historico.js" defer></script>
+</body>
+</html>

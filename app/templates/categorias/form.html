@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{ "Editar" if editando else "Nova" }} Categoria — AAPM SENAI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/categorias/form.css">
+    <script src="/static/js/categorias/form.js" defer></script>
+</head>
+
+<body>
+    <div class="form-container">
+        
+        <header class="form-header">
+            <h1>🏷️ {{ "Editar categoria" if editando else "Nova categoria" }}</h1>
+            <p>Gerencie as informações da categoria de produtos</p>
+        </header>
+
+        {% if erro %}
+        <div class="alerta">{{ erro }}</div>
+        {% endif %}
+
+        <form action="{{ '/categorias/' + editando.id|string + '/editar' if editando else '/categorias/nova' }}"
+            method="post" class="categoria-form">
+
+            <div class="input-group">
+                <label for="input-nome">Nome da Categoria</label>
+                <input type="text" name="nome" id="input-nome" class="form-control"
+                    value="{{ editando.nome if editando else (valores.nome if valores else '') }}" required autofocus placeholder="Ex: Bebidas, Eletrónicos...">
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">
+                    {{ "Salvar alterações" if editando else "Criar categoria" }}
+                </button>
+                <a href="/categorias" class="btn-cancel">Cancelar</a>
+            </div>
+
+        </form>
+
+        <!-- Produtos vinculados na edição -->
+        {% if editando and editando.produtos %}
+        <div class="produtos-vinculados-card">
+            <h3>📦 Produtos vinculados a esta categoria</h3>
+            <ul class="produtos-lista">
+                {% set tem_ativo = false %}
+                {% for p in editando.produtos if p.ativo %}
+                {% set tem_ativo = true %}
+                <li>
+                    <a href="/produtos/{{ p.id }}">{{ p.nome }}</a>
+                    <span class="preco">R$ {{ "%.2f"|format(p.preco) }}</span>
+                </li>
+                {% endfor %}
+                {% if not tem_ativo %}
+                <li class="vazio">Nenhum produto ativo vinculado.</li>
+                {% endif %}
+            </ul>
+        </div>
+        {% endif %}
+
+    </div>
+</body>
+
+</html>

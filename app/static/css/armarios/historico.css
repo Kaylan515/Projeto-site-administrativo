@@ -1,0 +1,213 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+:root {
+    --bg-color: #0c0a09;
+    --card-bg: rgba(24, 20, 18, 0.85);
+    --surface-2: rgba(33, 27, 26, 0.95);
+    --border-color: rgba(68, 54, 51, 0.5);
+    --primary-color: #d97706;
+    --primary-hover: #b45309;
+    --text-main: #f5f5f4;
+    --text-muted: #a8a29e;
+    --green: #22c55e;
+    --font-head: 'Space Grotesk', system-ui, sans-serif;
+    --font-body: 'DM Sans', system-ui, sans-serif;
+    --radius: 16px;
+    --radius-sm: 10px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.spotlight {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 1;
+    transition: background 0.1s ease;
+}
+
+.page-wrapper {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding: 2rem 3rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.site-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+.nav-brand {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+.nav-brand strong {
+    color: var(--text-main);
+    font-family: var(--font-head);
+    letter-spacing: 0.05em;
+}
+.divider {
+    margin: 0 0.5rem;
+    color: var(--border-color);
+}
+
+.brand-badge {
+    background: rgba(217, 119, 6, 0.15);
+    border: 1px solid rgba(217, 119, 6, 0.4);
+    color: #fbbf24;
+    padding: 0.35rem 0.85rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-family: var(--font-head);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.content-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.history-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 2.5rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(12px);
+}
+
+.card-header-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1.25rem;
+}
+
+.card-kicker {
+    font-family: var(--font-head);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.35rem;
+}
+
+.card-header-main h1 {
+    font-family: var(--font-head);
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.btn-secondary {
+    background-color: var(--surface-2);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    padding: 0.65rem 1rem;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-head);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    transition: background 0.2s;
+}
+.btn-secondary:hover {
+    background: rgba(50, 40, 38, 0.95);
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.95rem;
+}
+
+.data-table th {
+    background: var(--surface-2);
+    color: var(--text-muted);
+    font-family: var(--font-head);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.data-table td {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-main);
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.data-table tbody tr:hover {
+    background: rgba(217, 119, 6, 0.03);
+}
+
+.status-active {
+    color: #86efac;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.empty-row {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 2rem !important;
+}
+
+.site-footer {
+    border-top: 1px solid var(--border-color);
+    padding-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+.footer-sub {
+    font-size: 0.75rem;
+}

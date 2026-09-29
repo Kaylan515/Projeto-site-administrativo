@@ -1,0 +1,343 @@
+/**
+ * ==========================================================================
+ * DESIGN SYSTEM GLOBAL — AAPM SENAI (DARK MODE & ÂMBAR)
+ * ==========================================================================
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+:root {
+    --bg: #0c0a09;
+    --surface: rgba(24, 20, 18, 0.85);
+    --surface-2: rgba(33, 27, 26, 0.95);
+    --primary: #d97706;
+    --primary-dark: #b45309;
+    --accent: #ef4444;
+    --text: #f5f5f4;
+    --muted: #a8a29e;
+    --border: rgba(68, 54, 51, 0.5);
+    --shadow: rgba(0, 0, 0, 0.5);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background-color: var(--bg);
+    background-image: radial-gradient(circle at top, rgba(217, 119, 6, 0.08), transparent 40%);
+    color: var(--text);
+    min-height: 100vh;
+}
+
+.container {
+    width: min(1180px, calc(100% - 2rem));
+    margin: 0 auto;
+}
+
+.site-header {
+    background: linear-gradient(135deg, #181412, #211b1a);
+    border-bottom: 1px solid var(--border);
+    color: white;
+    padding: 1.25rem 0;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.4);
+}
+
+.header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.brand {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    letter-spacing: 0.03em;
+    text-decoration: none;
+}
+
+.subtitle {
+    margin: 0.4rem 0 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+}
+
+.top-nav {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.top-nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-weight: 600;
+    padding: 0.6rem 0.9rem;
+    border-radius: 999px;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-size: 0.9rem;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.top-nav a:hover {
+    background: rgba(217, 119, 6, 0.15);
+    color: #fbbf24;
+}
+
+.page-content {
+    padding: 2.5rem 0 4rem;
+}
+
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(12px);
+}
+
+.page-title {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: clamp(1.9rem, 2.8vw, 2.8rem);
+    letter-spacing: -0.04em;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    color: var(--text);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.button,
+button,
+input[type="submit"] {
+    border: none;
+    background: var(--primary);
+    color: white;
+    padding: 0.95rem 1.4rem;
+    border-radius: 14px;
+    cursor: pointer;
+    font-weight: 700;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3);
+}
+
+button:hover,
+.button:hover,
+input[type="submit"]:hover {
+    transform: translateY(-1px);
+    background: var(--primary-dark);
+    box-shadow: 0 8px 18px rgba(217, 119, 6, 0.4);
+}
+
+.button.secondary,
+button.secondary {
+    background: #443633;
+    box-shadow: none;
+    color: var(--text);
+}
+.button.secondary:hover,
+button.secondary:hover {
+    background: #574541;
+}
+
+.button.danger,
+button.danger {
+    background: var(--accent);
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+.button.danger:hover,
+button.danger:hover {
+    background: #dc2626;
+}
+
+.alert {
+    border-radius: 16px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 1.25rem;
+    border: 1px solid transparent;
+    font-weight: 600;
+}
+
+.alert.success {
+    background: rgba(34, 197, 94, 0.15);
+    border-color: rgba(34, 197, 94, 0.4);
+    color: #86efac;
+}
+
+.alert.error {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #fca5a5;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    border-radius: 18px;
+    border: 1px solid var(--border);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    min-width: 640px;
+}
+
+th,
+td {
+    padding: 1rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+th {
+    background: var(--surface-2);
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.85rem;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+}
+
+tbody tr {
+    transition: background 0.2s ease;
+}
+
+tbody tr:hover {
+    background: rgba(217, 119, 6, 0.03);
+}
+
+.product-thumb {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    border-radius: 999px;
+    padding: 0.45rem 0.85rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+}
+
+.status-badge.active {
+    background: rgba(34, 197, 94, 0.15);
+    color: #86efac;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.status-badge.inactive {
+    background: rgba(239, 68, 68, 0.15);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.form-grid {
+    display: grid;
+    gap: 1.3rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+label {
+    display: block;
+    margin-bottom: 0.45rem;
+    color: var(--muted);
+    font-weight: 700;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="file"],
+select,
+textarea {
+    width: 100%;
+    padding: 0.95rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface-2);
+    color: var(--text);
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 0.95rem;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.15);
+}
+
+.filter-panel {
+    display: grid;
+    gap: 1rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 1.4rem;
+    margin-bottom: 1.5rem;
+}
+
+.filter-panel form {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    align-items: end;
+}
+
+.footer-note {
+    display: block;
+    color: var(--muted);
+    margin-top: 1.5rem;
+}
+
+.page-footer {
+    text-align: center;
+    color: var(--muted);
+    margin: 3rem 0 1.5rem;
+    font-size: 0.9rem;
+}
+
+.small-link {
+    color: #fbbf24;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.small-link:hover {
+    text-decoration: underline;
+}

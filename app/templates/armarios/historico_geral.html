@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico de Reservas — AAPM SENAI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/armarios/historico_geral.css">
+</head>
+<body>
+    <div class="spotlight" id="spotlight"></div>
+
+    <div class="page-wrapper">
+        <header class="site-header">
+            <div class="nav-brand">
+                <strong>SENAI</strong>
+                <span class="divider">•</span>
+                <span>Gestão de Armários</span>
+            </div>
+            <span class="brand-badge">AAPM • SENAI</span>
+        </header>
+
+        <main class="content-container">
+            <div class="history-card">
+                <div class="card-header-main">
+                    <div>
+                        <span class="card-kicker">AUDITORIA E REGISTOS</span>
+                        <h1>Histórico de reservas</h1>
+                    </div>
+                    <a href="/armarios" class="btn-secondary">← Voltar aos armários</a>
+                </div>
+
+                <!-- Barra de Pesquisa e Filtros -->
+                <form method="get" class="search-filter-form">
+                    <div class="input-field-group search-group">
+                        <label for="busca">Pesquisar</label>
+                        <input type="search" id="busca" name="busca" value="{{ busca }}" placeholder="Aluno ou armário">
+                    </div>
+
+                    <div class="input-field-group select-group">
+                        <label for="semestre">Semestre</label>
+                        <select id="semestre" name="semestre">
+                            <option value="">Todos os semestres</option>
+                            {% for item in semestres %}
+                            <option value="{{ item }}" {{ 'selected' if semestre == item else '' }}>{{ item }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="filter-actions">
+                        <button type="submit" class="btn-primary">Pesquisar</button>
+                        <a href="/armarios/historico" class="btn-outline">Limpar</a>
+                    </div>
+                </form>
+
+                <!-- Tabela de Dados -->
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Armário</th>
+                                <th>Aluno</th>
+                                <th>Semestre</th>
+                                <th>Início</th>
+                                <th>Fim</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reserva in reservas %}
+                            <tr>
+                                <td><span class="badge-armario">{{ reserva.armario.numero }}</span></td>
+                                <td><strong>{{ reserva.locatario_nome }}</strong></td>
+                                <td>{{ reserva.semestre }}</td>
+                                <td>{{ reserva.iniciado_em.strftime('%d/%m/%Y') }}</td>
+                                <td>
+                                    {% if reserva.encerrado_em %}
+                                    {{ reserva.encerrado_em.strftime('%d/%m/%Y') }}
+                                    {% else %}
+                                    <span class="status-active">● Em andamento</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="empty-row">Nenhuma reserva encontrada.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Paginação -->
+                <div class="pagination-container">
+                    {% include "_pagination.html" %}
+                </div>
+            </div>
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-info">
+                <p><strong>Associação de Pais e Mestres</strong> • SENAI</p>
+                <p class="footer-sub">Plataforma interna de gestão acadêmica e operacional.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="/static/js/armarios/historico_geral.js" defer></script>
+</body>
+</html>

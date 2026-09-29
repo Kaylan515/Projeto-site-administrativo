@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Clientes — AAPM SENAI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/clientes/index.css">
+    <script src="/static/js/clientes/index.js" defer></script>
+</head>
+
+<body>
+    <div class="clientes-container">
+
+        <!-- Cabeçalho -->
+        <header class="clientes-header">
+            <div>
+                <a href="/" class="btn-voltar">← Dashboard</a>
+                <h1>👥 Gestão de Clientes</h1>
+            </div>
+            <a href="/clientes/novo" class="btn-novo">+ Novo cliente</a>
+        </header>
+
+        <!-- Alertas / Mensagens de Sucesso -->
+        {% if request.query_params.get('criado') == 'ok' %}
+        <div class="alerta sucesso">Cliente cadastrado com sucesso!</div>
+        {% endif %}
+        {% if request.query_params.get('editado') == 'ok' %}
+        <div class="alerta sucesso">Cliente atualizado com sucesso!</div>
+        {% endif %}
+
+        <!-- Cartão de Estatística -->
+        <section class="stats-card">
+            <span class="stats-label">Associados ativos</span>
+            <span class="stats-valor">{{ total_associados }}</span>
+        </section>
+
+        <!-- Filtros -->
+        <section class="filtros-card">
+            <form method="get" action="/clientes" class="filtros-form">
+
+                <div class="filtro-linha principal">
+                    <input type="text" name="busca" placeholder="🔍 Buscar por nome ou matrícula..." value="{{ busca }}"
+                        class="form-control busca-input">
+                    <button type="submit" class="btn-filtrar">Filtrar</button>
+                    {% if busca or apenas_associados or status or ordenar_por %}
+                    <a href="/clientes" class="btn-limpar">Limpar filtros</a>
+                    {% endif %}
+                </div>
+
+                <div class="filtro-linha secundaria">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="apenas_associados" value="true" {{ 'checked' if apenas_associados
+                            }}>
+                        <span>Apenas associados</span>
+                    </label>
+
+                    <select name="status" class="form-control">
+                        <option value="">Todos os status</option>
+                        <option value="ativo" {{ 'selected' if status=='ativo' else '' }}>Ativos</option>
+                        <option value="inativo" {{ 'selected' if status=='inativo' else '' }}>Inativos</option>
+                    </select>
+
+                    <select name="ordenar_por" class="form-control">
+                        <option value="nome" {{ 'selected' if ordenar_por=='nome' else '' }}>Ordenar por: Nome</option>
+                        <option value="matricula" {{ 'selected' if ordenar_por=='matricula' else '' }}>Ordenar por:
+                            Matrícula</option>
+                        <option value="criado_em" {{ 'selected' if ordenar_por=='criado_em' else '' }}>Ordenar por: Data
+                            de cadastro</option>
+                    </select>
+
+                    <select name="direcao" class="form-control">
+                        <option value="asc" {{ 'selected' if direcao=='asc' else '' }}>Crescente</option>
+                        <option value="desc" {{ 'selected' if direcao=='desc' else '' }}>Decrescente</option>
+                    </select>
+
+                    <select name="por_pagina" class="form-control">
+                        <option value="10" {{ 'selected' if por_pagina==10 else '' }}>10 por página</option>
+                        <option value="25" {{ 'selected' if por_pagina==25 else '' }}>25 por página</option>
+                        <option value="50" {{ 'selected' if por_pagina==50 else '' }}>50 por página</option>
+                    </select>
+                </div>
+
+            </form>
+        </section>
+
+        <!-- Tabela -->
+        <div class="tabela-wrapper">
+            <table class="tabela-clientes">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Matrícula</th>
+                        <th>Telefone</th>
+                        <th>Associado</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in clientes %}
+                    <tr>
+                        <td class="font-head font-bold">{{ c.nome }}</td>
+                        <td>{{ c.matricula or "—" }}</td>
+                        <td>{{ c.telefone or "—" }}</td>
+                        <td>
+                            {% if c.is_associado %}
+                            <span class="badge associado">✓ Sim (10% desc.)</span>
+                            {% else %}
+                            <span class="badge nao-associado">Não</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge {{ 'ativo' if c.ativo else 'inativo' }}">
+                                {{ "Ativo" if c.ativo else "Inativo" }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="acoes-container">
+                                <a href="/clientes/{{ c.id }}/editar" class="btn-acao editar">Editar</a>
+                                <form action="/clientes/{{ c.id }}/toggle-ativo" method="post" style="display:inline">
+                                    <button type="submit" class="btn-acao {{ 'desativar' if c.ativo else 'ativar' }}">
+                                        {{ "Desativar" if c.ativo else "Ativar" }}
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% if not clientes %}
+                    <tr>
+                        <td colspan="6" class="vazio">Nenhum cliente encontrado.</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginação e Rodapé -->
+        <div class="paginacao-footer">
+            <p class="info-paginacao">Página {{ pagina }} de {{ total_paginas }} ({{ total_clientes }} clientes)</p>
+            {% set total_registros = total_clientes %}
+            {% include "_pagination.html" %}
+        </div>
+
+    </div>
+</body>
+
+</html>

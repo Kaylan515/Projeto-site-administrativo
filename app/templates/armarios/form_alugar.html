@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alugar Armário {{ armario.numero }} — AAPM SENAI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/armarios/form_alugar.css">
+</head>
+<body>
+    <div class="spotlight" id="spotlight"></div>
+
+    <div class="auth-page-wrapper">
+        <header class="site-header">
+            <div class="nav-brand">
+                <strong>SENAI</strong>
+                <span class="divider">•</span>
+                <span>Gestão de Armários</span>
+            </div>
+            <span class="brand-badge">AAPM • SENAI</span>
+        </header>
+
+        <main class="auth-content-center">
+            <div class="auth-box">
+                <div class="auth-titles">
+                    <span class="auth-kicker">ALUGUER DE RECURSO</span>
+                    <h1>Alugar Armário {{ armario.numero }}</h1>
+                    {% if armario.localizacao %}
+                    <p>Localização: <strong>{{ armario.localizacao }}</strong></p>
+                    {% else %}
+                    <p>Preencha os dados abaixo para registar o aluguer.</p>
+                    {% endif %}
+                </div>
+
+                {% if erro %}
+                <div class="alert alert-danger">{{ erro }}</div>
+                {% endif %}
+
+                <form action="/armarios/{{ armario.id }}/alugar" method="post" class="auth-form">
+                    <div class="input-field-group">
+                        <label for="locatario_nome">Nome do locatário</label>
+                        <input type="text" id="locatario_nome" name="locatario_nome" placeholder="Nome completo do aluno" required autofocus autocomplete="off">
+                    </div>
+
+                    <div class="input-field-group">
+                        <label for="semestre">Semestre</label>
+                        <input type="text" id="semestre" name="semestre" placeholder="Ex: 2026.1" list="semestres-sugeridos" required autocomplete="off">
+                        <datalist id="semestres-sugeridos">
+                            <option value="2025.1">
+                            <option value="2025.2">
+                            <option value="2026.1">
+                            <option value="2026.2">
+                        </datalist>
+                    </div>
+
+                    <div class="input-field-group">
+                        <label for="observacao">Observação (opcional)</label>
+                        <input type="text" id="observacao" name="observacao" maxlength="255" placeholder="Ex: Chave reserva na portaria" autocomplete="off">
+                    </div>
+
+                    <div class="form-actions-row">
+                        <button type="submit" class="btn-primary">Confirmar aluguer</button>
+                        <a href="/armarios/{{ armario.id }}" class="btn-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+
+        <footer class="welcome-footer">
+            <div class="footer-info">
+                <p><strong>Associação de Pais e Mestres</strong> • SENAI</p>
+                <p class="footer-sub">Plataforma interna de gestão acadêmica e operacional.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="/static/js/armarios/form_alugar.js" defer></script>
+</body>
+</html>

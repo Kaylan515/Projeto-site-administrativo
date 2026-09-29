@@ -1,0 +1,8 @@
+{% if total_paginas > 1 %}
+<nav class="pagination" aria-label="Paginação">
+    <span>Página {{ pagina }} de {{ total_paginas }} ({{ total_registros }} registros)</span>
+    {% if pagina > 1 %}<a href="{{ request.url.include_query_params(pagina=pagina - 1) }}">← Anterior</a>{% endif %}
+    {% if pagina < total_paginas %}<a href="{{ request.url.include_query_params(pagina=pagina + 1) }}">Próxima →</a>{%
+        endif %}
+</nav>
+{% endif %}
