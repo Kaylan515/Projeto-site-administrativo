@@ -72,24 +72,47 @@
 
             <div class="carrinho-header">🛒 Carrinho</div>
 
-            <!-- Seleção de cliente -->
+            <!-- Seleção de Cliente -->
             <div class="cliente-section">
-                <label for="select-cliente">Cliente</label>
-                <select class="cliente-select" id="select-cliente" onchange="atualizarCliente(this)">
-                    <option value="0" data-associado="false">
+                <label>Cliente</label>
+                <div class="custom-dropdown" id="cliente-dropdown">
+                    <div class="dropdown-selected" id="dropdown-selected-text">
                         Sem identificação (sem desconto)
-                    </option>
-                    {% for c in clientes %}
-                    <option value="{{ c.id }}" data-associado="{{ 'true' if c.is_associado else 'false' }}">
-                        {{ c.nome }}
-                        {% if c.matricula %}({{ c.matricula }}){% endif %}
-                        {% if c.is_associado %} — ASSOCIADO{% endif %}
-                    </option>
-                    {% endfor %}
-                </select>
-
+                    </div>
+                    <div class="dropdown-options" id="dropdown-options-list">
+                        <div class="dropdown-option selected" data-value="0" data-associado="false">
+                            Sem identificação (sem desconto)
+                        </div>
+                        {% for c in clientes %}
+                        <div class="dropdown-option" data-value="{{ c.id }}" data-associado="{{ 'true' if c.is_associado else 'false' }}">
+                            {{ c.nome }}
+                            {% if c.matricula %}({{ c.matricula }}){% endif %}
+                            {% if c.is_associado %} — ASSOCIADO{% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
                 <div class="desconto-badge" id="badge-desconto" style="display:none">
                     ✓ {{ desconto_associado|int }}% de desconto aplicado
+                </div>
+            </div>
+
+            <!-- Seleção de Forma de Pagamento -->
+            <div class="cliente-section" style="margin-top: 0.75rem;">
+                <label>Forma de Pagamento</label>
+                <div class="pagamento-grid" id="pagamento-opcoes">
+                    <button type="button" class="pagamento-btn pix selected" data-value="PIX" onclick="selecionarPagamento(this)">
+                        💚 PIX
+                    </button>
+                    <button type="button" class="pagamento-btn dinheiro" data-value="Dinheiro" onclick="selecionarPagamento(this)">
+                        💵 Dinheiro
+                    </button>
+                    <button type="button" class="pagamento-btn debito" data-value="Cartão de Débito" onclick="selecionarPagamento(this)">
+                        💳 Débito
+                    </button>
+                    <button type="button" class="pagamento-btn credito" data-value="Cartão de Crédito" onclick="selecionarPagamento(this)">
+                        💳 Crédito
+                    </button>
                 </div>
             </div>
 
@@ -123,13 +146,27 @@
                 <form id="form-venda" action="/pdv/finalizar" method="post">
                     <input type="hidden" name="carrinho_json" id="input-carrinho">
                     <input type="hidden" name="cliente_id" id="input-cliente-id" value="0">
+                    <input type="hidden" name="forma_pagamento" id="input-pagamento" value="PIX">
                     <input type="hidden" name="observacao" id="input-obs">
+                    
                     <button class="btn-finalizar" id="btn-finalizar" type="button" disabled onclick="finalizarVenda()">
                         Finalizar venda
                     </button>
                 </form>
             </div>
         </aside>
+    </div>
+
+    <!-- ── MODAL DE CONFIRMAÇÃO CUSTOMIZADO ── -->
+    <div class="modal-overlay" id="modal-confirmacao">
+        <div class="modal-box">
+            <div class="modal-header">Confirmar Venda</div>
+            <div class="modal-body">Deseja realmente finalizar esta transação?</div>
+            <div class="modal-actions">
+                <button type="button" class="btn-modal-cancelar" id="modal-btn-nao">Cancelar</button>
+                <button type="button" class="btn-modal-confirmar" id="modal-btn-sim">Sim, Finalizar</button>
+            </div>
+        </div>
     </div>
 </body>
 

@@ -34,69 +34,84 @@
             .app-confirm-backdrop {
                 position: fixed;
                 inset: 0;
-                background: rgba(12, 10, 9, 0.72);
-                backdrop-filter: blur(6px);
+                background: rgba(12, 10, 9, 0.78);
+                backdrop-filter: blur(8px);
                 display: grid;
                 place-items: center;
                 z-index: 9999;
                 padding: 1rem;
+                animation: aapmFadeIn 0.2s ease-out;
+            }
+            @keyframes aapmFadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
             }
             .app-confirm-dialog {
                 width: min(460px, calc(100vw - 2rem));
-                background: rgba(24, 20, 18, 0.96);
-                border: 1px solid rgba(217, 119, 6, 0.38);
-                border-radius: 22px;
-                box-shadow: 0 28px 80px rgba(0, 0, 0, 0.45);
+                background: linear-gradient(145deg, rgba(28, 23, 21, 0.98), rgba(18, 14, 13, 0.98));
+                border: 1px solid rgba(217, 119, 6, 0.45);
+                border-radius: 24px;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 30px rgba(217, 119, 6, 0.12);
                 overflow: hidden;
+                animation: aapmScaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+            @keyframes aapmScaleUp {
+                from { transform: scale(0.95); opacity: 0; }
+                to { transform: scale(1); opacity: 1; }
             }
             .app-confirm-header {
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
                 gap: 1rem;
-                padding: 1rem 1.1rem 0.75rem;
+                padding: 1.25rem 1.25rem 0.75rem;
                 border-bottom: 1px solid rgba(255, 255, 255, 0.06);
             }
             .app-confirm-badge {
                 display: inline-flex;
                 align-items: center;
-                padding: 0.42rem 0.8rem;
+                padding: 0.42rem 0.85rem;
                 border-radius: 999px;
-                background: rgba(217, 119, 6, 0.12);
-                border: 1px solid rgba(217, 119, 6, 0.25);
-                color: #d97706;
-                font-size: 0.7rem;
+                background: rgba(217, 119, 6, 0.15);
+                border: 1px solid rgba(217, 119, 6, 0.3);
+                color: #fbbf24;
+                font-family: 'Space Grotesk', system-ui, sans-serif;
+                font-size: 0.72rem;
                 letter-spacing: 0.12em;
                 text-transform: uppercase;
                 font-weight: 700;
             }
             .app-confirm-close {
-                width: 2.15rem;
-                height: 2.15rem;
+                width: 2.25rem;
+                height: 2.25rem;
                 border-radius: 50%;
-                border: 1px solid rgba(255, 255, 255, 0.12);
-                background: transparent;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                background: rgba(255, 255, 255, 0.03);
                 color: #a8a29e;
-                font-size: 1.5rem;
+                font-size: 1.4rem;
                 line-height: 1;
                 cursor: pointer;
+                display: grid;
+                place-items: center;
                 transition: all 0.2s ease;
             }
             .app-confirm-close:hover {
-                background: rgba(255, 255, 255, 0.04);
-                color: #f5f5f4;
+                background: rgba(239, 68, 68, 0.15);
+                border-color: rgba(239, 68, 68, 0.4);
+                color: #fca5a5;
             }
             .app-confirm-dialog h2 {
                 margin: 0;
-                padding: 1.2rem 1.2rem 0.4rem;
+                padding: 1.25rem 1.25rem 0.5rem;
                 color: #f5f5f4;
                 font-family: 'Space Grotesk', system-ui, sans-serif;
-                font-size: 1.35rem;
+                font-size: 1.4rem;
                 font-weight: 700;
+                letter-spacing: -0.02em;
             }
             .app-confirm-dialog p {
                 margin: 0;
-                padding: 0 1.2rem 1.2rem;
+                padding: 0 1.25rem 1.5rem;
                 color: #d6cdca;
                 font-size: 0.98rem;
                 line-height: 1.6;
@@ -104,37 +119,46 @@
             .app-confirm-actions {
                 display: flex;
                 justify-content: flex-end;
-                gap: 0.75rem;
-                padding: 0 1.2rem 1.2rem;
+                gap: 0.85rem;
+                padding: 1rem 1.25rem 1.25rem;
+                background: rgba(0, 0, 0, 0.2);
+                border-top: 1px solid rgba(255, 255, 255, 0.04);
             }
             .app-confirm-cancel,
             .app-confirm-accept {
                 border: none;
                 border-radius: 12px;
-                padding: 0.8rem 1.15rem;
+                padding: 0.8rem 1.35rem;
+                font-family: 'Space Grotesk', system-ui, sans-serif;
+                font-size: 0.92rem;
                 font-weight: 700;
                 cursor: pointer;
-                transition: transform 0.2s ease, filter 0.2s ease, opacity 0.2s ease;
+                transition: all 0.2s ease;
             }
             .app-confirm-cancel {
-                background: rgba(255, 255, 255, 0.04);
+                background: rgba(255, 255, 255, 0.05);
                 border: 1px solid rgba(255, 255, 255, 0.12);
                 color: #f5f5f4;
             }
+            .app-confirm-cancel:hover {
+                background: rgba(255, 255, 255, 0.09);
+                border-color: rgba(255, 255, 255, 0.22);
+            }
             .app-confirm-accept {
                 background: linear-gradient(135deg, #d97706, #b45309);
-                color: #fff;
-                box-shadow: 0 14px 28px rgba(217, 119, 6, 0.28);
+                color: #ffffff;
+                box-shadow: 0 4px 15px rgba(217, 119, 6, 0.35);
+                border: 1px solid rgba(251, 191, 36, 0.2);
             }
-            .app-confirm-cancel:hover,
             .app-confirm-accept:hover {
-                transform: translateY(-1px);
-                filter: brightness(1.05);
+                transform: translateY(-2px);
+                background: linear-gradient(135deg, #f59e0b, #d97706);
+                box-shadow: 0 6px 20px rgba(217, 119, 6, 0.5);
             }
             .app-confirm-cancel:focus,
             .app-confirm-accept:focus,
             .app-confirm-close:focus {
-                outline: 2px solid rgba(217, 119, 6, 0.7);
+                outline: 2px solid #fbbf24;
                 outline-offset: 2px;
             }
         `;

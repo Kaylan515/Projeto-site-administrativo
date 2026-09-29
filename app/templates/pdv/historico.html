@@ -25,25 +25,38 @@
             </div>
         </div>
 
-        <!-- Formulário de Filtros Avançados -->
+        <!-- Formulário de Filtros Avançados (Layout Assimétrico) -->
         <form method="get" action="/pdv/historico" class="filter-form">
             <div class="filter-grid">
                 
-                <div class="filter-group full-width">
+                <!-- Busca Principal -->
+                <div class="filter-group col-search">
                     <input type="text" name="busca" placeholder="🔍 Cliente, observação ou nº da venda..." value="{{ busca }}" class="input-field">
                 </div>
 
-                <div class="filter-group">
-                    <label for="cliente_id">Cliente</label>
-                    <select name="cliente_id" id="cliente_id" class="input-field">
-                        <option value="0">Todos os clientes</option>
-                        {% for c in clientes %}
-                        <option value="{{ c.id }}" {{ 'selected' if cliente_id == c.id else '' }}>{{ c.nome }}</option>
-                        {% endfor %}
-                    </select>
+                <!-- Cliente -->
+                <div class="filter-group col-cliente">
+                    <label>Cliente</label>
+                    <div class="custom-dropdown" id="dropdown-cliente">
+                        <div class="dropdown-selected">
+                            {% set cliente_selecionado_nome = "Todos os clientes" %}
+                            {% for c in clientes %}
+                                {% if cliente_id|int == c.id|int %}{% set cliente_selecionado_nome = c.nome %}{% endif %}
+                            {% endfor %}
+                            {{ cliente_selecionado_nome }}
+                        </div>
+                        <div class="dropdown-options">
+                            <div class="dropdown-option {% if cliente_id|int == 0 %}selected{% endif %}" data-value="0">Todos os clientes</div>
+                            {% for c in clientes %}
+                            <div class="dropdown-option {% if cliente_id|int == c.id|int %}selected{% endif %}" data-value="{{ c.id }}">{{ c.nome }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <input type="hidden" name="cliente_id" id="input-cliente-id" value="{{ cliente_id or 0 }}">
                 </div>
 
-                <div class="filter-group">
+                <!-- Período -->
+                <div class="filter-group col-periodo">
                     <label>Período</label>
                     <div class="date-range">
                         <input type="date" name="data_inicio" value="{{ data_inicio }}" class="input-field" title="Data Inicial">
@@ -52,31 +65,53 @@
                     </div>
                 </div>
 
-                <div class="filter-group">
-                    <label for="ordenar_por">Ordenar por</label>
-                    <select name="ordenar_por" id="ordenar_por" class="input-field">
-                        <option value="data" {{ 'selected' if ordenar_por == 'data' else '' }}>Data</option>
-                        <option value="id" {{ 'selected' if ordenar_por == 'id' else '' }}>Número</option>
-                        <option value="total" {{ 'selected' if ordenar_por == 'total' else '' }}>Total</option>
-                        <option value="desconto" {{ 'selected' if ordenar_por == 'desconto' else '' }}>Desconto</option>
-                    </select>
+                <!-- Ordenar por -->
+                <div class="filter-group col-ordenar">
+                    <label>Ordenar por</label>
+                    <div class="custom-dropdown" id="dropdown-ordenar">
+                        <div class="dropdown-selected">
+                            {% set ord_map = {'data': 'Data', 'id': 'Número', 'total': 'Total', 'desconto': 'Desconto'} %}
+                            {{ ord_map.get(ordenar_por, 'Data') }}
+                        </div>
+                        <div class="dropdown-options">
+                            <div class="dropdown-option {% if ordenar_por == 'data' or not ordenar_por %}selected{% endif %}" data-value="data">Data</div>
+                            <div class="dropdown-option {% if ordenar_por == 'id' %}selected{% endif %}" data-value="id">Número</div>
+                            <div class="dropdown-option {% if ordenar_por == 'total' %}selected{% endif %}" data-value="total">Total</div>
+                            <div class="dropdown-option {% if ordenar_por == 'desconto' %}selected{% endif %}" data-value="desconto">Desconto</div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="ordenar_por" id="input-ordenar" value="{{ ordenar_por or 'data' }}">
                 </div>
 
-                <div class="filter-group">
-                    <label for="direcao">Direção</label>
-                    <select name="direcao" id="direcao" class="input-field">
-                        <option value="asc" {{ 'selected' if direcao == 'asc' else '' }}>Crescente</option>
-                        <option value="desc" {{ 'selected' if direcao == 'desc' else '' }}>Decrescente</option>
-                    </select>
+                <!-- Direção -->
+                <div class="filter-group col-direcao">
+                    <label>Direção</label>
+                    <div class="custom-dropdown" id="dropdown-direcao">
+                        <div class="dropdown-selected">
+                            {{ 'Decrescente' if direcao == 'desc' else 'Crescente' }}
+                        </div>
+                        <div class="dropdown-options">
+                            <div class="dropdown-option {% if direcao == 'asc' %}selected{% endif %}" data-value="asc">Crescente</div>
+                            <div class="dropdown-option {% if direcao == 'desc' or not direcao %}selected{% endif %}" data-value="desc">Decrescente</div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="direcao" id="input-direcao" value="{{ direcao or 'desc' }}">
                 </div>
 
-                <div class="filter-group">
-                    <label for="por_pagina">Resultados por página</label>
-                    <select name="por_pagina" id="por_pagina" class="input-field">
-                        <option value="10" {{ 'selected' if por_pagina|string == '10' else '' }}>10 por página</option>
-                        <option value="25" {{ 'selected' if por_pagina|string == '25' else '' }}>25 por página</option>
-                        <option value="50" {{ 'selected' if por_pagina|string == '50' else '' }}>50 por página</option>
-                    </select>
+                <!-- Resultados por página -->
+                <div class="filter-group col-paginacao">
+                    <label>Por página</label>
+                    <div class="custom-dropdown" id="dropdown-por-pagina">
+                        <div class="dropdown-selected">
+                            {{ por_pagina or 10 }} por pág.
+                        </div>
+                        <div class="dropdown-options">
+                            <div class="dropdown-option {% if por_pagina|string == '10' or not por_pagina %}selected{% endif %}" data-value="10">10 por pág.</div>
+                            <div class="dropdown-option {% if por_pagina|string == '25' %}selected{% endif %}" data-value="25">25 por pág.</div>
+                            <div class="dropdown-option {% if por_pagina|string == '50' %}selected{% endif %}" data-value="50">50 por pág.</div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="por_pagina" id="input-por-pagina" value="{{ por_pagina or 10 }}">
                 </div>
 
             </div>

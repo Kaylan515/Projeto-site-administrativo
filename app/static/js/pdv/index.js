@@ -1,176 +1,279 @@
-/**
- * ==========================================================================
- * PDV / CAIXA SCRIPT — AAPM SENAI
- * ==========================================================================
- */
-
+// ── Estado Global do PDV ─────────────────────────────────────
 let carrinho = [];
-let clienteAtual = { id: 0, associado: false };
-const DESCONTO_PCT = parseFloat(document.body.dataset.descontoAssociado) || 0;
+let clienteAtual = {
+    id: 0,
+    associado: false
+};
 
-// ── Adicionar produto ao carrinho ────────────────────────────
-function adicionarAoCarrinho(card) {
-    const id = parseInt(card.dataset.id);
-    const nome = card.dataset.nome;
-    const preco = parseFloat(card.dataset.preco);
-    const estoque = parseInt(card.dataset.estoque);
+// Obtém a percentagem de desconto configurada no body
+const descontoAssociadoPercent = parseFloat(document.body.dataset.descontoAssociado || 0);
 
-    const existente = carrinho.find(i => i.produto_id === id);
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Inicializar Dropdown Customizado de Clientes
+    initCustomDropdown();
 
-    if (!Number.isFinite(preco) || estoque <= 0) return;
+    // 2. Inicializar Filtro de Busca de Produtos
+    initBuscaProdutos();
+});
 
-    if (existente) {
-        if (existente.quantidade < existente.estoque_max) {
-            existente.quantidade = Math.min(existente.quantidade + 1, existente.estoque_max);
-        } else {
-            alert(`Estoque máximo atingido: ${existente.estoque_max} unidade(s).`);
-            return;
-        }
-    } else {
-        carrinho.push({ produto_id: id, nome, preco, quantidade: 1, estoque_max: estoque });
-    }
+// ── 1. DROPDOWN CUSTOMIZADO DE CLIENTES ───────────────────────
+function initCustomDropdown() {
+    const dropdown = document.getElementById('cliente-dropdown');
+    if (!dropdown) return;
 
-    renderizarCarrinho();
-}
+    const selectedText = document.getElementById('dropdown-selected-text');
+    const optionsList = document.getElementById('dropdown-options-list');
+    const hiddenInput = document.getElementById('input-cliente-id');
 
-// ── Alterar quantidade ────────────────────────────────────────
-function alterarQtd(produtoId, delta) {
-    const item = carrinho.find(i => i.produto_id === produtoId);
-    if (!item) return;
-
-    item.quantidade += delta;
-
-    if (item.quantidade <= 0) {
-        removerItem(produtoId);
-        return;
-    }
-
-    if (item.quantidade > item.estoque_max) {
-        item.quantidade = item.estoque_max;
-    }
-
-    renderizarCarrinho();
-}
-
-function removerItem(produtoId) {
-    carrinho = carrinho.filter(i => i.produto_id !== produtoId);
-    renderizarCarrinho();
-}
-
-// ── Atualizar cliente selecionado ─────────────────────────────
-function atualizarCliente(select) {
-    const opt = select.options[select.selectedIndex];
-    clienteAtual.id = parseInt(opt.value);
-    clienteAtual.associado = opt.dataset.associado === 'true';
-
-    const badge = document.getElementById('badge-desconto');
-    badge.style.display = clienteAtual.associado ? 'inline-flex' : 'none';
-
-    renderizarCarrinho();
-}
-
-// ── Renderizar lista do carrinho ──────────────────────────────
-function renderizarCarrinho() {
-    const lista = document.getElementById('lista-carrinho');
-    const vazio = document.getElementById('msg-vazio');
-    const totais = document.getElementById('totais');
-    const btnFinal = document.getElementById('btn-finalizar');
-
-    if (carrinho.length === 0) {
-        lista.innerHTML = '';
-        lista.appendChild(vazio);
-        vazio.style.display = 'flex';
-        totais.style.display = 'none';
-        btnFinal.disabled = true;
-        return;
-    }
-
-    vazio.style.display = 'none';
-    totais.style.display = 'block';
-    btnFinal.disabled = false;
-
-    lista.innerHTML = '';
-
-    carrinho.forEach(item => {
-        const subtotal = item.preco * item.quantidade;
-        const div = document.createElement('div');
-        div.className = 'item-carrinho';
-        div.innerHTML = `
-            <div style="flex:1">
-                <div class="item-nome">${item.nome}</div>
-                <div class="item-preco-unit">
-                    R$ ${item.preco.toFixed(2).replace('.', ',')} / un.
-                </div>
-            </div>
-            <div class="item-qty-ctrl">
-                <button type="button" class="qty-btn" onclick="alterarQtd(${item.produto_id}, -1)">−</button>
-                <span class="qty-value">${item.quantidade}</span>
-                <button type="button" class="qty-btn" onclick="alterarQtd(${item.produto_id}, +1)">+</button>
-            </div>
-            <div class="item-subtotal">
-                R$ ${subtotal.toFixed(2).replace('.', ',')}
-            </div>
-            <button type="button" class="item-remover" onclick="removerItem(${item.produto_id})" title="Remover">×</button>
-        `;
-        lista.appendChild(div);
+    dropdown.querySelector('.dropdown-selected').addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown.classList.toggle('ativo');
     });
 
-    renderizarTotais();
+    document.addEventListener('click', () => {
+        dropdown.classList.remove('ativo');
+    });
+
+    optionsList.addEventListener('click', (e) => {
+        const option = e.target.closest('.dropdown-option');
+        if (!option) return;
+
+        optionsList.querySelectorAll('.dropdown-option').forEach(opt => opt.classList.remove('selected'));
+        option.classList.add('selected');
+        selectedText.textContent = option.textContent.trim();
+
+        const valorId = option.dataset.value;
+        const isAssociado = option.dataset.associado === 'true';
+
+        hiddenInput.value = valorId;
+        clienteAtual.id = parseInt(valorId);
+        clienteAtual.associado = isAssociado;
+
+        const badge = document.getElementById('badge-desconto');
+        if (badge) {
+            badge.style.display = isAssociado ? 'block' : 'none';
+        }
+
+        renderizarCarrinho();
+        dropdown.classList.remove('ativo');
+    });
 }
 
-// ── Calcular e exibir totais ──────────────────────────────────
-function renderizarTotais() {
-    const subtotal = carrinho.reduce((acc, i) => acc + i.preco * i.quantidade, 0);
+// ── 2. SELECIONAR FORMA DE PAGAMENTO (BOTÕES) ────────────────
+function selecionarPagamento(botaoElement) {
+    const botoes = document.querySelectorAll('.pagamento-btn');
+    botoes.forEach(btn => btn.classList.remove('selected'));
 
-    const descontoValor = clienteAtual.associado ? subtotal * (DESCONTO_PCT / 100) : 0;
-    const total = subtotal - descontoValor;
+    botaoElement.classList.add('selected');
 
-    const fmt = v => 'R$ ' + v.toFixed(2).replace('.', ',');
-
-    document.getElementById('val-subtotal').textContent = fmt(subtotal);
-    document.getElementById('val-total').textContent = fmt(total);
-
-    const linhaDesc = document.getElementById('linha-desconto');
-    const labelDesc = document.getElementById('label-desconto');
-    const valDesc = document.getElementById('val-desconto');
-
-    if (clienteAtual.associado && descontoValor > 0) {
-        linhaDesc.style.display = 'flex';
-        labelDesc.textContent = `Desconto (${DESCONTO_PCT}%)`;
-        valDesc.textContent = `− ${fmt(descontoValor)}`;
-    } else {
-        linhaDesc.style.display = 'none';
+    const formaPagamento = botaoElement.dataset.value;
+    const inputPagamento = document.getElementById('input-pagamento');
+    if (inputPagamento) {
+        inputPagamento.value = formaPagamento;
     }
 }
 
-// ── Submeter a venda ──────────────────────────────────────────
+// ── 3. BUSCA / FILTRO DE PRODUTOS ─────────────────────────────
+function initBuscaProdutos() {
+    const inputBusca = document.getElementById('busca-produto');
+    if (!inputBusca) return;
+
+    inputBusca.addEventListener('input', (e) => {
+        const termo = e.target.value.toLowerCase().trim();
+        const cards = document.querySelectorAll('.produto-card');
+
+        cards.forEach(card => {
+            const nomeLower = card.dataset.nomeLower || '';
+            if (nomeLower.includes(termo)) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+}
+
+// ── 4. GESTÃO DO CARRINHO ─────────────────────────────────────
+function adicionarAoCarrinho(cardElement) {
+    const id = parseInt(cardElement.dataset.id);
+    const nome = cardElement.dataset.nome;
+    const preco = parseFloat(cardElement.dataset.preco);
+    const estoque = parseInt(cardElement.dataset.estoque);
+
+    if (estoque <= 0) {
+        alert('Este produto está sem estoque.');
+        return;
+    }
+
+    const itemExistente = carrinho.find(item => item.id === id);
+
+    if (itemExistente) {
+        if (itemExistente.quantidade < estoque) {
+            itemExistente.quantidade++;
+        } else {
+            alert('Quantidade máxima atingida para o estoque atual.');
+        }
+    } else {
+        carrinho.push({
+            id: id,
+            nome: nome,
+            preco: preco,
+            quantidade: 1,
+            estoque: estoque
+        });
+    }
+
+    renderizarCarrinho();
+}
+
+function alterarQuantidade(id, delta) {
+    const item = carrinho.find(i => i.id === id);
+    if (!item) return;
+
+    const novaQtd = item.quantidade + delta;
+
+    if (novaQtd <= 0) {
+        removerItem(id);
+    } else if (novaQtd <= item.estoque) {
+        item.quantidade = novaQtd;
+        renderizarCarrinho();
+    } else {
+        alert('Estoque insuficiente.');
+    }
+}
+
+function removerItem(id) {
+    carrinho = carrinho.filter(i => i.id !== id);
+    renderizarCarrinho();
+}
+
+function renderizarCarrinho() {
+    const listaContainer = document.getElementById('lista-carrinho');
+    const msgVazio = document.getElementById('msg-vazio');
+    const totaisContainer = document.getElementById('totais');
+    const btnFinalizar = document.getElementById('btn-finalizar');
+
+    if (carrinho.length === 0) {
+        listaContainer.innerHTML = `
+            <div class="carrinho-vazio" id="msg-vazio">
+                <span class="carrinho-vazio-icon">🛒</span>
+                Clique nos produtos para adicionar
+            </div>
+        `;
+        totaisContainer.style.display = 'none';
+        btnFinalizar.disabled = true;
+        document.getElementById('input-carrinho').value = '';
+        return;
+    }
+
+    let htmlItens = '';
+    let subtotal = 0;
+
+    carrinho.forEach(item => {
+        const totalItem = item.preco * item.quantidade;
+        subtotal += totalItem;
+
+        htmlItens += `
+            <div class="carrinho-item">
+                <div class="carrinho-item-info">
+                    <span class="carrinho-item-nome">${item.nome}</span>
+                    <span class="carrinho-item-preco">R$ ${item.preco.toFixed(2)} un</span>
+                </div>
+                <div class="carrinho-item-controlo">
+                    <button type="button" class="carrinho-item-btn" onclick="alterarQuantidade(${item.id}, -1)">-</button>
+                    <span>${item.quantidade}</span>
+                    <button type="button" class="carrinho-item-btn" onclick="alterarQuantidade(${item.id}, 1)">+</button>
+                    <button type="button" class="btn-remover" onclick="removerItem(${item.id})">🗑️</button>
+                </div>
+            </div>
+        `;
+    });
+
+    listaContainer.innerHTML = htmlItens;
+    totaisContainer.style.display = 'block';
+    btnFinalizar.disabled = false;
+
+    let descontoValor = 0;
+    const linhaDesconto = document.getElementById('linha-desconto');
+    const labelDesconto = document.getElementById('label-desconto');
+    const valDesconto = document.getElementById('val-desconto');
+
+    if (clienteAtual.associado && descontoAssociadoPercent > 0) {
+        descontoValor = subtotal * (descontoAssociadoPercent / 100);
+        labelDesconto.textContent = `Desconto (${descontoAssociadoPercent}%)`;
+        valDesconto.textContent = `- R$ ${descontoValor.toFixed(2)}`;
+        linhaDesconto.style.display = 'flex';
+    } else {
+        linhaDesconto.style.display = 'none';
+    }
+
+    const totalFinal = Math.max(0, subtotal - descontoValor);
+
+    document.getElementById('val-subtotal').textContent = `R$ ${subtotal.toFixed(2)}`;
+    document.getElementById('val-total').textContent = `R$ ${totalFinal.toFixed(2)}`;
+
+    document.getElementById('input-carrinho').value = JSON.stringify(
+        carrinho.map(item => ({
+            produto_id: item.id,
+            nome: item.nome,
+            preco: item.preco,
+            quantidade: item.quantidade
+        }))
+    );
+}
+
+// ── 5. FINALIZAR VENDA COM MODAL ESTILIZADO ───────────────────
 function finalizarVenda() {
-    if (carrinho.length === 0) return;
-    if (!window.confirm('Confirma o fechamento desta venda no sistema AAPM SENAI?')) return;
+    if (carrinho.length === 0) {
+        alert('O carrinho está vazio.');
+        return;
+    }
 
-    document.getElementById('input-carrinho').value = JSON.stringify(carrinho.map(i => ({
-        produto_id: i.produto_id,
-        nome: i.nome,
-        preco: i.preco,
-        quantidade: i.quantidade,
-    })));
+    const modal = document.getElementById('modal-confirmacao');
+    const btnSim = document.getElementById('modal-btn-sim');
+    const btnNao = document.getElementById('modal-btn-nao');
 
-    document.getElementById('input-cliente-id').value = clienteAtual.id;
-    document.getElementById('input-obs').value = document.getElementById('obs-input').value;
+    if (!modal) {
+        if (window.confirm('Deseja realmente finalizar esta venda?')) {
+            submeterVenda();
+        }
+        return;
+    }
+
+    modal.classList.add('ativo');
+
+    const aoConfirmar = () => {
+        limparEventosModal();
+        modal.classList.remove('ativo');
+        submeterVenda();
+    };
+
+    const aoCancelar = () => {
+        limparEventosModal();
+        modal.classList.remove('ativo');
+    };
+
+    function limparEventosModal() {
+        btnSim.removeEventListener('click', aoConfirmar);
+        btnNao.removeEventListener('click', aoCancelar);
+        modal.removeEventListener('click', foraModal);
+    }
+
+    const foraModal = (e) => {
+        if (e.target === modal) aoCancelar();
+    };
+
+    btnSim.addEventListener('click', aoConfirmar);
+    btnNao.addEventListener('click', aoCancelar);
+    modal.addEventListener('click', foraModal);
+}
+
+function submeterVenda() {
+    const obsInput = document.getElementById('obs-input');
+    const inputObs = document.getElementById('input-obs');
+    if (obsInput && inputObs) {
+        inputObs.value = obsInput.value;
+    }
 
     document.getElementById('form-venda').submit();
 }
-
-// ── Filtro de busca de produtos ───────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-    const buscaInput = document.getElementById('busca-produto');
-    if (buscaInput) {
-        buscaInput.addEventListener('input', function () {
-            const termo = this.value.toLowerCase().trim();
-            document.querySelectorAll('.produto-card').forEach(card => {
-                const nome = card.dataset.nomeLower || '';
-                card.style.display = nome.includes(termo) ? '' : 'none';
-            });
-        });
-    }
-});
