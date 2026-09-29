@@ -35,7 +35,7 @@
             <span class="stats-valor">{{ total_associados }}</span>
         </section>
 
-        <!-- Filtros -->
+        <!-- Filtros (Layout Assimétrico e Dropdowns Customizados) -->
         <section class="filtros-card">
             <form method="get" action="/clientes" class="filtros-form">
 
@@ -50,35 +50,62 @@
 
                 <div class="filtro-linha secundaria">
                     <label class="checkbox-label">
-                        <input type="checkbox" name="apenas_associados" value="true" {{ 'checked' if apenas_associados
-                            }}>
+                        <input type="checkbox" name="apenas_associados" value="true" {{ 'checked' if apenas_associados }}>
                         <span>Apenas associados</span>
                     </label>
 
-                    <select name="status" class="form-control">
-                        <option value="">Todos os status</option>
-                        <option value="ativo" {{ 'selected' if status=='ativo' else '' }}>Ativos</option>
-                        <option value="inativo" {{ 'selected' if status=='inativo' else '' }}>Inativos</option>
-                    </select>
+                    <!-- Dropdown Customizado: Status -->
+                    <div class="custom-dropdown" id="dropdown-status">
+                        <div class="dropdown-selected">
+                            {% set status_map = {'': 'Todos os status', 'ativo': 'Ativos', 'inativo': 'Inativos'} %}
+                            {{ status_map.get(status, 'Todos os status') }}
+                        </div>
+                        <div class="dropdown-options">
+                            <div class="dropdown-option {% if not status %}selected{% endif %}" data-value="">Todos os status</div>
+                            <div class="dropdown-option {% if status == 'ativo' %}selected{% endif %}" data-value="ativo">Ativos</div>
+                            <div class="dropdown-option {% if status == 'inativo' %}selected{% endif %}" data-value="inativo">Inativos</div>
+                        </div>
+                        <input type="hidden" name="status" id="input-status" value="{{ status or '' }}">
+                    </div>
 
-                    <select name="ordenar_por" class="form-control">
-                        <option value="nome" {{ 'selected' if ordenar_por=='nome' else '' }}>Ordenar por: Nome</option>
-                        <option value="matricula" {{ 'selected' if ordenar_por=='matricula' else '' }}>Ordenar por:
-                            Matrícula</option>
-                        <option value="criado_em" {{ 'selected' if ordenar_por=='criado_em' else '' }}>Ordenar por: Data
-                            de cadastro</option>
-                    </select>
+                    <!-- Dropdown Customizado: Ordenar por -->
+                    <div class="custom-dropdown" id="dropdown-ordenar">
+                        <div class="dropdown-selected">
+                            {% set ord_map = {'nome': 'Ordenar por: Nome', 'matricula': 'Ordenar por: Matrícula', 'criado_em': 'Ordenar por: Data de cadastro'} %}
+                            {{ ord_map.get(ordenar_por, 'Ordenar por: Nome') }}
+                        </div>
+                        <div class="dropdown-options">
+                            <div class="dropdown-option {% if ordenar_por == 'nome' or not ordenar_por %}selected{% endif %}" data-value="nome">Ordenar por: Nome</div>
+                            <div class="dropdown-option {% if ordenar_por == 'matricula' %}selected{% endif %}" data-value="matricula">Ordenar por: Matrícula</div>
+                            <div class="dropdown-option {% if ordenar_por == 'criado_em' %}selected{% endif %}" data-value="criado_em">Ordenar por: Data de cadastro</div>
+                        </div>
+                        <input type="hidden" name="ordenar_por" id="input-ordenar" value="{{ ordenar_por or 'nome' }}">
+                    </div>
 
-                    <select name="direcao" class="form-control">
-                        <option value="asc" {{ 'selected' if direcao=='asc' else '' }}>Crescente</option>
-                        <option value="desc" {{ 'selected' if direcao=='desc' else '' }}>Decrescente</option>
-                    </select>
+                    <!-- Dropdown Customizado: Direção -->
+                    <div class="custom-dropdown" id="dropdown-direcao">
+                        <div class="dropdown-selected">
+                            {{ 'Decrescente' if direcao == 'desc' else 'Crescente' }}
+                        </div>
+                        <div class="dropdown-options">
+                            <div class="dropdown-option {% if direcao == 'asc' or not direcao %}selected{% endif %}" data-value="asc">Crescente</div>
+                            <div class="dropdown-option {% if direcao == 'desc' %}selected{% endif %}" data-value="desc">Decrescente</div>
+                        </div>
+                        <input type="hidden" name="direcao" id="input-direcao" value="{{ direcao or 'asc' }}">
+                    </div>
 
-                    <select name="por_pagina" class="form-control">
-                        <option value="10" {{ 'selected' if por_pagina==10 else '' }}>10 por página</option>
-                        <option value="25" {{ 'selected' if por_pagina==25 else '' }}>25 por página</option>
-                        <option value="50" {{ 'selected' if por_pagina==50 else '' }}>50 por página</option>
-                    </select>
+                    <!-- Dropdown Customizado: Por página -->
+                    <div class="custom-dropdown" id="dropdown-por-pagina">
+                        <div class="dropdown-selected">
+                            {{ por_pagina or 10 }} por página
+                        </div>
+                        <div class="dropdown-options">
+                            <div class="dropdown-option {% if por_pagina|string == '10' or not por_pagina %}selected{% endif %}" data-value="10">10 por página</div>
+                            <div class="dropdown-option {% if por_pagina|string == '25' %}selected{% endif %}" data-value="25">25 por página</div>
+                            <div class="dropdown-option {% if por_pagina|string == '50' %}selected{% endif %}" data-value="50">50 por página</div>
+                        </div>
+                        <input type="hidden" name="por_pagina" id="input-por-pagina" value="{{ por_pagina or 10 }}">
+                    </div>
                 </div>
 
             </form>
