@@ -1,29 +1,60 @@
 /**
  * ==========================================================================
- * LISTAGEM DE CLIENTES SCRIPT — AAPM SENAI
+ * GESTÃO DE CLIENTES SCRIPT — AAPM SENAI
  * ==========================================================================
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-    const filtrosForm = document.querySelector('.filtros-form');
+    initClientesDropdowns();
+});
 
-    if (!filtrosForm) return;
+function initClientesDropdowns() {
+    const dropdowns = document.querySelectorAll('.custom-dropdown');
 
-    // Submete o formulário automaticamente ao alterar os seletores de filtro/ordenação
-    const selectsAutoSubmit = filtrosForm.querySelectorAll('select[name="status"], select[name="ordenar_por"], select[name="direcao"], select[name="por_pagina"]');
+    dropdowns.forEach(dropdown => {
+        const selectedText = dropdown.querySelector('.dropdown-selected');
+        const optionsList = dropdown.querySelector('.dropdown-options');
+        const hiddenInput = dropdown.querySelector('input[type="hidden"]');
 
-    selectsAutoSubmit.forEach(select => {
-        select.addEventListener('change', () => {
-            filtrosForm.submit();
+        if (!selectedText || !optionsList) return;
+
+        // Abrir/Fechar ao clicar no seletor visível
+        selectedText.addEventListener('click', (e) => {
+            e.stopPropagation();
+            
+            // Fecha todos os outros dropdowns abertos
+            dropdowns.forEach(other => {
+                if (other !== dropdown) other.classList.remove('ativo');
+            });
+
+            // Alterna o estado do atual
+            dropdown.classList.toggle('ativo');
+        });
+
+        // Selecionar uma opção da lista
+        optionsList.addEventListener('click', (e) => {
+            const option = e.target.closest('.dropdown-option');
+            if (!option) return;
+
+            // Remove a seleção anterior e marca a nova
+            optionsList.querySelectorAll('.dropdown-option').forEach(opt => opt.classList.remove('selected'));
+            option.classList.add('selected');
+            
+            // Atualiza o texto visível com o valor escolhido
+            selectedText.textContent = option.textContent.trim();
+            
+            // Atualiza o valor do input hidden para enviar no formulário GET
+            if (hiddenInput) {
+                hiddenInput.value = option.dataset.value;
+            }
+
+            // Fecha o menu dropdown
+            dropdown.classList.remove('ativo');
         });
     });
 
-    const checkboxAssociados = filtrosForm.querySelector('input[name="apenas_associados"]');
-    if (checkboxAssociados) {
-        checkboxAssociados.addEventListener('change', () => {
-            filtrosForm.submit();
-        });
-    }
-
-    console.log("Gestão de clientes inicializada com sucesso.");
-});
+    // Fecha todos os dropdowns ao clicar fora da área dos filtros
+    document.addEventListener('click', () => {
+        dropdowns.forEach(dropdown => dropdown.classList.remove('ativo'));
+    });
+}
