@@ -56,7 +56,7 @@ def test_criar_produto_com_sucesso(cliente):
         follow_redirects=False
         )
 
-    assert resposta.status_code == 200
+    assert resposta.status_code == 302
     assert resposta.headers["location"] == "/produtos?criado=ok"
 
     resposta_lista = cliente.get("/produtos/")
