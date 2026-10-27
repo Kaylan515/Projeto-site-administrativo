@@ -2,15 +2,15 @@
 
 :root {
     --bg-color: #0c0a09;
-    --card-bg: rgba(24, 20, 18, 0.85);
-    --surface-2: rgba(33, 27, 26, 0.95);
+    --card-bg: rgba(24, 20, 18, 0.75);
+    --surface-2: rgba(33, 27, 26, 0.85);
     --border-color: rgba(68, 54, 51, 0.5);
     --primary-color: #d97706;
     --primary-hover: #b45309;
+    --green: #22c55e;
+    --red: #ef4444;
     --text-main: #f5f5f4;
     --text-muted: #a8a29e;
-    --red: #ef4444;
-    --green: #22c55e;
     --font-head: 'Space Grotesk', system-ui, sans-serif;
     --font-body: 'DM Sans', system-ui, sans-serif;
     --radius: 16px;
@@ -30,6 +30,41 @@ body {
     font-size: 14px;
     min-height: 100vh;
     padding: 2.5rem;
+}
+
+/* ── BARRA DE ROLAGEM (SCROLLBAR) ESCURA ── */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #332a24 #181412;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #181412;
+    border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #332a24;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
+}
+
+::-webkit-scrollbar-button {
+    display: none;
+}
+
+/* Oculta qualquer select nativo legado */
+select {
+    display: none !important;
 }
 
 .historico-container {
@@ -80,7 +115,7 @@ body {
 }
 .btn-novo:hover { background-color: var(--primary-hover); }
 
-/* Resumo em Blocos/Cards */
+/* Resumo em Cards */
 .resumo-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -95,7 +130,6 @@ body {
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
-    backdrop-filter: blur(10px);
 }
 
 .resumo-label {
@@ -115,76 +149,120 @@ body {
 .resumo-card.entrada .resumo-valor { color: var(--green); }
 .resumo-card.saida .resumo-valor { color: var(--red); }
 
-/* Tabela Moderna */
+/* Filtros */
+.filtros-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.busca-wrapper {
+    display: flex;
+    align-items: center;
+    background: var(--surface-2);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 0.5rem 1rem;
+    gap: 0.75rem;
+}
+
+.busca-wrapper input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-main);
+    width: 100%;
+    font-size: 0.9rem;
+}
+
+.btn-filtrar {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    padding: 0.5rem 1.25rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 600;
+}
+.btn-filtrar:hover {
+    border-color: var(--primary-color);
+}
+
+.selects-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+/* ── ESTILO CUSTOM DROPDOWN (IDÊNTICO AO PDV) ── */
+.custom-dropdown {
+    position: relative !important;
+    min-width: 180px !important;
+    background: rgba(33, 27, 26, 0.85) !important;
+    border: 1px solid rgba(68, 54, 51, 0.5) !important;
+    border-radius: 10px !important;
+    cursor: pointer !important;
+    user-select: none !important;
+}
+
+.custom-dropdown.ativo {
+    border-color: #d97706 !important;
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15) !important;
+}
+
+.dropdown-selected {
+    padding: 0.6rem 2rem 0.6rem 0.75rem !important;
+    font-size: 0.85rem !important;
+    color: #f5f5f4 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d97706' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.75rem center !important;
+    background-size: 0.9rem !important;
+}
+
+.dropdown-options {
+    position: absolute !important;
+    top: calc(100% + 4px) !important;
+    left: 0 !important;
+    width: 100% !important;
+    background: #181412 !important;
+    border: 1px solid #d97706 !important;
+    border-radius: 10px !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6) !important;
+    z-index: 9999 !important;
+    max-height: 200px !important;
+    overflow-y: auto !important;
+    display: none !important;
+}
+
+.custom-dropdown.ativo .dropdown-options {
+    display: block !important;
+}
+
+.dropdown-option {
+    padding: 0.6rem 0.75rem !important;
+    font-size: 0.85rem !important;
+    color: #f5f5f4 !important;
+    transition: background 0.15s, color 0.15s !important;
+}
+
+.dropdown-option:hover {
+    background-color: rgba(217, 119, 6, 0.2) !important;
+    color: #d97706 !important;
+}
+
+.dropdown-option.selected {
+    background-color: rgba(217, 119, 6, 0.25) !important;
+    color: #d97706 !important;
+    font-weight: 600 !important;
+}
+
+/* Tabela */
 .tabela-wrapper {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: var(--radius);
-    overflow: hidden;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-}
-
-.tabela-mov {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: left;
-}
-
-.tabela-mov th {
-    background: var(--surface-2);
-    color: var(--text-muted);
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.tabela-mov td {
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid var(--border-color);
-    font-size: 0.9rem;
-}
-
-.tabela-mov tbody tr:last-child td {
-    border-bottom: none;
-}
-
-.tabela-mov tbody tr:hover {
-    background: var(--surface-2);
-}
-
-/* Badges de Tipo */
-.badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    font-weight: 600;
-}
-
-.badge.entrada {
-    background: rgba(34, 197, 94, 0.15);
-    border: 1px solid rgba(34, 197, 94, 0.4);
-    color: #4ade80;
-}
-
-.badge.saida {
-    background: rgba(239, 68, 68, 0.15);
-    border: 1px solid rgba(239, 68, 68, 0.4);
-    color: #fca5a5;
-}
-
-.font-head {
-    font-family: var(--font-head);
-    font-weight: 600;
-}
-
-.vazio {
-    text-align: center;
-    color: var(--text-muted);
-    padding: 3rem !important;
-}
+    overflow-

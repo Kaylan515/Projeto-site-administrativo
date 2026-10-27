@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <title>Histórico — {{ produto.nome }} — AAPM SENAI</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/css/movimentacoes/historico.css">
+    <link rel="stylesheet" href="/static/css/movimentacoes/historico.css?v=2">
+    <script src="/static/js/ui.js" defer></script>
 </head>
 
 <body>
@@ -15,66 +16,134 @@
         <header class="historico-header">
             <div>
                 <a href="/produtos/{{ produto.id }}" class="btn-voltar">← Voltar ao produto</a>
-                <h1>Histórico — {{ produto.nome }}[cite: 3]</h1>
+                <h1>Histórico — {{ produto.nome }}</h1>
             </div>
             <a href="/movimentacoes/nova?produto_id={{ produto.id }}" class="btn-novo">
-                + Registrar movimentação[cite: 3]
+                + Registrar movimentação
             </a>
         </header>
 
         <!-- Resumo do produto -->
         <section class="resumo-grid">
             <div class="resumo-card">
-                <span class="resumo-label">Estoque atual[cite: 3]</span>
-                <span class="resumo-valor">{{ produto.estoque_atual }}[cite: 3]</span>
+                <span class="resumo-label">Estoque atual</span>
+                <span class="resumo-valor">{{ produto.estoque_atual }}</span>
             </div>
             <div class="resumo-card entrada">
-                <span class="resumo-label">Total de entradas[cite: 3]</span>
-                <span class="resumo-valor">+ {{ total_entradas }}[cite: 3]</span>
+                <span class="resumo-label">Total de entradas</span>
+                <span class="resumo-valor">+ {{ total_entradas }}</span>
             </div>
             <div class="resumo-card saida">
-                <span class="resumo-label">Total de saídas[cite: 3]</span>
-                <span class="resumo-valor">- {{ total_saidas }}[cite: 3]</span>
+                <span class="resumo-label">Total de saídas</span>
+                <span class="resumo-valor">- {{ total_saidas }}</span>
             </div>
         </section>
+
+        <!-- Barra de Busca e Filtros com a Estrutura do PDV -->
+        <form method="GET" class="filtros-container" id="form-filtros">
+            <div class="busca-wrapper">
+                <span class="busca-icon">🔍</span>
+                <input type="text" name="busca" placeholder="Buscar por produto ou observação..." value="{{ request.args.get('busca', '') }}">
+                <button type="submit" class="btn-filtrar">Filtrar</button>
+            </div>
+
+            <div class="selects-row">
+                
+                <!-- CUSTOM DROPDOWN: Produtos -->
+                <div class="custom-dropdown">
+                    <input type="hidden" name="produto_id" value="{{ request.args.get('produto_id', '') }}">
+                    <div class="dropdown-selected">
+                        {% if produto_selecionado %}{{ produto_selecionado.nome }}{% else %}Todos os produtos{% endif %}
+                    </div>
+                    <div class="dropdown-options">
+                        <div class="dropdown-option {% if not request.args.get('produto_id') %}selected{% endif %}" data-value="">Todos os produtos</div>
+                        {% for p in produtos %}
+                        <div class="dropdown-option {% if request.args.get('produto_id') == p.id|string %}selected{% endif %}" data-value="{{ p.id }}">{{ p.nome }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- CUSTOM DROPDOWN: Tipos -->
+                <div class="custom-dropdown">
+                    <input type="hidden" name="tipo" value="{{ request.args.get('tipo', '') }}">
+                    <div class="dropdown-selected">
+                        {% if request.args.get('tipo') == 'entrada' %}Entrada
+                        {% elif request.args.get('tipo') == 'saida' %}Saída
+                        {% else %}Todos os tipos{% endif %}
+                    </div>
+                    <div class="dropdown-options">
+                        <div class="dropdown-option {% if not request.args.get('tipo') %}selected{% endif %}" data-value="">Todos os tipos</div>
+                        <div class="dropdown-option {% if request.args.get('tipo') == 'entrada' %}selected{% endif %}" data-value="entrada">Entrada</div>
+                        <div class="dropdown-option {% if request.args.get('tipo') == 'saida' %}selected{% endif %}" data-value="saida">Saída</div>
+                    </div>
+                </div>
+
+                <!-- CUSTOM DROPDOWN: Ordenação -->
+                <div class="custom-dropdown">
+                    <input type="hidden" name="ordem" value="{{ request.args.get('ordem', 'data') }}">
+                    <div class="dropdown-selected">
+                        {% if request.args.get('ordem') == 'valor' %}Ordenar por: Valor
+                        {% else %}Ordenar por: Data{% endif %}
+                    </div>
+                    <div class="dropdown-options">
+                        <div class="dropdown-option {% if request.args.get('ordem') != 'valor' %}selected{% endif %}" data-value="data">Ordenar por: Data</div>
+                        <div class="dropdown-option {% if request.args.get('ordem') == 'valor' %}selected{% endif %}" data-value="valor">Ordenar por: Valor</div>
+                    </div>
+                </div>
+
+                <!-- CUSTOM DROPDOWN: Direção -->
+                <div class="custom-dropdown">
+                    <input type="hidden" name="direcao" value="{{ request.args.get('direcao', 'desc') }}">
+                    <div class="dropdown-selected">
+                        {% if request.args.get('direcao') == 'asc' %}Crescente
+                        {% else %}Decrescente{% endif %}
+                    </div>
+                    <div class="dropdown-options">
+                        <div class="dropdown-option {% if request.args.get('direcao') != 'asc' %}selected{% endif %}" data-value="desc">Decrescente</div>
+                        <div class="dropdown-option {% if request.args.get('direcao') == 'asc' %}selected{% endif %}" data-value="asc">Crescente</div>
+                    </div>
+                </div>
+
+            </div>
+        </form>
 
         <!-- Tabela de Movimentações -->
         <div class="tabela-wrapper">
             <table class="tabela-mov">
                 <thead>
                     <tr>
-                        <th>Data[cite: 3]</th>
-                        <th>Tipo[cite: 3]</th>
-                        <th>Quantidade[cite: 3]</th>
-                        <th>Preço unit.[cite: 3]</th>
-                        <th>Total[cite: 3]</th>
-                        <th>Observação[cite: 3]</th>
-                        <th>Registrado por[cite: 3]</th>
+                        <th>Data</th>
+                        <th>Tipo</th>
+                        <th>Quantidade</th>
+                        <th>Preço unit.</th>
+                        <th>Total</th>
+                        <th>Observação</th>
+                        <th>Registrado por</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for m in movimentacoes %}
                     <tr>
-                        <td>{{ m.criado_em.strftime('%d/%m/%Y %H:%M') }}[cite: 3]</td>
+                        <td>{{ m.criado_em.strftime('%d/%m/%Y %H:%M') }}</td>
                         <td>
-                            {% if m.tipo.value == 'entrada' %}[cite: 3]
-                            <span class="badge entrada">▲ Entrada[cite: 3]</span>
+                            {% if m.tipo.value == 'entrada' %}
+                            <span class="badge entrada">▲ Entrada</span>
                             {% else %}
-                            <span class="badge saida">▼ Saída[cite: 3]</span>
+                            <span class="badge saida">▼ Saída</span>
                             {% endif %}
                         </td>
-                        <td>{{ m.quantidade }}[cite: 3]</td>
-                        <td>R$ {{ "%.2f"|format(m.preco_unitario) }}[cite: 3]</td>
-                        <td class="font-head">R$ {{ "%.2f"|format(m.valor_total) }}[cite: 3]</td>
-                        <td>{{ m.observacao or "—" }}[cite: 3]</td>
-                        <td>{{ m.usuario.nome if m.usuario else "—" }}[cite: 3]</td>
+                        <td>{{ m.quantidade }}</td>
+                        <td>R$ {{ "%.2f"|format(m.preco_unitario) }}</td>
+                        <td class="font-head">R$ {{ "%.2f"|format(m.valor_total) }}</td>
+                        <td>{{ m.observacao or "—" }}</td>
+                        <td>{{ m.usuario.nome if m.usuario else "—" }}</td>
                     </tr>
                     {% endfor %}
 
                     {% if not movimentacoes %}
                     <tr>
                         <td colspan="7" class="vazio">
-                            Nenhuma movimentação registrada.[cite: 3]
+                            Nenhuma movimentação registrada.
                         </td>
                     </tr>
                     {% endif %}
@@ -83,7 +152,7 @@
         </div>
 
     </div>
-    <script src="/static/js/movimentacoes/historico.js" defer></script>
+    <script src="/static/js/movimentacoes/historico.js?v=2" defer></script>
 </body>
 
 </html>

@@ -133,6 +133,42 @@ a { color: inherit; text-decoration: none; }
     margin-top: 2px;
 }
 
+.sidebar-brand-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.sidebar-brand-row .logo-name { margin-top: 4px; }
+.sidebar-brand-row .aapm-nav-toggle {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    place-items: center;
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 1px solid rgba(245, 158, 11, .7);
+    border-radius: 50%;
+    color: #fde68a;
+    background: linear-gradient(145deg, rgba(217, 119, 6, .35), rgba(120, 53, 15, .48));
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, .10), inset 0 1px rgba(255, 255, 255, .14), 0 5px 14px rgba(0, 0, 0, .3);
+    cursor: pointer;
+    transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+}
+.sidebar-brand-row .aapm-nav-toggle span { font: 500 22px/1 var(--font-body); }
+.sidebar-brand-row .aapm-nav-toggle:hover { transform: rotate(-8deg) scale(1.07); box-shadow: 0 0 0 4px rgba(217, 119, 6, .15), 0 0 18px rgba(217, 119, 6, .3); }
+.sidebar-brand-row .aapm-nav-toggle:focus-visible { outline: 2px solid #fbbf24; outline-offset: 4px; }
+
+body.aapm-nav-collapsed .layout { grid-template-columns: 76px minmax(0, 1fr); }
+body.aapm-nav-collapsed .sidebar { overflow: hidden; }
+body.aapm-nav-collapsed .sidebar-logo { padding: 0 8px 16px; text-align: center; }
+body.aapm-nav-collapsed .sidebar-logo .logo-tag,
+body.aapm-nav-collapsed .sidebar-logo .logo-sub,
+body.aapm-nav-collapsed .sidebar-logo .logo-name { display: none; }
+body.aapm-nav-collapsed .sidebar-brand-row { justify-content: center; }
+body.aapm-nav-collapsed .sidebar-brand-row .aapm-nav-toggle { flex-basis: 34px; padding: 0; font-size: 13px; }
+body.aapm-nav-collapsed .sidebar-nav .nav-section { display: none; }
+body.aapm-nav-collapsed .sidebar-nav .nav-link { justify-content: center; padding: 10px 4px; overflow: hidden; font-size: 0; }
+body.aapm-nav-collapsed .sidebar-nav .nav-link .icon { font-size: 16px; }
+body.aapm-nav-collapsed .sidebar-footer { display: none; }
+
 .sidebar-nav {
     padding: 20px 12px;
     flex: 1;
@@ -580,33 +616,49 @@ a[href='/pdv'] .icon::after { content: 'point_of_sale'; }
 .fade-in:nth-child(3) { animation-delay: .15s; }
 .fade-in:nth-child(4) { animation-delay: .20s; }
 
-@media (max-width: 1050px) {
+@media (max-width: 1200px) {
     .layout { grid-template-columns: 220px 1fr; }
-    .main { padding: 32px 28px; }
+    .main { min-width: 0; padding: 30px 24px; }
     .cards-grid { grid-template-columns: repeat(2, 1fr); }
     .bottom-grid { grid-template-columns: 1fr; }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 760px) {
     .layout { display: block; }
     .sidebar { 
         position: static; 
-        height: auto; 
+        height: auto;
         min-height: auto; 
-        padding: 16px 0; 
+        padding: 14px 0 8px;
+        border-right: 0;
+        border-bottom: 1px solid var(--border-color);
     }
+    .sidebar-logo { padding: 0 18px 12px; }
+    .sidebar-logo .logo-name { font-size: 1.25rem; }
     .sidebar-nav { 
         flex-direction: row; 
         overflow-x: auto; 
-        padding: 10px 12px; 
+        padding: 8px 12px 10px;
         -webkit-overflow-scrolling: touch; 
     }
     .nav-section, .sidebar-footer { display: none; }
-    .nav-link { flex: 0 0 auto; }
-    .main { padding: 28px 18px; }
+    .nav-link { flex: 0 0 auto; white-space: nowrap; }
+    body.aapm-nav-collapsed .sidebar { padding: 8px 0; }
+    body.aapm-nav-collapsed .sidebar-logo { display: flex; justify-content: flex-end; padding: 0 12px 8px; border: 0; }
+    body.aapm-nav-collapsed .sidebar-brand-row .aapm-nav-toggle { flex-basis: 34px; width: 34px; height: 34px; }
+    body.aapm-nav-collapsed .sidebar-nav { display: none; }
+    .main { padding: 24px 18px; }
     .cards-grid { grid-template-columns: 1fr; }
     .page-header h1 { font-size: 2rem; }
     .pie-chart-wrap { flex-direction: column; align-items: flex-start; }
+}
+
+@media (max-width: 480px) {
+    .main { padding: 20px 14px; }
+    .page-header h1 { font-size: 1.7rem; }
+    .dashboard-hero { padding: 22px 18px; }
+    .dashboard-hero h2 { font-size: 1.25rem; }
+    .cards-grid { gap: 12px; }
 }
 
 /* ==========================================================================
