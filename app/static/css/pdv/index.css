@@ -250,7 +250,7 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d97706' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-image: none;
     background-repeat: no-repeat;
     background-position: right 0.75rem center;
     background-size: 0.9rem;
@@ -598,3 +598,9 @@ body {
 .btn-modal-confirmar:hover {
     background-color: var(--primary-hover);
 }
+/* Page heading aligned with the administrative dashboard. */
+.pdv-page-header { padding: 0 2rem 12px; }
+.pdv-page-kicker { color: var(--text-muted); font: 600 11px var(--font-head); letter-spacing: .08em; }
+.pdv-page-header h1 { margin: 8px 0 10px; color: var(--text-main); font: 700 clamp(1.8rem, 3vw, 2.4rem)/1.15 var(--font-head); letter-spacing: -.035em; }
+.pdv-page-header p { color: var(--text-muted); font-size: 14px; line-height: 1.6; }
+@media (max-width: 760px) { .pdv-page-header { padding-inline: 0; } }

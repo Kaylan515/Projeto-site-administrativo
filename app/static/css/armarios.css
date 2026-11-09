@@ -63,7 +63,7 @@
 
 .locker-grid a:hover {
     color: #f59e0b;
-    text-decoration: underline;
+    text-decoration: none;
 }
 
 @media (max-width: 620px) {

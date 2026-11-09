@@ -8,8 +8,13 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/armarios/index.css">
     <script src="/static/js/ui.js" defer></script>
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <link rel="stylesheet" href="/static/css/typography.css">
 </head>
-<body>
+<body class="admin-page">
+    <div class="layout">
+        {% include "_sidebar.html" %}
+        <div class="admin-main">
     <div class="spotlight" id="spotlight"></div>
 
     <div class="page-wrapper">
@@ -147,7 +152,7 @@
                             {% if a.status.value == 'disponivel' %}
                             <a href="/armarios/{{ a.id }}/alugar" class="btn-card-action">Alugar</a>
                             {% elif a.status.value == 'alugado' %}
-                            <form action="/armarios/{{ a.id }}/liberar" method="post" onsubmit="return confirm('Confirma a liberação do armário {{ a.numero }} no sistema AAPM SENAI?')">
+                            <form action="/armarios/{{ a.id }}/liberar" method="post" data-confirm="Confirma a liberação do armário {{ a.numero }} no sistema AAPM SENAI?">
                                 <button type="submit" class="btn-card-action btn-danger-soft">Liberar</button>
                             </form>
                             {% endif %}
@@ -164,18 +169,20 @@
             </div>
 
             <div class="back-dashboard-row">
-                <a href="/" class="btn-secondary">← Voltar ao Dashboard</a>
+                <a href="/" class="btn-secondary">Voltar ao Dashboard</a>
             </div>
         </main>
 
         <footer class="site-footer">
             <div class="footer-info">
-                <p><strong>Associação de Pais e Mestres</strong> • SENAI</p>
+                <p><strong>Associação de Pais e Mestres</strong>• SENAI</p>
                 <p class="footer-sub">Plataforma interna de gestão acadêmica e operacional.</p>
             </div>
         </footer>
     </div>
 
     <script src="/static/js/armarios/index.js" defer></script>
+        </div>
+    </div>
 </body>
 </html>

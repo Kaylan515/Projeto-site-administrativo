@@ -10,13 +10,20 @@
     <link rel="stylesheet" href="/static/css/pdv/index.css">
     <script src="/static/js/pdv/index.js" defer></script>
     <script src="/static/js/ui.js" defer></script>
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <link rel="stylesheet" href="/static/css/typography.css">
 </head>
 
-<body data-desconto-associado="{{ desconto_associado }}">
+<body class="admin-page" data-desconto-associado="{{ desconto_associado }}">
+    <div class="layout">
+        {% include "_sidebar.html" %}
+        <div class="admin-main">
 
     <!-- ── TOPO ── -->
-    <header class="topbar">
-        <span class="topbar-title">🏪 PDV — AAPM SENAI</span>
+    <header class="pdv-page-header">
+        <span class="pdv-page-kicker">VENDAS</span>
+        <h1>Ponto de venda</h1>
+        <p>Selecione os produtos e finalize a venda pelo carrinho.</p>
     </header>
 
     <!-- ── Alertas vindos da query string ── -->
@@ -152,15 +159,6 @@
         </aside>
     </div>
 
-    <!-- ── MODAL DE CONFIRMAÇÃO CUSTOMIZADO ── -->
-    <div class="modal-overlay" id="modal-confirmacao">
-        <div class="modal-box">
-            <div class="modal-header">Confirmar Venda</div>
-            <div class="modal-body">Deseja realmente finalizar esta transação?</div>
-            <div class="modal-actions">
-                <button type="button" class="btn-modal-cancelar" id="modal-btn-nao">Cancelar</button>
-                <button type="button" class="btn-modal-confirmar" id="modal-btn-sim">Sim, Finalizar</button>
-            </div>
         </div>
     </div>
 </body>

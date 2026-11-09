@@ -12,11 +12,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,1,0&display=swap" rel="stylesheet">
     
     <!-- Estilo atualizado com a subpasta CSS de usuários -->
+    <link rel="stylesheet" href="/static/css/dashboard.css">
     <link rel="stylesheet" href="/static/css/usuarios/usuarios.css">
     <script src="/static/js/ui.js" defer></script>
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <link rel="stylesheet" href="/static/css/typography.css">
 </head>
 
-<body data-role="{{ usuario.role if usuario else 'admin' }}">
+<body data-role="{{ usuario.role if usuario else 'admin' }}" class="admin-page">
     <!-- Efeito de Spotlight do Mouse -->
     <div class="spotlight" id="spotlight"></div>
 
@@ -25,40 +28,7 @@
         <!-- =====================================================
              SIDEBAR DE NAVEGAÇÃO
         ===================================================== -->
-        <aside class="sidebar">
-            <div class="sidebar-logo">
-                <div class="logo-tag">Sistema</div>
-                <div class="logo-name">AAPM</div>
-                <div class="logo-sub">SENAI — Gestão de Loja</div>
-            </div>
-
-            <nav class="sidebar-nav">
-                <div class="nav-section">Principal</div>
-                <a href="/" class="nav-link"><span class="icon">⊞</span> Dashboard</a>
-                <a href="/produtos" class="nav-link"><span class="icon">📦</span> Produtos</a>
-                <a href="/categorias" class="nav-link"><span class="icon">🏷</span> Categorias</a>
-                <a href="/movimentacoes" class="nav-link"><span class="icon">↕</span> Movimentações</a>
-                <a href="/armarios" class="nav-link"><span class="icon">🔒</span> Armários</a>
-                <a href="/clientes" class="nav-link"><span class="icon">👥</span> Clientes</a>
-                <a href="/pdv" class="nav-link"><span class="icon">🛒</span> Ponto de venda</a>
-
-                <div class="nav-section">Administração</div>
-                <a href="/usuarios" class="nav-link active"><span class="icon">👥</span> Usuários</a>
-            </nav>
-
-            <div class="sidebar-footer">
-                {% if usuario %}
-                <div class="user-card">
-                    <div class="user-avatar">{{ usuario.nome[0].upper() }}</div>
-                    <div class="user-info">
-                        <div class="user-name">{{ usuario.nome }}</div>
-                        <div class="user-role">{{ usuario.role }}</div>
-                    </div>
-                </div>
-                {% endif %}
-                <a href="/auth/logout" class="logout-btn">← Sair</a>
-            </div>
-        </aside>
+        {% include "_sidebar.html" %}
 
         <!-- =====================================================
              CONTEÚDO PRINCIPAL
@@ -186,12 +156,22 @@
                 <div class="table-footer">
                     <span class="pagination-info">Página {{ pagina }} de {{ total_paginas }} ({{ total_usuarios }} usuários)</span>
                     {% set total_registros = total_usuarios %}
-                    {% include "_pagination.html" %}
+                    {% if total_paginas > 1 %}
+                    <nav class="pagination" aria-label="Paginação">
+                        <span>Página {{ pagina }} de {{ total_paginas }} ({{ total_registros }} registros)</span>
+                        {% if pagina > 1 %}
+                        <a href="{{ request.url.include_query_params(pagina=pagina - 1) }}">Anterior</a>
+                        {% endif %}
+                        {% if pagina < total_paginas %}
+                        <a href="{{ request.url.include_query_params(pagina=pagina + 1) }}">Próxima</a>
+                        {% endif %}
+                    </nav>
+                    {% endif %}
                 </div>
             </div>
 
             <div class="back-link-wrap" style="margin-top: 2rem;">
-                <a href="/" class="back-dashboard-link">← Voltar ao dashboard</a>
+                <a href="/" class="back-dashboard-link">Voltar ao dashboard</a>
             </div>
         </main>
     </div>

@@ -28,7 +28,7 @@
     function mountNavigation() {
         const body = document.body;
         const path = window.location.pathname;
-        if (path.startsWith('/auth/') || path === '/welcome' || path === '/erro' || body.classList.contains('auth-page')) return;
+        if (path.startsWith('/auth/') || path === '/welcome' || path === '/erro' || body.classList.contains('auth-page') || body.querySelector('.cupom')) return;
         const existingSidebar = body.querySelector('.sidebar');
         ensureNavigationStyles();
         if (existingSidebar) {
@@ -41,7 +41,9 @@
         nav.setAttribute('aria-label', 'Navegação principal');
         nav.innerHTML = '<div class="nav-brand-row"><span class="brand">AAPM · SENAI</span><button class="aapm-nav-toggle" type="button" aria-expanded="true" aria-label="Fechar menu"><span aria-hidden="true">×</span></button></div><a href="/">Dashboard</a><a href="/produtos">Produtos</a><a href="/categorias">Categorias</a><a href="/movimentacoes">Movimentações</a><a href="/armarios">Armários</a><a href="/clientes">Clientes</a><a href="/pdv">Ponto de venda</a><a href="/pdv/historico">Histórico de vendas</a><a href="/pdv/extrato">Extrato</a><a href="/usuarios">Usuários</a><a href="/auth/logout">Sair</a>';
         nav.querySelectorAll('a').forEach((link) => {
-            if (link.pathname === path || (link.pathname === '/movimentacoes' && path.startsWith('/movimentacoes/')) || (link.pathname === '/pdv' && path.startsWith('/pdv/'))) link.setAttribute('aria-current', 'page');
+            const matches = [...nav.querySelectorAll('a')].filter((item) => item.pathname === path || (item.pathname !== '/' && path.startsWith(item.pathname + '/')));
+            const active = matches.sort((a, b) => b.pathname.length - a.pathname.length)[0];
+            if (link === active) link.setAttribute('aria-current', 'page');
         });
         body.classList.add('aapm-with-nav');
         body.prepend(nav);
@@ -85,7 +87,7 @@
             body.aapm-nav-collapsed .sidebar-nav .nav-link { justify-content:center; padding:10px 4px; overflow:hidden; font-size:0; }
             body.aapm-nav-collapsed .sidebar-nav .nav-link .icon { font-size:16px; }
             body.aapm-with-nav { padding-left:260px !important; }
-            body.aapm-nav-collapsed { padding-left:76px !important; }
+            body.aapm-with-nav.aapm-nav-collapsed { padding-left:76px !important; }
             body.aapm-nav-collapsed .aapm-global-nav { width:76px; padding-inline:9px; }
             body.aapm-nav-collapsed .aapm-global-nav .nav-brand-row { justify-content:center; padding:0 0 14px; }
             body.aapm-nav-collapsed .aapm-global-nav .brand { display:none; }
@@ -94,14 +96,14 @@
             body.aapm-nav-collapsed .aapm-global-nav a[href='/']::after { content:'⌂'; }
             body.aapm-nav-collapsed .aapm-global-nav a[href='/produtos']::after { content:'▦'; }
             body.aapm-nav-collapsed .aapm-global-nav a[href='/categorias']::after { content:'▤'; }
-            body.aapm-nav-collapsed .aapm-global-nav a[href='/movimentacoes']::after { content:'↕'; }
+            body.aapm-nav-collapsed .aapm-global-nav a[href='/movimentacoes']::after { content:'▤'; }
             body.aapm-nav-collapsed .aapm-global-nav a[href='/armarios']::after { content:'▣'; }
             body.aapm-nav-collapsed .aapm-global-nav a[href='/clientes']::after { content:'♙'; }
             body.aapm-nav-collapsed .aapm-global-nav a[href='/pdv']::after { content:'▣'; }
             body.aapm-nav-collapsed .aapm-global-nav a[href='/pdv/historico']::after { content:'◷'; }
             body.aapm-nav-collapsed .aapm-global-nav a[href='/pdv/extrato']::after { content:'≡'; }
             body.aapm-nav-collapsed .aapm-global-nav a[href='/usuarios']::after { content:'♙'; }
-            body.aapm-nav-collapsed .aapm-global-nav a[href='/auth/logout']::after { content:'↪'; }
+            body.aapm-nav-collapsed .aapm-global-nav a[href='/auth/logout']::after { content:'⏻'; }
             @media(max-width:1200px) and (min-width:761px) { .aapm-global-nav { width:230px; } body.aapm-with-nav { padding-left:230px !important; } }
             @media(max-width:760px) {
                 .aapm-global-nav { inset:0 0 auto; width:100%; padding:8px 12px; flex-direction:row; align-items:center; overflow-x:auto; overflow-y:hidden; white-space:nowrap; border-right:0; border-bottom:1px solid var(--nav-border); box-shadow:0 10px 28px rgba(0,0,0,.24); }
@@ -114,7 +116,7 @@
                 body.aapm-nav-collapsed .sidebar-brand-row { display:flex; }
                 body.aapm-nav-collapsed .sidebar-logo .aapm-nav-toggle { display:grid; }
                 body.aapm-nav-collapsed .sidebar-nav { display:none; }
-                body.aapm-with-nav,body.aapm-nav-collapsed { padding:58px 0 0 !important; }
+                body.aapm-with-nav,body.aapm-with-nav.aapm-nav-collapsed { padding:58px 0 0 !important; }
                 body.aapm-nav-collapsed .aapm-global-nav { width:100%; padding:8px 12px; }
                 body.aapm-nav-collapsed .aapm-global-nav .nav-brand-row { padding:0 10px 0 2px; }
                 body.aapm-nav-collapsed .aapm-global-nav .brand { display:inline; }
@@ -135,13 +137,13 @@
         const collapsed = localStorage.getItem('aapm-nav-collapsed') === 'true';
         button.setAttribute('aria-expanded', String(!collapsed));
         button.setAttribute('aria-label', collapsed ? 'Abrir menu' : 'Fechar menu');
-        button.innerHTML = `<span aria-hidden="true">${collapsed ? '›' : '×'}</span>`;
+        button.innerHTML = `<span aria-hidden="true">${collapsed ? '☰' : '×'}</span>`;
         button.addEventListener('click', () => {
             const isCollapsed = document.body.classList.toggle('aapm-nav-collapsed');
             if (layout) layout.classList.toggle('sidebar-collapsed', isCollapsed);
             button.setAttribute('aria-expanded', String(!isCollapsed));
             button.setAttribute('aria-label', isCollapsed ? 'Abrir menu' : 'Fechar menu');
-            button.innerHTML = `<span aria-hidden="true">${isCollapsed ? '›' : '×'}</span>`;
+            button.innerHTML = `<span aria-hidden="true">${isCollapsed ? '☰' : '×'}</span>`;
             localStorage.setItem('aapm-nav-collapsed', String(isCollapsed));
         });
         if (layout) {
@@ -298,21 +300,38 @@
                 outline-offset: 2px;
             }
         `;
+        style.textContent += `
+            .app-confirm-backdrop { background: rgba(0,0,0,.68); backdrop-filter: blur(4px); font-family: 'DM Sans', system-ui, sans-serif; }
+            .app-confirm-dialog { box-sizing: border-box; background: #191a1d; border: 1px solid #3a3b40; border-radius: 16px; box-shadow: 0 24px 80px #0008; max-height: calc(100dvh - 2rem); overflow-y: auto; text-align: left; }
+            .app-confirm-badge { color: #f0ae54; background: #30291f; border-color: #484035; letter-spacing: .06em; }
+            .app-confirm-dialog h2 { color: #f5f5f4; font-size: 1.3rem; }
+            .app-confirm-dialog p { color: #bfc0c8; overflow-wrap: anywhere; white-space: pre-line; }
+            .app-confirm-close { border-radius: 8px; }
+            .app-confirm-actions { background: #151619; flex-wrap: wrap; }
+            .app-confirm-cancel, .app-confirm-accept { width: auto; min-height: 44px; margin: 0; border-radius: 9px; }
+            .app-confirm-accept { background: #f0ae54; color: #191a1d; border: 1px solid #f0ae54; box-shadow: none; }
+            .app-confirm-accept:hover { background: #f6be74; transform: none; box-shadow: none; }
+            @media (max-width: 420px) { .app-confirm-actions > button { flex: 1; padding-inline: 12px; } }
+            @media (prefers-reduced-motion: reduce) { .app-confirm-backdrop, .app-confirm-dialog { animation: none; } }
+        `;
         document.head.append(style);
     }
 
     function showAppConfirm(message, onConfirm) {
+        if (document.querySelector('.app-confirm-backdrop')) return;
+        const previousFocus = document.activeElement;
+        const previousOverflow = document.body.style.overflow;
         ensureConfirmStyles();
         const backdrop = document.createElement('div');
         backdrop.className = 'app-confirm-backdrop';
         backdrop.innerHTML = `
-            <section class="app-confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="app-confirm-title">
+            <section class="app-confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="app-confirm-title" aria-describedby="app-confirm-message">
                 <div class="app-confirm-header">
                     <span class="app-confirm-badge">AAPM SENAI</span>
                     <button type="button" class="app-confirm-close" aria-label="Fechar">×</button>
                 </div>
                 <h2 id="app-confirm-title">Confirmar ação</h2>
-                <p>${message}</p>
+                <p id="app-confirm-message"></p>
                 <div class="app-confirm-actions">
                     <button type="button" class="app-confirm-cancel">Cancelar</button>
                     <button type="button" class="app-confirm-accept">Confirmar</button>
@@ -324,7 +343,22 @@
         const cancelButton = backdrop.querySelector('.app-confirm-cancel');
         const acceptButton = backdrop.querySelector('.app-confirm-accept');
 
-        const dismiss = () => backdrop.remove();
+        backdrop.querySelector('#app-confirm-message').textContent = message;
+        const handleKey = (event) => {
+            if (event.key === 'Escape') { event.preventDefault(); dismiss(); }
+            if (event.key === 'Tab') {
+                const buttons = [closeButton, cancelButton, acceptButton];
+                const index = buttons.indexOf(document.activeElement);
+                event.preventDefault();
+                buttons[(index + (event.shiftKey ? 2 : 1)) % 3].focus();
+            }
+        };
+        const dismiss = () => {
+            document.removeEventListener('keydown', handleKey);
+            backdrop.remove();
+            document.body.style.overflow = previousOverflow;
+            if (previousFocus?.isConnected) previousFocus.focus();
+        };
 
         closeButton.addEventListener('click', dismiss);
         cancelButton.addEventListener('click', dismiss);
@@ -338,13 +372,17 @@
         });
 
         document.body.append(backdrop);
-        acceptButton.focus();
+        document.body.style.overflow = 'hidden';
+        document.addEventListener('keydown', handleKey);
+        cancelButton.focus();
     }
 
-    function openConfirmation(form, message) {
+    const approvedForms = new WeakSet();
+    function openConfirmation(form, message, submitter) {
         showAppConfirm(message, () => {
-            form.classList.add('is-submitting');
-            form.submit();
+            approvedForms.add(form);
+            try { form.requestSubmit(submitter || undefined); }
+            finally { approvedForms.delete(form); }
         });
     }
 
@@ -358,6 +396,15 @@
     document.addEventListener('DOMContentLoaded', () => {
         mountShell();
         mountNavigation();
+        if (document.body.classList.contains('admin-page') && !document.querySelector('.cupom')) {
+            const effectsCss = document.createElement('link');
+            effectsCss.rel = 'stylesheet';
+            effectsCss.href = '/static/css/visual-effects.css';
+            document.head.append(effectsCss);
+            const effectsScript = document.createElement('script');
+            effectsScript.src = '/static/js/visual-effects.js';
+            document.head.append(effectsScript);
+        }
         document.addEventListener('click', (event) => {
             const target = event.target.closest('button, .btn-primary, .btn-secondary');
             if (!target || target.disabled) return;
@@ -385,12 +432,12 @@
             if (!(form instanceof HTMLFormElement) || form.method.toLowerCase() !== 'post') return;
             const action = form.getAttribute('action') || '';
             if (action.startsWith('/auth/') || action === '/pdv/finalizar') return;
-            if (form.hasAttribute('onsubmit')) return;
+            if (event.defaultPrevented || approvedForms.has(form) || form.hasAttribute('onsubmit')) return;
 
             event.preventDefault();
             event.stopImmediatePropagation();
             const label = event.submitter?.textContent?.trim() || 'confirmar esta ação';
-            openConfirmation(form, form.dataset.confirm || formatConfirmMessage(label));
-        }, true);
+            openConfirmation(form, form.dataset.confirm || formatConfirmMessage(label), event.submitter);
+        });
     });
 })();

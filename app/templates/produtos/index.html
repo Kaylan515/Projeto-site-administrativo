@@ -5,17 +5,22 @@
     <meta charset="UTF-8">
     <title>Produtos — AAPM SENAI</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <!-- Ligações aos ficheiros CSS e JS específicos -->
     <link rel="stylesheet" href="/static/css/produtos/index.css">
     <script src="/static/js/produtos/index.js" defer></script>
     <script src="/static/js/ui.js" defer></script>
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <link rel="stylesheet" href="/static/css/typography.css">
 </head>
 
-<body>
+<body class="admin-page">
+    <div class="layout">
+        {% include "_sidebar.html" %}
+        <div class="admin-main">
 
     <div class="container">
-        
+
         <div class="page-header">
             <h1>Produtos</h1>
             {% if usuario and usuario.role == 'admin' %}
@@ -98,7 +103,7 @@
                             <div class="action-buttons">
                                 <a href="/produtos/{{ p.id }}/editar" class="btn-action btn-edit">Editar</a>
                                 <form action="/produtos/{{ p.id }}/desativar" method="post" class="inline-form"
-                                    onsubmit="return confirm('Confirma a desativação do produto {{ p.nome }} no sistema AAPM SENAI?')">
+                                    data-confirm="Confirma a desativação do produto {{ p.nome }} no sistema AAPM SENAI?">
                                     <button type="submit" class="btn-action btn-delete">Desativar</button>
                                 </form>
                             </div>
@@ -119,21 +124,21 @@
         </div>
 
         <!-- Paginação -->
-        {% if total_paginas > 1 %}
+        {% if total_paginas >1 %}
         <nav class="pagination" aria-label="Paginação">
             <p class="pagination-info">
                 Página {{ pagina }} de {{ total_paginas }} ({{ total_produtos }} produtos)
             </p>
             <div class="pagination-links">
-                {% if pagina > 1 %}
+                {% if pagina >1 %}
                 <a href="/produtos?pagina={{ pagina - 1 }}&busca={{ busca|urlencode }}&categoria_id={{ categoria_id }}&possui_variacao={{ possui_variacao }}" class="btn-secondary">
-                    ← Anterior
+                     Anterior
                 </a>
                 {% endif %}
 
                 {% if pagina < total_paginas %}
                 <a href="/produtos?pagina={{ pagina + 1 }}&busca={{ busca|urlencode }}&categoria_id={{ categoria_id }}&possui_variacao={{ possui_variacao }}" class="btn-secondary">
-                    Próximo →
+                    Próximo
                 </a>
                 {% endif %}
             </div>
@@ -141,11 +146,13 @@
         {% endif %}
 
         <div class="footer-back">
-            <a href="/" class="back-link">← Dashboard</a>
+            <a href="/" class="back-link">Dashboard</a>
         </div>
 
     </div>
 
+        </div>
+    </div>
 </body>
 
 </html>

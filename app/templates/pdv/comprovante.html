@@ -12,6 +12,7 @@
     <!-- Script opcional para a página -->
     <script src="/static/js/pdv/comprovante.js" defer></script>
     <script src="/static/js/ui.js" defer></script>
+    <link rel="stylesheet" href="/static/css/typography.css">
 </head>
 
 <body>
@@ -55,7 +56,7 @@
                 <span>R$ {{ "%.2f"|format(venda.total_bruto) }}</span>
             </div>
 
-            {% if venda.desconto_valor > 0 %}
+            {% if venda.desconto_valor >0 %}
             <div class="total-linha desc-linha">
                 <span>Desconto ({{ venda.desconto_percentual|int }}%)</span>
                 <span>− R$ {{ "%.2f"|format(venda.desconto_valor) }}</span>

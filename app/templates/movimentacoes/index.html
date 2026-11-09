@@ -7,15 +7,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/css/movimentacoes/index.css">
     <script src="/static/js/ui.js" defer></script>
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <link rel="stylesheet" href="/static/css/typography.css">
 </head>
 
-<body>
+<body class="admin-page">
+    <div class="layout">
+        {% include "_sidebar.html" %}
+        <div class="admin-main">
     <div class="movimentacoes-container">
         
         <!-- Cabeçalho -->
         <header class="mov-header">
             <div>
-                <a href="/" class="btn-voltar">← Dashboard</a>
+                <a href="/" class="btn-voltar">Dashboard</a>
                 <h1>📦 Histórico de movimentações</h1>
             </div>
             <a href="/movimentacoes/nova" class="btn-novo">+ Registrar movimentação</a>
@@ -98,9 +103,9 @@
                         </td>
                         <td>
                             {% if m.tipo.value == 'entrada' %}
-                            <span class="badge entrada">▲ Entrada</span>
+                            <span class="badge entrada">Entrada</span>
                             {% else %}
-                            <span class="badge saida">▼ Saída</span>
+                            <span class="badge saida">Saída</span>
                             {% endif %}
                         </td>
                         <td>{{ m.quantidade }}</td>
@@ -126,11 +131,23 @@
         <div class="paginacao-footer">
             <p class="info-paginacao">Página {{ pagina }} de {{ total_paginas }} ({{ total_movimentacoes }} movimentações)</p>
             {% set total_registros = total_movimentacoes %}
-            {% include "_pagination.html" %}
+            {% if total_paginas > 1 %}
+            <nav class="pagination" aria-label="Paginação">
+                <span>Página {{ pagina }} de {{ total_paginas }} ({{ total_registros }} registros)</span>
+                {% if pagina > 1 %}
+                <a href="{{ request.url.include_query_params(pagina=pagina - 1) }}">Anterior</a>
+                {% endif %}
+                {% if pagina < total_paginas %}
+                <a href="{{ request.url.include_query_params(pagina=pagina + 1) }}">Próxima</a>
+                {% endif %}
+            </nav>
+            {% endif %}
         </div>
 
     </div>
     <script src="/static/js/movimentacoes/index.js" defer></script>
+        </div>
+    </div>
 </body>
 
 </html>

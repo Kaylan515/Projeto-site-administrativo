@@ -10,9 +10,14 @@
     <link rel="stylesheet" href="/static/css/pdv/historico.css">
     <script src="/static/js/pdv/historico.js" defer></script>
     <script src="/static/js/ui.js" defer></script>
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <link rel="stylesheet" href="/static/css/typography.css">
 </head>
 
-<body>
+<body class="admin-page">
+    <div class="layout">
+        {% include "_sidebar.html" %}
+        <div class="admin-main">
     <div class="container">
         
         <!-- Cabeçalho -->
@@ -22,7 +27,7 @@
                 <p class="subtitle">Consulte, filtre e analise todas as transações efetuadas.</p>
             </div>
             <div>
-                <a href="/pdv" class="btn-secondary">← Voltar ao PDV</a>
+                <a href="/pdv" class="btn-secondary">Voltar ao PDV</a>
             </div>
         </div>
 
@@ -145,7 +150,7 @@
                         <td>{{ v.cliente.nome if v.cliente else "Balcão" }}</td>
                         <td><span class="badge-itens">{{ v.itens | length }} it.</span></td>
                         <td>
-                            {% if v.desconto_percentual > 0 %}
+                            {% if v.desconto_percentual >0 %}
                             <span class="discount-tag">
                                 {{ v.desconto_percentual|int }}% (− R$ {{ "%.2f"|format(v.desconto_valor) }})
                             </span>
@@ -168,11 +173,23 @@
 
         <!-- Rodapé e Paginação -->
         <div class="pagination-footer">
-            <p class="pagination-info">Página <strong>{{ pagina }}</strong> de <strong>{{ total_paginas }}</strong> ({{ total_vendas }} vendas encontradas)</p>
+            <p class="pagination-info">Página <strong>{{ pagina }}</strong>de <strong>{{ total_paginas }}</strong>({{ total_vendas }} vendas encontradas)</p>
             {% set total_registros = total_vendas %}
-            {% include "_pagination.html" %}
+            {% if total_paginas > 1 %}
+            <nav class="pagination" aria-label="Paginação">
+                <span>Página {{ pagina }} de {{ total_paginas }} ({{ total_registros }} registros)</span>
+                {% if pagina > 1 %}
+                <a href="{{ request.url.include_query_params(pagina=pagina - 1) }}">Anterior</a>
+                {% endif %}
+                {% if pagina < total_paginas %}
+                <a href="{{ request.url.include_query_params(pagina=pagina + 1) }}">Próxima</a>
+                {% endif %}
+            </nav>
+            {% endif %}
         </div>
 
+    </div>
+        </div>
     </div>
 </body>
 

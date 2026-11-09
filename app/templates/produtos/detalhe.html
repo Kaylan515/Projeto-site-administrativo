@@ -9,9 +9,14 @@
     <!-- Ligação ao CSS específico da pasta produtos -->
     <link rel="stylesheet" href="/static/css/produtos/detalhe.css">
     <script src="/static/js/ui.js" defer></script>
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <link rel="stylesheet" href="/static/css/typography.css">
 </head>
 
-<body>
+<body class="admin-page">
+    <div class="layout">
+        {% include "_sidebar.html" %}
+        <div class="admin-main">
     <div class="container">
         {% if request.query_params.get('editado') == 'ok' %}
         <div class="alert alert-success">Produto atualizado com sucesso!</div>
@@ -64,12 +69,14 @@
                 </div>
 
                 <div class="back-wrap">
-                    <a href="/produtos" class="back-link">← Voltar</a>
+                    <a href="/produtos" class="back-link">Voltar</a>
                 </div>
             </div>
         </div>
     </div>
     <script src="/static/js/produtos/detalhe.js" defer></script>
+        </div>
+    </div>
 </body>
 
 </html>

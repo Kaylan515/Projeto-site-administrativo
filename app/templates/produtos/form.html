@@ -10,9 +10,14 @@
     <link rel="stylesheet" href="/static/css/produtos/form.css">
     <script src="/static/js/produtos/form.js" defer></script>
     <script src="/static/js/ui.js" defer></script>
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <link rel="stylesheet" href="/static/css/typography.css">
 </head>
 
-<body>
+<body class="admin-page">
+    <div class="layout">
+        {% include "_sidebar.html" %}
+        <div class="admin-main">
     <div class="container">
         <h1>{{ "Editar produto" if editando else "Novo produto" }}</h1>
 
@@ -97,6 +102,8 @@
                 <a href="/produtos" class="btn-cancel">Cancelar</a>
             </div>
         </form>
+    </div>
+        </div>
     </div>
 </body>
 

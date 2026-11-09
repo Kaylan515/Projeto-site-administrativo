@@ -10,9 +10,14 @@
     <link rel="stylesheet" href="/static/css/pdv/extrato.css">
     <script src="/static/js/pdv/extrato.js" defer></script>
     <script src="/static/js/ui.js" defer></script>
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <link rel="stylesheet" href="/static/css/typography.css">
 </head>
 
-<body>
+<body class="admin-page">
+    <div class="layout">
+        {% include "_sidebar.html" %}
+        <div class="admin-main">
     <div class="container">
 
         <div class="page-header">
@@ -77,10 +82,12 @@
 
         <!-- Navegação de Rodapé -->
         <div class="footer-nav">
-            <a href="/pdv" class="btn-primary">← Voltar ao PDV</a>
-            <a href="/pdv/historico" class="btn-secondary">Histórico completo →</a>
+            <a href="/pdv" class="btn-primary">Voltar ao PDV</a>
+            <a href="/pdv/historico" class="btn-secondary">Histórico completo </a>
         </div>
 
+    </div>
+        </div>
     </div>
 </body>
 

@@ -8,15 +8,20 @@
     <link rel="stylesheet" href="/static/css/categorias/index.css">
     <script src="/static/js/categorias/index.js" defer></script>
     <script src="/static/js/ui.js" defer></script>
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <link rel="stylesheet" href="/static/css/typography.css">
 </head>
 
-<body>
+<body class="admin-page">
+    <div class="layout">
+        {% include "_sidebar.html" %}
+        <div class="admin-main">
     <div class="categorias-container">
         
         <!-- Hed -->
         <header class="categorias-header">
             <div>
-                <a href="/" class="btn-voltar">← Dashboard</a>
+                <a href="/" class="btn-voltar">Dashboard</a>
                 <h1>🏷️ Gestão de Categorias</h1>
             </div>
             <a href="/categorias/nova" class="btn-novo">+ Nova categoria</a>
@@ -90,9 +95,11 @@
 
         <!-- Rodapé -->
         <div class="categorias-footer">
-            <a href="/" class="btn-voltar">← Dashboard</a>
+            <a href="/" class="btn-voltar">Dashboard</a>
         </div>
 
+    </div>
+        </div>
     </div>
 </body>
 

@@ -1,0 +1,10 @@
+.ambient-light {
+    position: fixed; top: 0; left: 0; width: 650px; height: 650px;
+    background: radial-gradient(circle, rgba(240,174,84,.1), transparent 65%);
+    pointer-events: none; z-index: 3; opacity: 0; transition: opacity .35s;
+    will-change: transform;
+}
+.ambient-light.is-visible { opacity: 1; }
+.admin-page .ambient-light { background: radial-gradient(circle, rgba(240,174,84,.045), transparent 65%); }
+@media (prefers-reduced-motion: reduce), (hover: none) { .ambient-light { display: none; } }
+@media print { .ambient-light { display: none; } }

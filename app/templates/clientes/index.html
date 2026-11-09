@@ -8,15 +8,20 @@
     <link rel="stylesheet" href="/static/css/clientes/index.css">
     <script src="/static/js/clientes/index.js" defer></script>
     <script src="/static/js/ui.js" defer></script>
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <link rel="stylesheet" href="/static/css/typography.css">
 </head>
 
-<body>
+<body class="admin-page">
+    <div class="layout">
+        {% include "_sidebar.html" %}
+        <div class="admin-main">
     <div class="clientes-container">
 
         <!-- Cabeçalho -->
         <header class="clientes-header">
             <div>
-                <a href="/" class="btn-voltar">← Dashboard</a>
+                <a href="/" class="btn-voltar">Dashboard</a>
                 <h1>👥 Gestão de Clientes</h1>
             </div>
             <a href="/clientes/novo" class="btn-novo">+ Novo cliente</a>
@@ -168,9 +173,21 @@
         <div class="paginacao-footer">
             <p class="info-paginacao">Página {{ pagina }} de {{ total_paginas }} ({{ total_clientes }} clientes)</p>
             {% set total_registros = total_clientes %}
-            {% include "_pagination.html" %}
+            {% if total_paginas > 1 %}
+            <nav class="pagination" aria-label="Paginação">
+                <span>Página {{ pagina }} de {{ total_paginas }} ({{ total_registros }} registros)</span>
+                {% if pagina > 1 %}
+                <a href="{{ request.url.include_query_params(pagina=pagina - 1) }}">Anterior</a>
+                {% endif %}
+                {% if pagina < total_paginas %}
+                <a href="{{ request.url.include_query_params(pagina=pagina + 1) }}">Próxima</a>
+                {% endif %}
+            </nav>
+            {% endif %}
         </div>
 
+    </div>
+        </div>
     </div>
 </body>
 

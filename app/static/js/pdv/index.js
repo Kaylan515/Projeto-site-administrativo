@@ -229,43 +229,7 @@ function finalizarVenda() {
         return;
     }
 
-    const modal = document.getElementById('modal-confirmacao');
-    const btnSim = document.getElementById('modal-btn-sim');
-    const btnNao = document.getElementById('modal-btn-nao');
-
-    if (!modal) {
-        if (window.confirm('Deseja realmente finalizar esta venda?')) {
-            submeterVenda();
-        }
-        return;
-    }
-
-    modal.classList.add('ativo');
-
-    const aoConfirmar = () => {
-        limparEventosModal();
-        modal.classList.remove('ativo');
-        submeterVenda();
-    };
-
-    const aoCancelar = () => {
-        limparEventosModal();
-        modal.classList.remove('ativo');
-    };
-
-    function limparEventosModal() {
-        btnSim.removeEventListener('click', aoConfirmar);
-        btnNao.removeEventListener('click', aoCancelar);
-        modal.removeEventListener('click', foraModal);
-    }
-
-    const foraModal = (e) => {
-        if (e.target === modal) aoCancelar();
-    };
-
-    btnSim.addEventListener('click', aoConfirmar);
-    btnNao.addEventListener('click', aoCancelar);
-    modal.addEventListener('click', foraModal);
+    window.showAppConfirm('Deseja realmente finalizar esta venda?', submeterVenda);
 }
 
 function submeterVenda() {
