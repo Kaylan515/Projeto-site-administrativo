@@ -4,7 +4,7 @@ Aplicação web para gerenciar produtos, estoque, categorias, clientes, usuário
 
 ## Funcionalidades
 
-- Dashboard com indicadores e produtos com estoque baixo: até 5 unidades, incluindo produtos sem estoque.
+- Dashboard com indicadores e produtos com estoque baixo: de 1 a 5 unidades, excluindo produtos sem estoque.
 - Cadastro e edição de produtos, imagens, categorias e variações.
 - Entradas e saídas de estoque com histórico de movimentações.
 - Cadastro de clientes e identificação de associados.
@@ -191,3 +191,162 @@ requirements.txt      Dependências Python
 - **Tabela ou coluna inexistente:** confira o `DATABASE_URL` e aplique `python -m alembic upgrade head` no banco correto.
 - **PIX indisponível:** confira `PIX_KEY` no `.env`, reinicie o servidor e tente gerar o código novamente.
 - **Sessão expirada:** entre novamente. Alterar `SECRET_KEY` também invalida os tokens emitidos com a chave anterior.
+
+## Perfis e permissões
+
+As permissões são verificadas nas rotas do servidor, além da exibição dos itens no menu.
+
+| Operação | Administrador | Operador |
+| --- | --- | --- |
+| Consultar dashboard, produtos e detalhes dos produtos | Sim | Sim |
+| Criar, editar e desativar produtos | Sim | Não |
+| Gerenciar categorias, clientes e usuários | Sim | Não |
+| Consultar armários e históricos de reservas | Sim | Sim |
+| Cadastrar, editar, alugar, liberar ou desativar armários | Sim | Não |
+| Consultar a listagem geral de movimentações | Sim | Não |
+| Registrar movimentação e consultar histórico de um produto | Sim | Sim |
+| Realizar vendas e consultar histórico, extrato e comprovantes | Sim | Sim |
+
+O administrador não pode desativar a própria conta pela opção de alternar status. Na edição de um usuário, deixar a senha vazia mantém a senha anterior.
+
+## Operação dos módulos
+
+### Produtos e estoque
+
+A listagem de produtos é única. Os filtros de nome, categoria, variação e estoque alteram os resultados dessa mesma tela.
+
+- **Todos os estoques:** inclui os produtos ativos com saldo positivo ou zerado.
+- **Estoque baixo:** inclui somente produtos ativos com **1 a 5 unidades**. Produtos com zero unidades não entram nesse indicador.
+- **PDV:** mostra apenas produtos ativos com estoque maior que zero.
+- **Desativação:** retira o produto da listagem ativa sem apagar a venda já registrada.
+
+A coluna de estoque mostra a quantidade disponível de cada produto. Quando não houver resultado para os filtros, use **Limpar** ou **Mostrar todos os produtos**.
+
+As imagens de produtos são armazenadas em `app/static/uploads/`. As extensões aceitas pelo upload são `.jpg`, `.jpeg`, `.png` e `.webp`. Inclua essa pasta nas cópias de segurança; guardar somente o banco não preserva as imagens.
+
+### Movimentações
+
+Uma entrada aumenta o estoque; uma saída reduz o estoque. A quantidade deve ser maior que zero, e uma saída não pode superar a quantidade disponível.
+
+O histórico por produto mostra entradas e saídas. As vendas do PDV também reduzem o estoque, mas os registros da venda ficam nas tabelas de vendas e itens; não se deve assumir que toda venda cria uma movimentação manual.
+
+### Clientes e associados
+
+O cliente pode ser identificado no carrinho antes de fechar a venda. Quando estiver cadastrado como associado ativo, o desconto configurado será aplicado ao total. Uma venda também pode ser feita sem identificação de cliente.
+
+A matrícula, quando informada, não pode ser duplicada. O cadastro de clientes e a alteração do vínculo de associado são operações administrativas.
+
+### Armários
+
+O fluxo de locação é:
+
+1. Cadastrar o número e a localização do armário.
+2. Selecionar um armário disponível.
+3. Informar o nome do locatário e o semestre.
+4. Confirmar a locação.
+5. Liberar o armário ao encerrar o uso.
+
+A reserva fica no histórico após a liberação. Não é permitido alugar novamente um armário já ocupado nem desativá-lo enquanto estiver alugado.
+
+## Exemplo de venda com pagamento dividido
+
+Para uma venda de **R$ 100,00**:
+
+1. Informe **R$ 40,00** em débito.
+2. Abra a opção **Dinheiro**: o saldo em dinheiro será **R$ 60,00**.
+3. Se o cliente entregar R$ 80,00, escolha **Informar troco a receber** e digite **R$ 20,00**.
+4. Registre o dinheiro e confira o resumo.
+5. Confirme a venda.
+
+A soma registrada na venda será R$ 40,00 em débito e R$ 60,00 em dinheiro. Os R$ 20,00 de troco não aumentam o valor da venda.
+
+Para dividir entre cartão e PIX, informe primeiro a parcela do cartão e gere o QR Code para o saldo restante. O valor do PIX também pode ser ajustado antes de gerar o código. Se o valor for alterado, gere outro QR Code e confira novamente o recebimento correspondente.
+
+**Gerar ou copiar um QR Code não confirma o pagamento.** Somente registre o PIX após conferir o crédito no banco. A aplicação ainda não faz conciliação automática.
+
+As parcelas de pagamento são armazenadas em centavos inteiros. O servidor recalcula o total usando os preços do banco, verifica o estoque e compara a soma dos pagamentos antes de salvar.
+
+## Histórico, extrato e comprovante
+
+- **Histórico de vendas:** consulta vendas anteriores com filtros de cliente, busca e período, além de ordenação e paginação.
+- **Extrato:** resume quantidade de vendas, total bruto, descontos e total líquido do dia.
+- **Comprovante:** mostra os itens e as formas de pagamento da venda; possui opção de impressão.
+
+O extrato usa a data local do processo que executa o servidor. Configure o relógio e o fuso horário do ambiente de execução para que o fechamento diário corresponda ao horário de operação.
+
+O registro histórico guarda o nome e o preço unitário do item vendido, os totais da venda e os valores por forma de pagamento. Alterar depois o preço do cadastro não recalcula uma venda anterior.
+
+## Cópias de segurança e atualização
+
+Para o SQLite local, pare o servidor antes de copiar o arquivo. O exemplo abaixo considera o `DATABASE_URL=sqlite:///./estoque.db`; se a configuração apontar para outro arquivo, use o caminho correspondente.
+
+```powershell
+New-Item -ItemType Directory -Path .\backups -Force
+$backupStamp = Get-Date -Format "yyyyMMdd-HHmmss"
+Copy-Item -LiteralPath .\estoque.db -Destination ".\backups\estoque-$backupStamp.db"
+```
+
+Preserve também:
+
+- `app/static/uploads/`, para as imagens.
+- A configuração do ambiente, em local privado, sem publicar segredos.
+- A versão do código e das migrações que corresponde ao backup.
+
+Antes de atualizar uma instalação:
+
+1. Pare o servidor e faça o backup.
+2. Instale as dependências atualizadas.
+3. Confira a revisão do banco e aplique as migrações.
+4. Execute os testes.
+5. Inicie o servidor e confira login, dashboard, produtos e PDV.
+
+```powershell
+python -m pip install -r requirements.txt
+python -m alembic current
+python -m alembic upgrade head
+python -m pytest tests -q -p no:cacheprovider
+python -m uvicorn app.main:app --reload
+```
+
+Para restaurar um backup, pare o servidor, preserve uma cópia do banco atual e recupere o arquivo e as imagens correspondentes. Confira a compatibilidade entre a revisão do banco restaurado e o código antes de voltar a operar. Não use `alembic stamp` para contornar um erro sem verificar o esquema existente.
+
+## Desenvolvimento e diagnóstico
+
+O ponto de entrada documentado é `app.main:app`. Execute o servidor a partir da raiz do projeto, pois os caminhos de templates, arquivos estáticos, uploads e banco SQLite são relativos ao diretório de trabalho.
+
+A documentação HTTP gerada pelo FastAPI está disponível em:
+
+- [Swagger UI](http://127.0.0.1:8000/docs)
+- [ReDoc](http://127.0.0.1:8000/redoc)
+
+Algumas rotas recebem formulários e retornam páginas HTML ou redirecionamentos; a documentação HTTP não substitui o fluxo das telas.
+
+Para executar testes de um módulo específico:
+
+```powershell
+python -m pytest tests/test_auth.py -q -p no:cacheprovider
+python -m pytest tests/test_armarios_api.py -q -p no:cacheprovider
+python -m pytest tests/test_regressoes.py -q -p no:cacheprovider
+```
+
+Para encerrar no primeiro teste com falha e mostrar mais detalhes:
+
+```powershell
+python -m pytest tests -x -vv -p no:cacheprovider
+```
+
+Ao investigar um erro interno, confira a saída do terminal do Uvicorn e registre a tela, a ação e o horário em que ele ocorreu. Não inclua senhas, tokens, o conteúdo do `.env` ou dados de clientes em relatos públicos.
+
+### Outras situações comuns
+
+| Situação | O que conferir |
+| --- | --- |
+| Porta 8000 ocupada | Inicie com `python -m uvicorn app.main:app --reload --port 8001` e acesse a porta correspondente. |
+| Produtos não aparecem no PDV | Confira se estão ativos e com estoque maior que zero. |
+| Indicador de estoque baixo mostra zero | Não há produtos ativos com 1 a 5 unidades; produtos zerados não entram nessa contagem. |
+| Botão de finalizar está desabilitado | Confira os valores por forma, o saldo restante e a confirmação manual do PIX. |
+| QR Code não aparece | Confira a chave configurada, o valor da parcela, o ambiente Python e a instalação de `qrcode`. |
+| Código PIX não copia automaticamente | Use o campo copia e cola para selecionar e copiar manualmente. |
+| Imagem não aparece após restaurar o banco | Recupere também a pasta de uploads do mesmo backup. |
+| Testes JavaScript aparecem como ignorados | Instale Node.js e confira `node --version`. |
+| Animações não aparecem | Confira se o sistema operacional ou navegador está com movimento reduzido habilitado. |

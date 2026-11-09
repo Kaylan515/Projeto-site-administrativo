@@ -49,11 +49,11 @@
                     <div class="card-label">Armários disponíveis</div>
                     <div class="card-link">Ver mapa </div>
                 </a>
-                <a href="/produtos?estoque_baixo=true" class="card {% if estoque_baixo %}red{% else %}green{% endif %}">
-                    <span class="card-icon" aria-hidden="true">⚠</span>
+                <a href="/produtos?estoque_baixo=true" class="card {{ 'red' if total_estoque_baixo else 'green' }}">
+                    <span class="card-icon" aria-hidden="true">&#9888;</span>
                     <div class="card-value">{{ total_estoque_baixo | default(0) }}</div>
                     <div class="card-label">Produtos com estoque baixo</div>
-                    <div class="card-link">Até 5 unidades em estoque</div>
+                    <div class="card-link">Ver produtos com 1 a 5 unidades</div>
                 </a>
                 <a href="/clientes" class="card blue admin-only">
                     <span class="card-icon" aria-hidden="true">👥</span>

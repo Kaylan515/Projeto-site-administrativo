@@ -41,7 +41,6 @@
 
         <!-- Filtros -->
         <form method="get" action="/produtos" class="filters-form">
-            {% if estoque_baixo %}<input type="hidden" name="estoque_baixo" value="true">{% endif %}
             <input type="text" name="busca" placeholder="Buscar por nome..." value="{{ busca }}">
 
             <select name="categoria_id">
@@ -59,9 +58,13 @@
                 <option value="nao" {{ 'selected' if possui_variacao == 'nao' else '' }}>Sem variação</option>
             </select>
 
+            <select name="estoque_baixo" aria-label="Filtrar por estoque">
+                <option value="false" {% if not estoque_baixo %}selected{% endif %}>Todos os estoques</option>
+                <option value="true" {% if estoque_baixo %}selected{% endif %}>Estoque baixo (1 a 5 unidades)</option>
+            </select>
             <div class="filter-actions">
                 <button type="submit" class="btn-secondary">Filtrar</button>
-                {% if busca or categoria_id or possui_variacao %}
+                {% if busca or categoria_id or possui_variacao or estoque_baixo %}
                 <a href="/produtos" class="btn-clear">Limpar</a>
                 {% endif %}
             </div>
@@ -118,8 +121,14 @@
 
                     {% if not produtos %}
                     <tr>
-                        <td colspan="7" class="empty-row">
-                            Nenhum produto encontrado.
+                        <td colspan="{{ 7 if usuario and usuario.role == 'admin' else 6 }}" class="empty-row">
+                            {% if busca or categoria_id or possui_variacao or estoque_baixo %}
+                            Nenhum produto corresponde aos filtros selecionados.
+                            <a href="/produtos" class="empty-products-reset">Mostrar todos os produtos</a>
+                            {% else %}
+                            Nenhum produto cadastrado ainda.
+                            {% if usuario and usuario.role == 'admin' %}<a href="/produtos/novo" class="empty-products-reset">Cadastrar primeiro produto</a>{% endif %}
+                            {% endif %}
                         </td>
                     </tr>
                     {% endif %}
@@ -127,7 +136,7 @@
             </table>
         </div>
 
-        {% if estoque_baixo %}<p class="stock-filter-note">Exibindo produtos ativos com até 5 unidades em estoque.</p>{% endif %}
+        {% if estoque_baixo %}<p class="stock-filter-note">Exibindo produtos ativos com 1 a 5 unidades em estoque.</p>{% endif %}
 
         <!-- Paginação -->
         {% if total_paginas >1 %}

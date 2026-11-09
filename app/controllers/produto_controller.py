@@ -60,7 +60,7 @@ def listar_produtos(
     )
 
     if estoque_baixo:
-        query = query.filter(Produto.estoque_atual <= 5)
+        query = query.filter(Produto.estoque_atual > 0, Produto.estoque_atual <= 5)
 
     # Filtro por nome
     if busca:

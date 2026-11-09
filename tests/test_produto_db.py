@@ -53,14 +53,42 @@ def test_dashboard_e_filtro_estoque_baixo(cliente, db_session):
         Produto(nome='Estoque inativo teste', preco=1, estoque_atual=1, ativo=False),
     ])
     db_session.commit()
-    assert _dados_dashboard(db_session)['total_estoque_baixo'] == 2
+    assert _dados_dashboard(db_session)['total_estoque_baixo'] == 1
     page = cliente.get('/dashboard')
     assert page.status_code == 200
-    assert '<div class="card-value">2</div>' in page.text
+    assert 'Produtos com estoque baixo' in page.text
+    assert 'href="/produtos?estoque_baixo=true"' in page.text
     filtered = cliente.get('/produtos/?estoque_baixo=true')
     assert filtered.status_code == 200
-    assert 'Estoque zerado teste' in filtered.text
+    assert 'Estoque zerado teste' not in filtered.text
     assert 'Estoque limite teste' in filtered.text
     assert 'Estoque normal teste' not in filtered.text
     assert 'Estoque inativo teste' not in filtered.text
-    assert 'name="estoque_baixo" value="true"' in filtered.text
+    assert 'name="estoque_baixo"' in filtered.text
+    assert 'value="true" selected' in filtered.text
+
+
+def test_estoque_baixo_vazio_permite_retornar_lista(cliente, db_session):
+    from app.models.produto import Produto
+    db_session.add(Produto(nome='Produto disponivel', preco=5, estoque_atual=10))
+    db_session.commit()
+    dashboard = cliente.get('/dashboard')
+    assert dashboard.status_code == 200
+    assert 'href="/produtos?estoque_baixo=true"' in dashboard.text
+    filtrado = cliente.get('/produtos/?estoque_baixo=true')
+    assert filtrado.status_code == 200
+    assert 'Mostrar todos os produtos' in filtrado.text
+    assert 'class="btn-clear"' in filtrado.text
+    todos = cliente.get('/produtos/')
+    assert 'Produto disponivel' in todos.text
+
+
+def test_listagem_produtos_com_e_sem_barra_e_a_mesma(cliente, db_session):
+    from app.models.produto import Produto
+    db_session.add(Produto(nome='Produto unico',preco=1,estoque_atual=10))
+    db_session.commit()
+    for path in ['/produtos','/produtos/']:
+        response=cliente.get(path)
+        assert response.status_code==200
+        assert 'Produto unico' in response.text
+        assert response.template.name=='produtos/index.html'

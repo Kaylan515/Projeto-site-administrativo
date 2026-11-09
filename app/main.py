@@ -56,7 +56,7 @@ def _dados_dashboard(db: Session) -> dict:
     total_categorias = db.query(Categoria).filter(Categoria.ativo == True).count()
     estoque_baixo = (
         db.query(Produto)
-        .filter(Produto.ativo == True, Produto.estoque_atual <= 5)
+        .filter(Produto.ativo == True, Produto.estoque_atual > 0, Produto.estoque_atual <= 5)
         .order_by(Produto.estoque_atual, Produto.nome)
         .all()
     )
