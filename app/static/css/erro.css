@@ -70,3 +70,19 @@ body::before {
 .footer-info strong { color: var(--text-main); }
 .footer-sub { font-size: 0.75rem; }
 .footer-links { display: flex; gap: 1rem; align-items: center; }
+/* Error screens share the same palette and responsive layout. */
+:root { --bg-color: #111214; --card-bg: #191a1d; --border-color: #303136; --text-muted: #adaeb6; --primary-color: #f0ae54; --primary-hover: #f6be74; }
+body { color-scheme: dark; }
+body::before { background: radial-gradient(ellipse at 70% 30%, #f0ae5408, transparent 60%); }
+.error-section { width: 100%; padding: 48px 0; }
+.error-code-badge { background: #30291f; border-color: #66513a; border-radius: 14px; font-size: clamp(3rem, 10vw, 5rem); }
+.btn-primary { background: #f0ae54; color: #191a1d; border-radius: 9px; box-shadow: none; min-height: 48px; }
+a:focus-visible { outline: 2px solid #f0ae54; outline-offset: 4px; }
+.site-header, .welcome-footer { flex-wrap: wrap; gap: 20px; }
+@media (max-width: 700px) {
+    .auth-page-wrapper { padding: 24px 20px; }
+    .nav-brand { flex-wrap: wrap; font-size: 12px; }
+    .welcome-footer { flex-direction: column; align-items: flex-start; line-height: 1.8; }
+    .error-copy p { font-size: 15px; }
+}
+@media (prefers-reduced-motion: reduce) { .btn-primary:hover { transform: none; } }

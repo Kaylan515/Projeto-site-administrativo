@@ -12,9 +12,17 @@
     <!-- Caminho atualizado para a subpasta usuarios -->
     <link rel="stylesheet" href="/static/css/usuarios/form.css">
     <script src="/static/js/usuarios/form.js" defer></script>
-    <script src="/static/js/ui.js" defer></script>
+    <script src="/static/js/ui.js?v=20261109-manual-nav" defer></script>
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <link rel="stylesheet" href="/static/css/typography.css">
+    <link rel="stylesheet" href="/static/css/background.css">
+    <link rel="stylesheet" href="/static/css/visual-effects.css?v=20261109-mouse">
+    <script src="/static/js/visual-effects.js?v=20261109-mouse" defer></script>
 </head>
-<body>
+<body class="admin-page">
+    <div class="layout">
+        {% include "_sidebar.html" %}
+        <div class="admin-main">
     <h1>{{ "Editar usuário" if editando else "Novo usuário" }}</h1>
 
     {% if erro %}
@@ -23,8 +31,8 @@
 
     <!--
         action muda dinamicamente:
-        - criação → POST /usuarios/novo
-        - edição  → POST /usuarios/{id}/editar
+        - criação  POST /usuarios/novo
+        - edição   POST /usuarios/{id}/editar
     -->
     <form action="{{ '/usuarios/' + editando.id|string + '/editar' if editando else '/usuarios/novo' }}"
           method="post">
@@ -84,5 +92,7 @@
         </button>
         <a href="/usuarios">Cancelar</a>
     </form>
+        </div>
+    </div>
 </body>
 </html>

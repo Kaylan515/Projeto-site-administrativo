@@ -9,19 +9,24 @@
     <!-- Ligações aos ficheiros CSS e JS específicos -->
     <link rel="stylesheet" href="/static/css/pdv/extrato.css">
     <script src="/static/js/pdv/extrato.js" defer></script>
-    <script src="/static/js/ui.js" defer></script>
+    <script src="/static/js/ui.js?v=20261109-manual-nav" defer></script>
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <link rel="stylesheet" href="/static/css/typography.css">
+    <link rel="stylesheet" href="/static/css/background.css">
+    <link rel="stylesheet" href="/static/css/visual-effects.css?v=20261109-mouse">
+    <script src="/static/js/visual-effects.js?v=20261109-mouse" defer></script>
 </head>
 
-<body>
+<body class="admin-page">
+    <div class="layout">
+        {% include "_sidebar.html" %}
+        <div class="admin-main">
     <div class="container">
 
         <div class="page-header">
             <div>
                 <h1>Extrato do PDV</h1>
                 <p class="subtitle">Resumo das vendas realizadas hoje.</p>
-            </div>
-            <div class="header-actions">
-                <button onclick="window.print()" class="btn-secondary">🖨️ Imprimir</button>
             </div>
         </div>
 
@@ -56,6 +61,7 @@
                         <th>Horário</th>
                         <th>Cliente</th>
                         <th>Total</th>
+                        <th>Pagamento</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -65,10 +71,11 @@
                         <td>{{ venda.criado_em.strftime('%H:%M') }}</td>
                         <td>{{ venda.cliente.nome if venda.cliente else 'Balcão' }}</td>
                         <td class="preco">R$ {{ '%.2f'|format(venda.total_liquido) }}</td>
+                        <td>{% if venda.pagamentos %}<div class="sale-payments">{% for forma, centavos in venda.pagamentos.items() %}<span>{{ forma }} <strong>R$ {{ '%.2f'|format(centavos / 100) }}</strong></span>{% endfor %}</div>{% else %}<span class="text-muted">Não informado</span>{% endif %}</td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="4" class="empty-row">Nenhuma venda registrada hoje.</td>
+                        <td colspan="5" class="empty-row">Nenhuma venda registrada hoje.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -77,10 +84,12 @@
 
         <!-- Navegação de Rodapé -->
         <div class="footer-nav">
-            <a href="/pdv" class="btn-primary">← Voltar ao PDV</a>
-            <a href="/pdv/historico" class="btn-secondary">Histórico completo →</a>
+            <a href="/pdv" class="btn-primary">Voltar ao PDV</a>
+            <a href="/pdv/historico" class="btn-secondary">Histórico completo </a>
         </div>
 
+    </div>
+        </div>
     </div>
 </body>
 

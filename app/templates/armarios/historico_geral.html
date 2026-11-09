@@ -7,9 +7,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/armarios/historico_geral.css">
-    <script src="/static/js/ui.js" defer></script>
+    <script src="/static/js/ui.js?v=20261109-manual-nav" defer></script>
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <link rel="stylesheet" href="/static/css/typography.css">
+    <link rel="stylesheet" href="/static/css/background.css">
+    <link rel="stylesheet" href="/static/css/visual-effects.css?v=20261109-mouse">
+    <script src="/static/js/visual-effects.js?v=20261109-mouse" defer></script>
 </head>
-<body>
+<body class="admin-page">
+    <div class="layout">
+        {% include "_sidebar.html" %}
+        <div class="admin-main">
     <div class="spotlight" id="spotlight"></div>
 
     <div class="page-wrapper">
@@ -29,7 +37,7 @@
                         <span class="card-kicker">AUDITORIA E REGISTOS</span>
                         <h1>Histórico de reservas</h1>
                     </div>
-                    <a href="/armarios" class="btn-secondary">← Voltar aos armários</a>
+                    <a href="/armarios" class="btn-secondary">Voltar aos armários</a>
                 </div>
 
                 <!-- Barra de Pesquisa e Filtros -->
@@ -93,19 +101,32 @@
 
                 <!-- Paginação -->
                 <div class="pagination-container">
-                    {% include "_pagination.html" %}
+                    {% if total_paginas > 1 %}
+                    <nav class="pagination app-pagination" aria-label="Paginação">
+                        <span class="pagination-summary">Página {{ pagina }} de {{ total_paginas }} ({{ total_registros }} registros)</span>
+                        {% if pagina > 1 %}
+                        <a href="{{ request.url.include_query_params(pagina=pagina - 1) }}" rel="prev">Anterior</a>
+                        {% endif %}
+                        <span class="pagination-current" aria-current="page" aria-label="Página atual: {{ pagina }}">{{ pagina }}</span>
+                {% if pagina < total_paginas %}
+                        <a href="{{ request.url.include_query_params(pagina=pagina + 1) }}" rel="next">Próxima</a>
+                        {% endif %}
+                    </nav>
+                    {% endif %}
                 </div>
             </div>
         </main>
 
         <footer class="site-footer">
             <div class="footer-info">
-                <p><strong>Associação de Pais e Mestres</strong> • SENAI</p>
+                <p><strong>Associação de Pais e Mestres</strong>• SENAI</p>
                 <p class="footer-sub">Plataforma interna de gestão acadêmica e operacional.</p>
             </div>
         </footer>
     </div>
 
     <script src="/static/js/armarios/historico_geral.js" defer></script>
+        </div>
+    </div>
 </body>
 </html>

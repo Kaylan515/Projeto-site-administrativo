@@ -250,7 +250,7 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d97706' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-image: none;
     background-repeat: no-repeat;
     background-position: right 0.75rem center;
     background-size: 0.9rem;
@@ -598,3 +598,62 @@ body {
 .btn-modal-confirmar:hover {
     background-color: var(--primary-hover);
 }
+/* Page heading aligned with the administrative dashboard. */
+.pdv-page-header { padding: 0 2rem 12px; }
+.pdv-page-kicker { color: var(--text-muted); font: 600 11px var(--font-head); letter-spacing: .08em; }
+.pdv-page-header h1 { margin: 8px 0 10px; color: var(--text-main); font: 700 clamp(1.8rem, 3vw, 2.4rem)/1.15 var(--font-head); letter-spacing: -.035em; }
+.pdv-page-header p { color: var(--text-muted); font-size: 14px; line-height: 1.6; }
+@media (max-width: 760px) { .pdv-page-header { padding-inline: 0; } }
+
+.pdv-page-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+.pdv-report-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+@media (max-width: 600px) {
+    .pdv-report-actions { width: 100%; }
+    .pdv-report-actions a { flex: 1 1 150px; }
+}
+
+/* Cash payment step uses the same colors as the confirmation dialogs. */
+.cash-dialog { width: min(460px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); margin: auto; padding: 28px; border: 1px solid #3a3b40; border-radius: 16px; background: #191a1d; color: #f5f5f4; box-shadow: 0 24px 80px #0008; overflow-y: auto; }
+.cash-dialog::backdrop { background: #000a; backdrop-filter: blur(4px); }
+.cash-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.cash-close { width: 36px; height: 36px; border: 1px solid #3a3b40; border-radius: 8px; background: #222327; color: #d5d5db; font-size: 24px; cursor: pointer; }
+.cash-dialog h2 { margin: 16px 0 8px; font: 600 24px var(--font-head); letter-spacing: -.03em; }
+.cash-dialog #cash-description { color: #adaeb6; font-size: 14px; line-height: 1.6; margin-bottom: 20px; }
+.cash-total, .cash-change { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 16px; border-radius: 10px; margin: 18px 0; font-variant-numeric: tabular-nums; }
+.cash-total { background: #222327; color: #d5d5db; }
+.cash-change { background: #30291f; border: 1px solid #66513a; color: #f0ae54; }
+.cash-change strong { font-size: 24px; }
+.cash-dialog .input-field-group input { width: 100%; }
+.cash-exact { display: flex; align-items: center; gap: 10px; margin: 16px 0; font-size: 13px; color: #d5d5db; cursor: pointer; }
+.cash-error { color: #f6a6ad; font-size: 13px; line-height: 1.6; }
+.cash-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+@media (prefers-reduced-motion: no-preference) { .cash-dialog[open] { animation: cashArrival .25s ease-out; } @keyframes cashArrival { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: none; } } }
+@media (max-width: 480px) { .cash-dialog { padding: 20px; } .cash-actions > button { flex: 1; } }
+
+.split-payments { padding: 16px; margin: 12px 0; border: 1px solid var(--border-color); border-radius: 12px; background: #191a1d; }
+.split-payments > p { color: var(--text-muted); font-size: 12px; margin-bottom: 12px; line-height: 1.6; }
+.split-payments > label { display: grid; grid-template-columns: minmax(0, 1fr) minmax(90px, 130px); align-items: center; gap: 12px; margin: 10px 0; font-size: 13px; color: var(--text-dim); }
+.split-payments .payment-amount { width: 100%; text-align: right; }
+.payment-balance { border-top: 1px solid var(--border-color); margin-top: 16px; padding-top: 12px; }
+.payment-balance > div { display: flex; justify-content: space-between; gap: 12px; margin: 8px 0; font-size: 13px; font-variant-numeric: tabular-nums; }
+.payment-balance strong { color: #f0ae54; }
+#payment-message { font-size: 12px; line-height: 1.6; color: #f6cc94; margin-top: 12px; }
+#payment-message.is-complete { color: #93dfb5; }
+
+.cash-payment-summary { padding: 12px; margin-bottom: 12px; border: 1px solid #66513a; border-radius: 9px; color: #f0c58f; background: #30291f; font-size: 12px; line-height: 1.8; }
+.pix-code-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px; min-height: 220px; border: 1px dashed #66513a; border-radius: 14px; background: #222327; text-align: center; }
+.pix-placeholder-icon { color: #f0ae54; font-size: 54px; line-height: 1; }
+.pix-code-placeholder > span:last-child, .pix-pending-note { color: #adaeb6; font-size: 13px; line-height: 1.7; }
+.pix-pending-note { margin-top: 16px; }
+.pix-dialog #pix-description { color: #adaeb6; font-size: 14px; line-height: 1.6; }
+
+.cash-choice-group { border: 0; padding: 0; margin: 20px 0; min-width: 0; }
+.cash-choice-group legend { color: #adaeb6; font-size: 12px; margin-bottom: 10px; }
+.cash-choice { display: flex; align-items: center; gap: 12px; padding: 16px; margin-bottom: 10px; border: 1px solid #3a3b40; border-radius: 10px; background: #222327; color: #d5d5db; cursor: pointer; font-size: 14px; transition: border-color .2s, background .2s; }
+.cash-choice:has(input:checked) { border-color: #f0ae54; background: #30291f; color: #f0c58f; }
+#cash-change-field { margin: 12px 0 18px; }
+#cash-change-field[hidden] { display: none; }
+
+.pix-qr-image { display: block; width: min(100%, 280px); height: auto; margin: 20px auto; background: white; border: 12px solid white; border-radius: 10px; }
+#pix-copy-code { display: block; width: 100%; margin: 10px 0; font: 12px/1.6 monospace; word-break: break-all; }
+#pix-code-area[hidden] { display: none; }

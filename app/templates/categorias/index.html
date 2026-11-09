@@ -7,16 +7,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/css/categorias/index.css">
     <script src="/static/js/categorias/index.js" defer></script>
-    <script src="/static/js/ui.js" defer></script>
+    <script src="/static/js/ui.js?v=20261109-manual-nav" defer></script>
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <link rel="stylesheet" href="/static/css/typography.css">
+    <link rel="stylesheet" href="/static/css/background.css">
+    <link rel="stylesheet" href="/static/css/visual-effects.css?v=20261109-mouse">
+    <script src="/static/js/visual-effects.js?v=20261109-mouse" defer></script>
 </head>
 
-<body>
+<body class="admin-page">
+    <div class="layout">
+        {% include "_sidebar.html" %}
+        <div class="admin-main">
     <div class="categorias-container">
         
         <!-- Hed -->
         <header class="categorias-header">
             <div>
-                <a href="/" class="btn-voltar">← Dashboard</a>
                 <h1>🏷️ Gestão de Categorias</h1>
             </div>
             <a href="/categorias/nova" class="btn-novo">+ Nova categoria</a>
@@ -88,11 +95,9 @@
             </table>
         </div>
 
-        <!-- Rodapé -->
-        <div class="categorias-footer">
-            <a href="/" class="btn-voltar">← Dashboard</a>
-        </div>
 
+    </div>
+        </div>
     </div>
 </body>
 

@@ -8,10 +8,18 @@
     
     <!-- Ligação ao CSS específico da pasta produtos -->
     <link rel="stylesheet" href="/static/css/produtos/detalhe.css">
-    <script src="/static/js/ui.js" defer></script>
+    <script src="/static/js/ui.js?v=20261109-manual-nav" defer></script>
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <link rel="stylesheet" href="/static/css/typography.css">
+    <link rel="stylesheet" href="/static/css/background.css">
+    <link rel="stylesheet" href="/static/css/visual-effects.css?v=20261109-mouse">
+    <script src="/static/js/visual-effects.js?v=20261109-mouse" defer></script>
 </head>
 
-<body>
+<body class="admin-page">
+    <div class="layout">
+        {% include "_sidebar.html" %}
+        <div class="admin-main">
     <div class="container">
         {% if request.query_params.get('editado') == 'ok' %}
         <div class="alert alert-success">Produto atualizado com sucesso!</div>
@@ -64,12 +72,14 @@
                 </div>
 
                 <div class="back-wrap">
-                    <a href="/produtos" class="back-link">← Voltar</a>
+                    <a href="/produtos" class="back-link">Voltar</a>
                 </div>
             </div>
         </div>
     </div>
     <script src="/static/js/produtos/detalhe.js" defer></script>
+        </div>
+    </div>
 </body>
 
 </html>

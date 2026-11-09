@@ -1,0 +1,9 @@
+/* Shared text treatment for every page and link state. */
+a:any-link,
+a:any-link:hover,
+a:any-link:focus,
+a:any-link:active,
+u,
+ins {
+    text-decoration: none !important;
+}

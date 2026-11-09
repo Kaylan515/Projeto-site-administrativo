@@ -7,16 +7,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/css/clientes/index.css">
     <script src="/static/js/clientes/index.js" defer></script>
-    <script src="/static/js/ui.js" defer></script>
+    <script src="/static/js/ui.js?v=20261109-manual-nav" defer></script>
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <link rel="stylesheet" href="/static/css/typography.css">
+    <link rel="stylesheet" href="/static/css/background.css">
+    <link rel="stylesheet" href="/static/css/visual-effects.css?v=20261109-mouse">
+    <script src="/static/js/visual-effects.js?v=20261109-mouse" defer></script>
 </head>
 
-<body>
+<body class="admin-page">
+    <div class="layout">
+        {% include "_sidebar.html" %}
+        <div class="admin-main">
     <div class="clientes-container">
 
         <!-- Cabeçalho -->
         <header class="clientes-header">
             <div>
-                <a href="/" class="btn-voltar">← Dashboard</a>
+                <a href="/" class="btn-voltar">Dashboard</a>
                 <h1>👥 Gestão de Clientes</h1>
             </div>
             <a href="/clientes/novo" class="btn-novo">+ Novo cliente</a>
@@ -168,9 +176,21 @@
         <div class="paginacao-footer">
             <p class="info-paginacao">Página {{ pagina }} de {{ total_paginas }} ({{ total_clientes }} clientes)</p>
             {% set total_registros = total_clientes %}
-            {% include "_pagination.html" %}
+            {% if total_paginas > 1 %}
+            <nav class="pagination app-pagination" aria-label="Paginação">
+                {% if pagina > 1 %}
+                <a href="{{ request.url.include_query_params(pagina=pagina - 1) }}" rel="prev">Anterior</a>
+                {% endif %}
+                <span class="pagination-current" aria-current="page" aria-label="Página atual: {{ pagina }}">{{ pagina }}</span>
+                {% if pagina < total_paginas %}
+                <a href="{{ request.url.include_query_params(pagina=pagina + 1) }}" rel="next">Próxima</a>
+                {% endif %}
+            </nav>
+            {% endif %}
         </div>
 
+    </div>
+        </div>
     </div>
 </body>
 

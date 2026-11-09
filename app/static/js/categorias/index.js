@@ -37,11 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             if (formParent) formParent.submit();
                         }
                     });
-                } else {
-                    // Fallback de segurança caso o ui.js ainda não tenha carregado
-                    if (confirm(mensagem)) {
-                        if (botao.tagName === 'A') window.location.href = botao.href;
-                    }
                 }
             }
         });

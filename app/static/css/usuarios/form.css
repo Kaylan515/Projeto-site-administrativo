@@ -134,5 +134,5 @@ a {
 
 a:hover {
     color: var(--text-main);
-    text-decoration: underline;
+    text-decoration: none;
 }

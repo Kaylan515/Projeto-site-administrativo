@@ -217,7 +217,7 @@ select {
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d97706' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+    background-image: none;
     background-repeat: no-repeat !important;
     background-position: right 0.75rem center !important;
     background-size: 0.9rem !important;
@@ -265,4 +265,21 @@ select {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: var(--radius);
-    overflow-
+    overflow-x: auto;
+}
+.tabela-mov { width: 100%; border-collapse: collapse; }
+.tabela-mov th { padding: 14px 18px; background: #16171a; color: var(--text-muted); text-align: left; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+.tabela-mov td { padding: 16px 18px; border-top: 1px solid var(--border-color); color: var(--text-main); font-size: 13px; line-height: 1.6; }
+.tabela-mov tbody tr { transition: background-color .2s; }
+.tabela-mov tbody tr:hover { background: #f0ae5408; }
+.tabela-mov td a { color: var(--primary-color); font-weight: 600; }
+.tabela-mov .badge { display: inline-flex; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+.tabela-mov .badge.entrada { background: #203c2e; color: #93dfb5; }
+.tabela-mov .badge.saida { background: #3a2529; color: #f6a6ad; }
+.tabela-mov .font-head { font-family: var(--font-head); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tabela-mov .vazio { padding: 40px 20px; text-align: center; color: var(--text-muted); }
+@media (max-width: 760px) {
+    .busca-row { flex-wrap: wrap; }
+    .selects-row { gap: 10px; }
+    .custom-dropdown { flex: 1 1 180px; }
+}

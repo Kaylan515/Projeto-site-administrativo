@@ -292,7 +292,7 @@ body {
     font-weight: 600;
 }
 .link-action:hover {
-    text-decoration: underline;
+    text-decoration: none;
 }
 
 .link-back {

@@ -44,7 +44,8 @@ html, body {
     font-size: 15px;
     line-height: 1.6;
     min-height: 100vh;
-    overflow-x: hidden;
+    /* Clip horizontal overflow without creating a scroll container for the sticky menu. */
+    overflow-x: clip;
     position: relative;
 }
 
@@ -289,7 +290,7 @@ body.aapm-nav-collapsed .sidebar-footer { display: none; }
    ========================================================================== */
 .main {
     padding: 48px 56px;
-    overflow-y: auto;
+    overflow: visible;
 }
 
 .page-header {
@@ -586,7 +587,7 @@ tr:hover td { background: rgba(217, 119, 6, 0.04); }
 a[href='/'] .icon::after { content: 'dashboard'; }
 a[href='/produtos'] .icon::after { content: 'inventory_2'; }
 a[href='/categorias'] .icon::after { content: 'category'; }
-a[href='/movimentacoes'] .icon::after { content: 'swap_vert'; }
+a[href='/movimentacoes'] .icon::after { content: 'receipt_long'; }
 a[href='/armarios'] .icon::after { content: 'lock'; }
 a[href='/clientes'] .icon::after { content: 'groups'; }
 a[href='/pdv'] .icon::after { content: 'point_of_sale'; }

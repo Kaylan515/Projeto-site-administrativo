@@ -7,10 +7,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/css/movimentacoes/form.css">
     <script src="/static/js/movimentacoes/form.js" defer></script>
-    <script src="/static/js/ui.js" defer></script>
+    <script src="/static/js/ui.js?v=20261109-manual-nav" defer></script>
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <link rel="stylesheet" href="/static/css/typography.css">
+    <link rel="stylesheet" href="/static/css/background.css">
+    <link rel="stylesheet" href="/static/css/visual-effects.css?v=20261109-mouse">
+    <script src="/static/js/visual-effects.js?v=20261109-mouse" defer></script>
 </head>
 
-<body>
+<body class="admin-page">
+    <div class="layout">
+        {% include "_sidebar.html" %}
+        <div class="admin-main">
     <div class="form-container">
         <header class="form-header">
             <h1>📦 Registrar movimentação</h1>
@@ -39,7 +47,7 @@
             </div>
 
             <div id="info-estoque" class="info-box" style="display:none">
-                Estoque atual: <strong id="valor-estoque">0</strong> unidade(s)
+                Estoque atual: <strong id="valor-estoque">0</strong>unidade(s)
             </div>
 
             <div class="input-group">
@@ -48,7 +56,7 @@
                     <option value="">Selecione o tipo...</option>
                     {% for t in tipos %}
                     <option value="{{ t.value }}">
-                        {{ "▲ Entrada" if t.value == 'entrada' else "▼ Saída" }}
+                        {{ " Entrada" if t.value == 'entrada' else " Saída" }}
                     </option>
                     {% endfor %}
                 </select>
@@ -83,6 +91,8 @@
                 <a href="/movimentacoes" class="btn-cancel">Cancelar</a>
             </div>
         </form>
+    </div>
+        </div>
     </div>
 </body>
 

@@ -51,7 +51,7 @@ def test_login_valido_invalido_e_usuario_inativo(cliente, db_session, monkeypatc
 
     sucesso = cliente.post("/auth/login", data={"email": usuario.email, "senha": "senha123"}, follow_redirects=False)
     assert sucesso.status_code == 302
-    assert sucesso.headers["location"] == "/"
+    assert sucesso.headers["location"] == "/dashboard"
     assert "access_token" in sucesso.headers.get("set-cookie", "")
 
     invalido = cliente.post("/auth/login", data={"email": usuario.email, "senha": "errada"})
@@ -68,3 +68,28 @@ def test_cadastro_publico_redireciona_sem_criar_usuario(cliente, db_session):
     assert resposta.status_code == 303
     assert resposta.headers["location"] == "/auth/login?mensagem=cadastro_restrito"
     assert db_session.query(Usuario).filter_by(email="novo@example.com").first() is None
+
+
+def test_dashboard_preserva_sessao_ao_navegar(cliente, db_session, monkeypatch):
+    import app.auth as auth
+    from app.main import app
+    monkeypatch.setattr(auth, 'SECRET_KEY', 'chave-de-teste-dashboard')
+    app.dependency_overrides.pop(auth.get_usuario_logado, None)
+    app.dependency_overrides.pop(auth.get_usuario_opcional, None)
+    usuario = Usuario(nome='Teste dashboard', email='dashboard@example.com', senha_hash=hash_senha('senha123'), role='admin')
+    db_session.add(usuario)
+    db_session.commit()
+    login = cliente.post('/auth/login', data={'email': usuario.email, 'senha': 'senha123'}, follow_redirects=False)
+    assert login.headers['location'] == '/dashboard'
+    token = cliente.cookies.get('access_token')
+    assert token
+    for url in ['/dashboard', '/produtos/', '/dashboard', '/']:
+        resposta = cliente.get(url)
+        assert resposta.status_code == 200
+        assert cliente.cookies.get('access_token') == token
+        assert 'Max-Age=0' not in resposta.headers.get('set-cookie', '')
+    assert 'href="/dashboard"' in resposta.text
+    cliente.cookies.clear()
+    sem_sessao = cliente.get('/dashboard', follow_redirects=False)
+    assert sem_sessao.status_code == 303
+    assert sem_sessao.headers['location'].startswith('/auth/login')
