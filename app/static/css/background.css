@@ -1,0 +1,30 @@
+/* One background across public pages and the administrative area. */
+@media screen {
+    html { background-color: #111214; }
+    html body,
+    html body.admin-page {
+        background-color: #111214;
+        background-image:
+            radial-gradient(ellipse at 8% 8%, rgba(240, 174, 84, .13) 0%, transparent 42%),
+            radial-gradient(ellipse at 92% 68%, rgba(175, 116, 53, .09) 0%, transparent 42%),
+            radial-gradient(ellipse at 64% 0%, rgba(106, 127, 157, .065) 0%, transparent 45%),
+            radial-gradient(circle, rgba(222, 207, 184, .08) .7px, transparent 1px);
+        background-size: 100% 100%, 100% 100%, 100% 100%, 26px 26px;
+        background-position: center;
+        background-repeat: no-repeat, no-repeat, no-repeat, repeat;
+        background-attachment: fixed;
+    }
+    /* Replace older background overlays without affecting the cursor light. */
+    html body::before { content: none; }
+}
+@media screen and (max-width: 760px) {
+    html body,
+    html body.admin-page {
+        background-attachment: scroll;
+        background-size: 100% 100%, 100% 100%, 100% 100%, 32px 32px;
+    }
+}
+@media print {
+    html, html body, html body.admin-page { background: white !important; }
+    html body::before { content: none; }
+}

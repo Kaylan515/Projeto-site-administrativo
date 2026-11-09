@@ -49,6 +49,7 @@ def listar_produtos(
     busca: str = "",
     categoria_id: int = 0,
     possui_variacao: str = "",
+    estoque_baixo: bool = False,
     pagina: int = 1,
     db: Session = Depends(get_db),
     usuario=Depends(get_usuario_logado)
@@ -57,6 +58,9 @@ def listar_produtos(
     query = db.query(Produto).filter(
         Produto.ativo == True
     )
+
+    if estoque_baixo:
+        query = query.filter(Produto.estoque_atual <= 5)
 
     # Filtro por nome
     if busca:
@@ -126,6 +130,7 @@ def listar_produtos(
             "busca": busca,
             "categoria_id": categoria_id,
             "possui_variacao": possui_variacao,
+            "estoque_baixo": estoque_baixo,
 
             # Paginação
             "pagina": pagina,

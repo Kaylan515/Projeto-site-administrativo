@@ -11,7 +11,7 @@
 
         const shell = document.createElement('div');
         shell.className = 'app-shell';
-        shell.innerHTML = '<header class="app-shell-header"><a class="app-shell-brand" href="/">AAPM <span>•</span> SENAI</a><nav class="app-shell-nav" aria-label="Navegação principal"><a href="/">Dashboard</a><a href="/produtos">Produtos</a><a href="/armarios">Armários</a><a href="/pdv">PDV</a></nav></header><main class="app-content"></main><footer class="app-shell-footer"><span><strong>AAPM SENAI</strong> · Gestão acadêmica e operacional</span><a href="/">Ir ao dashboard</a></footer>';
+        shell.innerHTML = '<header class="app-shell-header"><a class="app-shell-brand" href="/">AAPM <span>•</span> SENAI</a><nav class="app-shell-nav" aria-label="Navegação principal"><a href="/dashboard">Dashboard</a><a href="/produtos">Produtos</a><a href="/armarios">Armários</a><a href="/pdv">PDV</a></nav></header><main class="app-content"></main><footer class="app-shell-footer"><span><strong>AAPM SENAI</strong> · Gestão acadêmica e operacional</span><a href="/">Ir ao dashboard</a></footer>';
 
         const content = shell.querySelector('.app-content');
         [...body.childNodes].forEach((node) => {
@@ -39,7 +39,7 @@
         const nav = document.createElement('nav');
         nav.className = 'aapm-global-nav';
         nav.setAttribute('aria-label', 'Navegação principal');
-        nav.innerHTML = '<div class="nav-brand-row"><span class="brand">AAPM · SENAI</span><button class="aapm-nav-toggle" type="button" aria-expanded="true" aria-label="Fechar menu"><span aria-hidden="true">×</span></button></div><a href="/">Dashboard</a><a href="/produtos">Produtos</a><a href="/categorias">Categorias</a><a href="/movimentacoes">Movimentações</a><a href="/armarios">Armários</a><a href="/clientes">Clientes</a><a href="/pdv">Ponto de venda</a><a href="/pdv/historico">Histórico de vendas</a><a href="/pdv/extrato">Extrato</a><a href="/usuarios">Usuários</a><a href="/auth/logout">Sair</a>';
+        nav.innerHTML = '<div class="nav-brand-row"><span class="brand">AAPM · SENAI</span><button class="aapm-nav-toggle" type="button" aria-expanded="true" aria-label="Fechar menu"><span aria-hidden="true">×</span></button></div><a href="/dashboard">Dashboard</a><a href="/produtos">Produtos</a><a href="/categorias">Categorias</a><a href="/movimentacoes">Movimentações</a><a href="/armarios">Armários</a><a href="/clientes">Clientes</a><a href="/pdv">Ponto de venda</a><a href="/usuarios">Usuários</a><a href="/auth/logout">Sair</a>';
         nav.querySelectorAll('a').forEach((link) => {
             const matches = [...nav.querySelectorAll('a')].filter((item) => item.pathname === path || (item.pathname !== '/' && path.startsWith(item.pathname + '/')));
             const active = matches.sort((a, b) => b.pathname.length - a.pathname.length)[0];
@@ -55,7 +55,7 @@
         const style = document.createElement('style');
         style.id = 'aapm-navigation-styles';
         style.textContent = `
-            .aapm-global-nav { --nav-bg:rgba(24,20,18,.96); --nav-surface:rgba(33,27,26,.8); --nav-border:rgba(68,54,51,.55); --nav-amber:#d97706; --nav-amber-bright:#f59e0b; --nav-text:#d6cdca; position:fixed; z-index:1000; inset:0 auto 0 0; display:flex; flex-direction:column; gap:4px; width:260px; padding:22px 12px; overflow-y:auto; color:#f5f5f4; background:var(--nav-bg); border-right:1px solid var(--nav-border); box-shadow:12px 0 36px rgba(0,0,0,.16); backdrop-filter:blur(14px); font:500 14px 'DM Sans',system-ui,sans-serif; transition:width .22s ease; }
+            .aapm-global-nav { --nav-bg:rgba(24,20,18,.96); --nav-surface:rgba(33,27,26,.8); --nav-border:rgba(68,54,51,.55); --nav-amber:#d97706; --nav-amber-bright:#f59e0b; --nav-text:#d6cdca; position:fixed; z-index:1000; inset:0 auto 0 0; display:flex; flex-direction:column; gap:4px; width:260px; padding:22px 12px; overflow-y:auto; color:#f5f5f4; background:var(--nav-bg); border-right:1px solid var(--nav-border); box-shadow:12px 0 36px rgba(0,0,0,.16); backdrop-filter:blur(14px); font:500 14px 'DM Sans',system-ui,sans-serif; transition:width 1.2s cubic-bezier(.4,0,.2,1); }
             .nav-brand-row { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:0 8px 16px 12px; margin-bottom:9px; border-bottom:1px solid var(--nav-border); }
             .aapm-global-nav .brand { min-width:0; color:var(--nav-amber-bright); font:700 19px 'Space Grotesk',system-ui,sans-serif; letter-spacing:-.025em; white-space:nowrap; }
             .aapm-global-nav a { display:block; padding:10px 14px; border:1px solid transparent; border-radius:10px; color:var(--nav-text); text-decoration:none; transition:background .18s ease,color .18s ease,border-color .18s ease,transform .18s ease; }
@@ -86,22 +86,20 @@
             body.aapm-nav-collapsed .sidebar-nav .nav-section { display:none; }
             body.aapm-nav-collapsed .sidebar-nav .nav-link { justify-content:center; padding:10px 4px; overflow:hidden; font-size:0; }
             body.aapm-nav-collapsed .sidebar-nav .nav-link .icon { font-size:16px; }
-            body.aapm-with-nav { padding-left:260px !important; }
+            body.aapm-with-nav { padding-left:260px !important; transition:padding-left 1.2s cubic-bezier(.4,0,.2,1); }
             body.aapm-with-nav.aapm-nav-collapsed { padding-left:76px !important; }
             body.aapm-nav-collapsed .aapm-global-nav { width:76px; padding-inline:9px; }
             body.aapm-nav-collapsed .aapm-global-nav .nav-brand-row { justify-content:center; padding:0 0 14px; }
             body.aapm-nav-collapsed .aapm-global-nav .brand { display:none; }
             body.aapm-nav-collapsed .aapm-global-nav a { overflow:hidden; padding:10px 4px; text-align:center; font-size:0; }
             body.aapm-nav-collapsed .aapm-global-nav a::after { display:block; font-size:17px; }
-            body.aapm-nav-collapsed .aapm-global-nav a[href='/']::after { content:'⌂'; }
+            body.aapm-nav-collapsed .aapm-global-nav a[href='/dashboard']::after { content:'⌂'; }
             body.aapm-nav-collapsed .aapm-global-nav a[href='/produtos']::after { content:'▦'; }
             body.aapm-nav-collapsed .aapm-global-nav a[href='/categorias']::after { content:'▤'; }
             body.aapm-nav-collapsed .aapm-global-nav a[href='/movimentacoes']::after { content:'▤'; }
             body.aapm-nav-collapsed .aapm-global-nav a[href='/armarios']::after { content:'▣'; }
             body.aapm-nav-collapsed .aapm-global-nav a[href='/clientes']::after { content:'♙'; }
             body.aapm-nav-collapsed .aapm-global-nav a[href='/pdv']::after { content:'▣'; }
-            body.aapm-nav-collapsed .aapm-global-nav a[href='/pdv/historico']::after { content:'◷'; }
-            body.aapm-nav-collapsed .aapm-global-nav a[href='/pdv/extrato']::after { content:'≡'; }
             body.aapm-nav-collapsed .aapm-global-nav a[href='/usuarios']::after { content:'♙'; }
             body.aapm-nav-collapsed .aapm-global-nav a[href='/auth/logout']::after { content:'⏻'; }
             @media(max-width:1200px) and (min-width:761px) { .aapm-global-nav { width:230px; } body.aapm-with-nav { padding-left:230px !important; } }
@@ -124,6 +122,11 @@
             }
             @media(max-width:420px) { .aapm-global-nav { padding:6px 8px; } .aapm-global-nav .brand { font-size:14px; } .aapm-global-nav a { padding:7px 8px; font-size:12px; } .aapm-nav-toggle { flex-basis:32px; width:32px; height:32px; } }
         `;
+        style.textContent += `
+            @media (prefers-reduced-motion: reduce) {
+                body.aapm-with-nav, .aapm-global-nav { transition: none; }
+            }
+        `;
         document.head.append(style);
     }
 
@@ -134,17 +137,58 @@
             button.className = 'aapm-nav-toggle';
             button.type = 'button';
         }
-        const collapsed = localStorage.getItem('aapm-nav-collapsed') === 'true';
+        // Start expanded; only the toggle button closes the menu.
+        const collapsed = false;
         button.setAttribute('aria-expanded', String(!collapsed));
         button.setAttribute('aria-label', collapsed ? 'Abrir menu' : 'Fechar menu');
         button.innerHTML = `<span aria-hidden="true">${collapsed ? '☰' : '×'}</span>`;
+        let sidebarAnimation;
+        // JavaScript owns the geometry animation; CSS transitions must not compete.
+        if (layout) layout.style.transition = 'none';
+        const finishNavigationAnimation = () => {
+            sidebarAnimation?.cancel();
+            sidebarAnimation = null;
+        };
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        const mobileNavigation = window.matchMedia('(max-width: 760px)');
+        reducedMotion.addEventListener('change', finishNavigationAnimation);
+        mobileNavigation.addEventListener('change', finishNavigationAnimation);
         button.addEventListener('click', () => {
+            const previousRect = sidebar.getBoundingClientRect();
+            finishNavigationAnimation();
             const isCollapsed = document.body.classList.toggle('aapm-nav-collapsed');
             if (layout) layout.classList.toggle('sidebar-collapsed', isCollapsed);
             button.setAttribute('aria-expanded', String(!isCollapsed));
             button.setAttribute('aria-label', isCollapsed ? 'Abrir menu' : 'Fechar menu');
             button.innerHTML = `<span aria-hidden="true">${isCollapsed ? '☰' : '×'}</span>`;
-            localStorage.setItem('aapm-nav-collapsed', String(isCollapsed));
+            if (!reducedMotion.matches) {
+                const nextRect = sidebar.getBoundingClientRect();
+                if (layout && !mobileNavigation.matches && typeof layout.animate === 'function') {
+                    // Both keyframes use matching track definitions and measured pixel widths.
+                    sidebarAnimation = layout.animate([
+                        { gridTemplateColumns: `${previousRect.width}px minmax(0, 1fr)` },
+                        { gridTemplateColumns: `${nextRect.width}px minmax(0, 1fr)` }
+                    ], { duration: 1200, easing: 'cubic-bezier(.4,0,.2,1)' });
+                } else if (layout && mobileNavigation.matches && typeof sidebar.animate === 'function') {
+                    sidebarAnimation = sidebar.animate([
+                        { height: `${previousRect.height}px`, overflow: 'hidden' },
+                        { height: `${nextRect.height}px`, overflow: 'hidden' }
+                    ], { duration: 1200, easing: 'cubic-bezier(.4,0,.2,1)' });
+                }
+                const icon = button.querySelector('span');
+                if (typeof icon?.animate === 'function') {
+                    icon.animate([
+                        { opacity: .3, transform: 'rotate(-70deg) scale(.7)' },
+                        { opacity: 1, transform: 'rotate(0) scale(1)' }
+                    ], { duration: 420, easing: 'ease-in-out' });
+                }
+                if (!isCollapsed) {
+                    sidebar.querySelectorAll('.nav-label, .user-info').forEach(label => {
+                        if (typeof label.animate !== 'function') return;
+                        label.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, delay: 160, fill: 'backwards' });
+                    });
+                }
+            }
         });
         if (layout) {
             layout.classList.toggle('sidebar-collapsed', collapsed);
@@ -317,7 +361,7 @@
         document.head.append(style);
     }
 
-    function showAppConfirm(message, onConfirm) {
+    function showAppConfirm(message, onConfirm, options = {}) {
         if (document.querySelector('.app-confirm-backdrop')) return;
         const previousFocus = document.activeElement;
         const previousOverflow = document.body.style.overflow;
@@ -344,6 +388,8 @@
         const acceptButton = backdrop.querySelector('.app-confirm-accept');
 
         backdrop.querySelector('#app-confirm-message').textContent = message;
+        backdrop.querySelector('#app-confirm-title').textContent = options.title || 'Confirmar ação';
+        acceptButton.textContent = options.confirmText || 'Confirmar';
         const handleKey = (event) => {
             if (event.key === 'Escape') { event.preventDefault(); dismiss(); }
             if (event.key === 'Tab') {
@@ -353,18 +399,29 @@
                 buttons[(index + (event.shiftKey ? 2 : 1)) % 3].focus();
             }
         };
-        const dismiss = () => {
+        let closing = false;
+        const dismiss = async () => {
+            if (closing) return false;
+            closing = true;
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && typeof backdrop.animate === 'function') {
+                const exit = backdrop.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 180, easing: 'ease-in', fill: 'forwards' });
+                backdrop.querySelector('.app-confirm-dialog').animate([
+                    { transform: 'translateY(0) scale(1)' },
+                    { transform: 'translateY(8px) scale(.98)' }
+                ], { duration: 180, easing: 'ease-in', fill: 'forwards' });
+                await exit.finished.catch(() => {});
+            }
             document.removeEventListener('keydown', handleKey);
             backdrop.remove();
             document.body.style.overflow = previousOverflow;
             if (previousFocus?.isConnected) previousFocus.focus();
+            return true;
         };
 
-        closeButton.addEventListener('click', dismiss);
-        cancelButton.addEventListener('click', dismiss);
-        acceptButton.addEventListener('click', () => {
-            dismiss();
-            if (typeof onConfirm === 'function') onConfirm();
+        closeButton.addEventListener('click', () => { dismiss(); });
+        cancelButton.addEventListener('click', () => { dismiss(); });
+        acceptButton.addEventListener('click', async () => {
+            if (await dismiss() && typeof onConfirm === 'function') onConfirm();
         });
 
         backdrop.addEventListener('click', (event) => {
@@ -396,28 +453,21 @@
     document.addEventListener('DOMContentLoaded', () => {
         mountShell();
         mountNavigation();
-        if (document.body.classList.contains('admin-page') && !document.querySelector('.cupom')) {
-            const effectsCss = document.createElement('link');
-            effectsCss.rel = 'stylesheet';
-            effectsCss.href = '/static/css/visual-effects.css';
-            document.head.append(effectsCss);
-            const effectsScript = document.createElement('script');
-            effectsScript.src = '/static/js/visual-effects.js';
-            document.head.append(effectsScript);
-        }
         document.addEventListener('click', (event) => {
-            const target = event.target.closest('button, .btn-primary, .btn-secondary');
-            if (!target || target.disabled) return;
-
-            const ripple = document.createElement('span');
-            ripple.className = 'ui-ripple';
-            const bounds = target.getBoundingClientRect();
-            ripple.style.left = `${event.clientX - bounds.left}px`;
-            ripple.style.top = `${event.clientY - bounds.top}px`;
-            target.append(ripple);
-            ripple.addEventListener('animationend', () => ripple.remove());
+            const link = event.target.closest('a[href]');
+            if (!link || link.origin !== window.location.origin || link.pathname.replace(/\/$/, '') !== '/auth/logout') return;
+            event.preventDefault();
+            showAppConfirm('Deseja sair da sua conta? Você precisará entrar novamente para acessar o sistema.', () => {
+                window.location.assign(link.href);
+            }, { title: 'Sair da conta', confirmText: 'Sim, sair' });
         });
-
+        window.addEventListener('pageshow', () => {
+            document.querySelectorAll('.pagination a[aria-busy="true"]').forEach(link => {
+                link.style.pointerEvents = '';
+                link.style.opacity = '';
+                link.removeAttribute('aria-busy');
+            });
+        });
         // Melhora a UX da paginação evitando cliques duplos
         document.querySelectorAll('.pagination a').forEach((link) => {
             link.addEventListener('click', () => {

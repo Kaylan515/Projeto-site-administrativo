@@ -9,9 +9,12 @@
     <!-- Ligações aos ficheiros CSS e JS específicos -->
     <link rel="stylesheet" href="/static/css/pdv/historico.css">
     <script src="/static/js/pdv/historico.js" defer></script>
-    <script src="/static/js/ui.js" defer></script>
+    <script src="/static/js/ui.js?v=20261109-manual-nav" defer></script>
     <link rel="stylesheet" href="/static/css/admin.css">
     <link rel="stylesheet" href="/static/css/typography.css">
+    <link rel="stylesheet" href="/static/css/background.css">
+    <link rel="stylesheet" href="/static/css/visual-effects.css?v=20261109-mouse">
+    <script src="/static/js/visual-effects.js?v=20261109-mouse" defer></script>
 </head>
 
 <body class="admin-page">
@@ -26,9 +29,7 @@
                 <h1>Histórico de Vendas</h1>
                 <p class="subtitle">Consulte, filtre e analise todas as transações efetuadas.</p>
             </div>
-            <div>
-                <a href="/pdv" class="btn-secondary">Voltar ao PDV</a>
-            </div>
+            <a href="/pdv" class="btn-secondary">Voltar ao PDV</a>
         </div>
 
         <!-- Formulário de Filtros Avançados (Layout Assimétrico) -->
@@ -139,6 +140,7 @@
                         <th>Itens</th>
                         <th>Desconto</th>
                         <th>Total</th>
+                        <th>Pagamento</th>
                         <th>Operador</th>
                     </tr>
                 </thead>
@@ -159,12 +161,21 @@
                             {% endif %}
                         </td>
                         <td class="preco">R$ {{ "%.2f"|format(v.total_liquido) }}</td>
+                        <td>
+                            {% if v.pagamentos %}
+                            <div class="sale-payments">
+                                {% for forma, centavos in v.pagamentos.items() %}
+                                <span>{{ forma }} <strong>R$ {{ "%.2f"|format(centavos / 100) }}</strong></span>
+                                {% endfor %}
+                            </div>
+                            {% else %}<span class="text-muted">Não informado</span>{% endif %}
+                        </td>
                         <td>{{ v.usuario.nome if v.usuario else "—" }}</td>
                     </tr>
                     {% endfor %}
                     {% if not vendas %}
                     <tr>
-                        <td colspan="7" class="empty-row">Nenhuma venda encontrada com os critérios selecionados.</td>
+                        <td colspan="8" class="empty-row">Nenhuma venda encontrada com os critérios selecionados.</td>
                     </tr>
                     {% endif %}
                 </tbody>
@@ -173,16 +184,16 @@
 
         <!-- Rodapé e Paginação -->
         <div class="pagination-footer">
-            <p class="pagination-info">Página <strong>{{ pagina }}</strong>de <strong>{{ total_paginas }}</strong>({{ total_vendas }} vendas encontradas)</p>
+            <p class="pagination-info">Página <strong>{{ pagina }}</strong> de <strong>{{ total_paginas }}</strong> ({{ total_vendas }} vendas encontradas)</p>
             {% set total_registros = total_vendas %}
             {% if total_paginas > 1 %}
-            <nav class="pagination" aria-label="Paginação">
-                <span>Página {{ pagina }} de {{ total_paginas }} ({{ total_registros }} registros)</span>
+            <nav class="pagination app-pagination" aria-label="Paginação">
                 {% if pagina > 1 %}
-                <a href="{{ request.url.include_query_params(pagina=pagina - 1) }}">Anterior</a>
+                <a href="{{ request.url.include_query_params(pagina=pagina - 1) }}" rel="prev">Anterior</a>
                 {% endif %}
+                <span class="pagination-current" aria-current="page" aria-label="Página atual: {{ pagina }}">{{ pagina }}</span>
                 {% if pagina < total_paginas %}
-                <a href="{{ request.url.include_query_params(pagina=pagina + 1) }}">Próxima</a>
+                <a href="{{ request.url.include_query_params(pagina=pagina + 1) }}" rel="next">Próxima</a>
                 {% endif %}
             </nav>
             {% endif %}

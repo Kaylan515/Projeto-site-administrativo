@@ -6,9 +6,12 @@
     <title>Movimentações — AAPM SENAI</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/css/movimentacoes/index.css">
-    <script src="/static/js/ui.js" defer></script>
+    <script src="/static/js/ui.js?v=20261109-manual-nav" defer></script>
     <link rel="stylesheet" href="/static/css/admin.css">
     <link rel="stylesheet" href="/static/css/typography.css">
+    <link rel="stylesheet" href="/static/css/background.css">
+    <link rel="stylesheet" href="/static/css/visual-effects.css?v=20261109-mouse">
+    <script src="/static/js/visual-effects.js?v=20261109-mouse" defer></script>
 </head>
 
 <body class="admin-page">
@@ -132,13 +135,13 @@
             <p class="info-paginacao">Página {{ pagina }} de {{ total_paginas }} ({{ total_movimentacoes }} movimentações)</p>
             {% set total_registros = total_movimentacoes %}
             {% if total_paginas > 1 %}
-            <nav class="pagination" aria-label="Paginação">
-                <span>Página {{ pagina }} de {{ total_paginas }} ({{ total_registros }} registros)</span>
+            <nav class="pagination app-pagination" aria-label="Paginação">
                 {% if pagina > 1 %}
-                <a href="{{ request.url.include_query_params(pagina=pagina - 1) }}">Anterior</a>
+                <a href="{{ request.url.include_query_params(pagina=pagina - 1) }}" rel="prev">Anterior</a>
                 {% endif %}
+                <span class="pagination-current" aria-current="page" aria-label="Página atual: {{ pagina }}">{{ pagina }}</span>
                 {% if pagina < total_paginas %}
-                <a href="{{ request.url.include_query_params(pagina=pagina + 1) }}">Próxima</a>
+                <a href="{{ request.url.include_query_params(pagina=pagina + 1) }}" rel="next">Próxima</a>
                 {% endif %}
             </nav>
             {% endif %}

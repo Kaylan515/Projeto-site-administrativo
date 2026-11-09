@@ -9,7 +9,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.controllers import auth_controller
-from app.auth import get_usuario_opcional  # ← troca aqui
+from app.auth import get_usuario_logado, get_usuario_opcional  # ← troca aqui
 from app.controllers import usuario_controller  # ← adicionar
 from app.controllers import produto_controller  # ← adicionar
 from app.controllers import categoria_controller
@@ -17,7 +17,7 @@ from app.controllers import movimentacao_controller
 from app.controllers import armario_controller  # ← adicionar
 
 from app.controllers import cliente_controller, pdv_controller
-from app.database import engine
+from app.database import get_db
 from app.models.produto import Produto
 from app.models.categoria import Categoria
 from app.models.movimentacao import Movimentacao
@@ -50,71 +50,71 @@ async def pagina_http_erro(request: Request, exc: StarletteHTTPException):
 @app.exception_handler(Exception)
 async def pagina_erro_interno(request: Request, exc: Exception):
     return templates.TemplateResponse(request, "erro.html", {"request": request, "codigo": 500, "titulo": "Erro interno", "mensagem": "Ocorreu uma falha inesperada. Tente novamente ou retorne ao painel."}, status_code=500)
-def _dados_dashboard() -> dict:
+def _dados_dashboard(db: Session) -> dict:
     """Monta os indicadores exibidos no painel principal."""
-    with Session(engine) as db:
-        total_produtos = db.query(Produto).filter(Produto.ativo == True).count()
-        total_categorias = db.query(Categoria).filter(Categoria.ativo == True).count()
-        estoque_baixo = (
-            db.query(Produto)
-            .filter(Produto.ativo == True, Produto.estoque_atual <= 5)
-            .order_by(Produto.estoque_atual, Produto.nome)
-            .all()
-        )
-        movimentacoes_recentes = (
-            db.query(Movimentacao)
-            .options(joinedload(Movimentacao.produto))
-            .order_by(Movimentacao.criado_em.desc())
-            .limit(5)
-            .all()
-        )
-        itens_grafico = (
-            db.query(Produto)
-            .filter(Produto.ativo == True)
-            .order_by(Produto.estoque_atual.desc(), Produto.nome)
-            .limit(5)
-            .all()
-        )
-        total_itens_grafico = sum(item.estoque_atual for item in itens_grafico)
-        cores_grafico = ["#ff4b5f", "#f59e0b", "#22c55e", "#60a5fa", "#a78bfa"]
-        acumulado = 0
-        grafico_estoque = []
-        partes_pizza = []
-        for indice, item in enumerate(itens_grafico):
-            percentual = round(item.estoque_atual / total_itens_grafico * 100, 2) if total_itens_grafico else 0
-            inicio = acumulado
-            acumulado += percentual
-            cor = cores_grafico[indice]
-            grafico_estoque.append({"nome": item.nome, "quantidade": item.estoque_atual, "percentual": percentual, "cor": cor})
-            partes_pizza.append(f"{cor} {inicio}% {acumulado}%")
-        grafico_pizza = ", ".join(partes_pizza) or "#443633 0 100%"
-        total_armarios = db.query(Armario).filter(Armario.ativo == True).count()
-        total_clientes = db.query(Cliente).filter(Cliente.ativo == True).count()
-        total_vendas = db.query(Venda).count()
-        armarios_disponiveis = (
-            db.query(Armario)
-            .filter(Armario.ativo == True, Armario.status == StatusArmario.DISPONIVEL)
-            .count()
-        )
-        armarios_alugados = (
-            db.query(Armario)
-            .filter(Armario.ativo == True, Armario.status == StatusArmario.ALUGADO)
-            .count()
-        )
+    total_produtos = db.query(Produto).filter(Produto.ativo == True).count()
+    total_categorias = db.query(Categoria).filter(Categoria.ativo == True).count()
+    estoque_baixo = (
+        db.query(Produto)
+        .filter(Produto.ativo == True, Produto.estoque_atual <= 5)
+        .order_by(Produto.estoque_atual, Produto.nome)
+        .all()
+    )
+    movimentacoes_recentes = (
+        db.query(Movimentacao)
+        .options(joinedload(Movimentacao.produto))
+        .order_by(Movimentacao.criado_em.desc())
+        .limit(5)
+        .all()
+    )
+    itens_grafico = (
+        db.query(Produto)
+        .filter(Produto.ativo == True)
+        .order_by(Produto.estoque_atual.desc(), Produto.nome)
+        .limit(5)
+        .all()
+    )
+    total_itens_grafico = sum(item.estoque_atual for item in itens_grafico)
+    cores_grafico = ["#ff4b5f", "#f59e0b", "#22c55e", "#60a5fa", "#a78bfa"]
+    acumulado = 0
+    grafico_estoque = []
+    partes_pizza = []
+    for indice, item in enumerate(itens_grafico):
+        percentual = round(item.estoque_atual / total_itens_grafico * 100, 2) if total_itens_grafico else 0
+        inicio = acumulado
+        acumulado += percentual
+        cor = cores_grafico[indice]
+        grafico_estoque.append({"nome": item.nome, "quantidade": item.estoque_atual, "percentual": percentual, "cor": cor})
+        partes_pizza.append(f"{cor} {inicio}% {acumulado}%")
+    grafico_pizza = ", ".join(partes_pizza) or "#443633 0 100%"
+    total_armarios = db.query(Armario).filter(Armario.ativo == True).count()
+    total_clientes = db.query(Cliente).filter(Cliente.ativo == True).count()
+    total_vendas = db.query(Venda).count()
+    armarios_disponiveis = (
+        db.query(Armario)
+        .filter(Armario.ativo == True, Armario.status == StatusArmario.DISPONIVEL)
+        .count()
+    )
+    armarios_alugados = (
+        db.query(Armario)
+        .filter(Armario.ativo == True, Armario.status == StatusArmario.ALUGADO)
+        .count()
+    )
 
-        return {
-            "total_produtos": total_produtos,
-            "total_categorias": total_categorias,
-            "estoque_baixo": estoque_baixo,
-            "movimentacoes_recentes": movimentacoes_recentes,
-            "grafico_estoque": grafico_estoque,
-            "grafico_pizza": grafico_pizza,
-            "total_armarios": total_armarios,
-            "armarios_disponiveis": armarios_disponiveis,
-            "armarios_alugados": armarios_alugados,
-            "total_clientes": total_clientes,
-            "total_vendas": total_vendas,
-        }
+    return {
+        "total_produtos": total_produtos,
+        "total_categorias": total_categorias,
+        "estoque_baixo": estoque_baixo,
+        "total_estoque_baixo": len(estoque_baixo),
+        "movimentacoes_recentes": movimentacoes_recentes,
+        "grafico_estoque": grafico_estoque,
+        "grafico_pizza": grafico_pizza,
+        "total_armarios": total_armarios,
+        "armarios_disponiveis": armarios_disponiveis,
+        "armarios_alugados": armarios_alugados,
+        "total_clientes": total_clientes,
+        "total_vendas": total_vendas,
+    }
 
 # Inclui os routers dos controladores
 app.include_router(auth_controller.router)
@@ -134,6 +134,7 @@ app.include_router(armario_controller.router)   # ← adicionar
 @app.get("/")
 def dashboard(
     request: Request,
+    db: Session = Depends(get_db),
     usuario = Depends(get_usuario_opcional)  # ← não lança erro se não logado
 ):
     """
@@ -154,12 +155,15 @@ def dashboard(
     return templates.TemplateResponse(
         request,
         "dashboard.html",
-        {"request": request, "usuario": usuario, **_dados_dashboard()}
+        {"request": request, "usuario": usuario, **_dados_dashboard(db)}
     )
 
 
 @app.get("/dashboard", include_in_schema=False)
-def redirecionar_dashboard():
-    """Mantém links antigos funcionando após o painel passar a usar '/'."""
-    return RedirectResponse(url="/", status_code=302)
-    
+def painel_autenticado(
+    request: Request,
+    db: Session = Depends(get_db),
+    usuario = Depends(get_usuario_logado),
+):
+    """Open the authenticated dashboard without routing through the public entry."""
+    return dashboard(request=request, db=db, usuario=usuario)

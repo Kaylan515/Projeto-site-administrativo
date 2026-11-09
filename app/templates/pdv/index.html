@@ -9,9 +9,12 @@
     <!-- Ligações aos ficheiros CSS e JS específicos -->
     <link rel="stylesheet" href="/static/css/pdv/index.css">
     <script src="/static/js/pdv/index.js" defer></script>
-    <script src="/static/js/ui.js" defer></script>
+    <script src="/static/js/ui.js?v=20261109-manual-nav" defer></script>
     <link rel="stylesheet" href="/static/css/admin.css">
     <link rel="stylesheet" href="/static/css/typography.css">
+    <link rel="stylesheet" href="/static/css/background.css">
+    <link rel="stylesheet" href="/static/css/visual-effects.css?v=20261109-mouse">
+    <script src="/static/js/visual-effects.js?v=20261109-mouse" defer></script>
 </head>
 
 <body class="admin-page" data-desconto-associado="{{ desconto_associado }}">
@@ -21,9 +24,15 @@
 
     <!-- ── TOPO ── -->
     <header class="pdv-page-header">
-        <span class="pdv-page-kicker">VENDAS</span>
-        <h1>Ponto de venda</h1>
-        <p>Selecione os produtos e finalize a venda pelo carrinho.</p>
+        <div>
+            <span class="pdv-page-kicker">VENDAS</span>
+            <h1>Ponto de venda</h1>
+            <p>Selecione os produtos e finalize a venda pelo carrinho.</p>
+        </div>
+        <nav class="pdv-report-actions" aria-label="Consultas de vendas">
+            <a href="/pdv/historico" class="btn-secondary">Histórico de vendas</a>
+            <a href="/pdv/extrato" class="btn-secondary">Extrato</a>
+        </nav>
     </header>
 
     <!-- ── Alertas vindos da query string ── -->
@@ -32,6 +41,8 @@
     <div class="alerta">
         {% if erro == 'vazio' %}Carrinho vazio. Adicione produtos antes de finalizar.
         {% elif erro == 'estoque' %}Estoque insuficiente para: {{ request.query_params.get('produto') }}
+        {% elif erro == 'pix_pendente' %}Confirme o recebimento do PIX no banco antes de finalizar a venda.
+        {% elif erro == 'pagamento' %}Os valores dos pagamentos devem ser válidos e somar exatamente o total da venda. Confira os preços e tente novamente.
         {% elif erro == 'quantidade' %}Quantidade inválida.
         {% else %}Ocorreu um erro. Tente novamente.
         {% endif %}
@@ -118,6 +129,21 @@
                 </div>
             </div>
 
+            <section class="split-payments" aria-label="Valores por forma de pagamento">
+                <p>Informe os valores dos cartões. Para dinheiro ou PIX, use os botões acima.</p>
+                <input type="hidden" id="payment-pix" class="payment-amount" data-method="PIX" value="">
+                <input type="hidden" id="payment-dinheiro" class="payment-amount" data-method="Dinheiro" value="">
+                <div id="cash-payment-summary" class="cash-payment-summary" hidden></div>
+                <label for="payment-debito">Débito (R$)<input id="payment-debito" class="payment-amount" data-method="Cartão de Débito" inputmode="decimal" type="text" placeholder="0,00" autocomplete="off"></label>
+                <label for="payment-credito">Crédito (R$)<input id="payment-credito" class="payment-amount" data-method="Cartão de Crédito" inputmode="decimal" type="text" placeholder="0,00" autocomplete="off"></label>
+                <div class="payment-balance" aria-live="polite">
+                    <div><span>Total</span><strong id="payment-total">R$ 0,00</strong></div>
+                    <div><span>Valor pago</span><strong id="payment-paid">R$ 0,00</strong></div>
+                    <div><span id="payment-balance-label">Saldo restante</span><strong id="payment-remaining">R$ 0,00</strong></div>
+                    <p id="payment-message">Adicione produtos e informe os pagamentos.</p>
+                </div>
+            </section>
+
             <!-- Lista de itens -->
             <div class="carrinho-itens" id="lista-carrinho">
                 <div class="carrinho-vazio" id="msg-vazio">
@@ -147,6 +173,8 @@
 
                 <form id="form-venda" action="/pdv/finalizar" method="post">
                     <input type="hidden" name="carrinho_json" id="input-carrinho">
+                    <input type="hidden" name="pagamentos_json" id="input-pagamentos">
+                    <input type="hidden" name="pix_recebido" id="input-pix-recebido" value="false">
                     <input type="hidden" name="cliente_id" id="input-cliente-id" value="0">
                     <input type="hidden" name="forma_pagamento" id="input-pagamento" value="PIX">
                     <input type="hidden" name="observacao" id="input-obs">
@@ -161,6 +189,58 @@
 
         </div>
     </div>
+    <dialog class="cash-dialog" id="cash-dialog" aria-labelledby="cash-title" aria-describedby="cash-description">
+        <form method="dialog" id="cash-form">
+            <div class="cash-heading">
+                <span class="pdv-page-kicker">PAGAMENTO EM DINHEIRO</span>
+                <button type="button" class="cash-close" id="cash-close" aria-label="Fechar">×</button>
+            </div>
+            <h2 id="cash-title">Confira o troco</h2>
+            <p id="cash-description">Escolha se o cliente receberá troco. O dinheiro cobre o saldo restante da venda.</p>
+            <div class="cash-total"><span>Valor a pagar em dinheiro</span><strong id="cash-total"></strong></div>
+            <fieldset class="cash-choice-group">
+                <legend>Troco</legend>
+                <label class="cash-choice"><input type="radio" name="cash-choice" id="cash-with-change" value="change" required> Informar troco a receber</label>
+                <div class="input-field-group" id="cash-change-field" hidden>
+                    <label for="cash-change-amount">Valor do troco (R$)</label>
+                    <input id="cash-change-amount" type="text" inputmode="decimal" autocomplete="off" placeholder="Ex.: 10,00" aria-describedby="cash-error" disabled>
+                </div>
+                <label class="cash-choice"><input type="radio" name="cash-choice" id="cash-without-change" value="exact" required> Não haverá troco</label>
+            </fieldset>
+            <p id="cash-error" class="cash-error" role="alert" hidden></p>
+            <div class="cash-actions">
+                <button type="button" class="btn-secondary" id="cash-cancel">Cancelar</button>
+                <button type="submit" class="btn-primary" id="cash-confirm" disabled>Registrar dinheiro</button>
+            </div>
+        </form>
+    </dialog>
+    <dialog class="cash-dialog pix-dialog" id="pix-dialog" aria-labelledby="pix-title" aria-describedby="pix-description">
+        <div class="cash-heading">
+            <span class="pdv-page-kicker">PAGAMENTO VIA PIX</span>
+            <button type="button" class="cash-close" id="pix-close" aria-label="Fechar">×</button>
+        </div>
+        <h2 id="pix-title">Pagar com PIX</h2>
+        <p id="pix-description">Leia o QR Code no aplicativo do banco ou copie o código PIX.</p>
+        <div class="input-field-group">
+            <label for="pix-amount">Valor a pagar via PIX (R$)</label>
+            <input type="text" inputmode="decimal" id="pix-amount" autocomplete="off">
+        </div>
+        <div class="cash-actions"><button type="button" class="btn-secondary" id="pix-generate">Gerar QR Code</button></div>
+        <p id="pix-error" class="cash-error" role="alert" hidden></p>
+        <div id="pix-code-area" hidden>
+            <div class="cash-total"><span>Valor do PIX</span><strong id="pix-total"></strong></div>
+            <img id="pix-qr-image" class="pix-qr-image" alt="QR Code para pagamento PIX">
+            <label for="pix-copy-code">PIX copia e cola</label>
+            <textarea id="pix-copy-code" readonly rows="3"></textarea>
+            <button type="button" id="pix-copy" class="btn-secondary">Copiar código</button>
+            <p class="pix-pending-note">Confira o destinatário no aplicativo do banco. A confirmação do recebimento é manual.</p>
+            <label class="cash-choice"><input type="checkbox" id="pix-received"> Conferi no banco e o PIX foi recebido</label>
+        </div>
+        <div class="cash-actions">
+            <button type="button" class="btn-secondary" id="pix-cancel">Cancelar</button>
+            <button type="button" class="btn-primary" id="pix-confirm" disabled>Registrar PIX</button>
+        </div>
+    </dialog>
 </body>
 
 </html>

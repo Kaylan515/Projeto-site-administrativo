@@ -8,9 +8,12 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,1,0&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/dashboard.css?v=20261109-scroll">
-    <script src="/static/js/ui.js" defer></script>
+    <script src="/static/js/ui.js?v=20261109-manual-nav" defer></script>
     <link rel="stylesheet" href="/static/css/admin.css">
     <link rel="stylesheet" href="/static/css/typography.css">
+    <link rel="stylesheet" href="/static/css/background.css">
+    <link rel="stylesheet" href="/static/css/visual-effects.css?v=20261109-mouse">
+    <script src="/static/js/visual-effects.js?v=20261109-mouse" defer></script>
 </head>
 <body class="admin-page dashboard-page" data-role="{{ usuario.role }}">
 
@@ -48,9 +51,9 @@
                 </a>
                 <a href="/produtos?estoque_baixo=true" class="card {% if estoque_baixo %}red{% else %}green{% endif %}">
                     <span class="card-icon" aria-hidden="true">⚠</span>
-                    <div class="card-value">{{ estoque_baixo | length }}</div>
-                    <div class="card-label">Estoque baixo</div>
-                    <div class="card-link">Ver produtos </div>
+                    <div class="card-value">{{ total_estoque_baixo | default(0) }}</div>
+                    <div class="card-label">Produtos com estoque baixo</div>
+                    <div class="card-link">Até 5 unidades em estoque</div>
                 </a>
                 <a href="/clientes" class="card blue admin-only">
                     <span class="card-icon" aria-hidden="true">👥</span>
@@ -58,11 +61,11 @@
                     <div class="card-label">Clientes ativos</div>
                     <div class="card-link">Consultar clientes</div>
                 </a>
-                <a href="/pdv/historico" class="card green">
+                <a href="/pdv" class="card green">
                     <span class="card-icon" aria-hidden="true">🛒</span>
                     <div class="card-value">{{ total_vendas }}</div>
                     <div class="card-label">Vendas registradas</div>
-                    <div class="card-link">Ver histórico</div>
+                    <div class="card-link">Abrir ponto de venda</div>
                 </a>
             </div>
 

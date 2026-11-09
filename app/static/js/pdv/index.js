@@ -14,6 +14,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. Inicializar Filtro de Busca de Produtos
     initBuscaProdutos();
+    initPagamentoDinheiro();
+    initPagamentoPix();
+    document.querySelectorAll('.payment-amount').forEach(input => input.addEventListener('input', atualizarPagamentos));
+    atualizarPagamentos();
 });
 
 // ── 1. DROPDOWN CUSTOMIZADO DE CLIENTES ───────────────────────
@@ -61,16 +65,11 @@ function initCustomDropdown() {
 
 // ── 2. SELECIONAR FORMA DE PAGAMENTO (BOTÕES) ────────────────
 function selecionarPagamento(botaoElement) {
-    const botoes = document.querySelectorAll('.pagamento-btn');
-    botoes.forEach(btn => btn.classList.remove('selected'));
-
-    botaoElement.classList.add('selected');
-
-    const formaPagamento = botaoElement.dataset.value;
-    const inputPagamento = document.getElementById('input-pagamento');
-    if (inputPagamento) {
-        inputPagamento.value = formaPagamento;
-    }
+    if (!carrinho.length) return;
+    if (botaoElement.dataset.value === 'Dinheiro') { abrirPagamentoDinheiro(); return; }
+    if (botaoElement.dataset.value === 'PIX') { abrirPagamentoPix(); return; }
+    const field = [...document.querySelectorAll('.payment-amount')].find(input => input.dataset.method === botaoElement.dataset.value);
+    field?.focus();
 }
 
 // ── 3. BUSCA / FILTRO DE PRODUTOS ─────────────────────────────
@@ -163,6 +162,7 @@ function renderizarCarrinho() {
         totaisContainer.style.display = 'none';
         btnFinalizar.disabled = true;
         document.getElementById('input-carrinho').value = '';
+        atualizarPagamentos();
         return;
     }
 
@@ -191,7 +191,7 @@ function renderizarCarrinho() {
 
     listaContainer.innerHTML = htmlItens;
     totaisContainer.style.display = 'block';
-    btnFinalizar.disabled = false;
+    btnFinalizar.disabled = true;
 
     let descontoValor = 0;
     const linhaDesconto = document.getElementById('linha-desconto');
@@ -207,7 +207,8 @@ function renderizarCarrinho() {
         linhaDesconto.style.display = 'none';
     }
 
-    const totalFinal = Math.max(0, subtotal - descontoValor);
+    const totalFinal = totalVendaCentavos() / 100;
+    atualizarPagamentos();
 
     document.getElementById('val-subtotal').textContent = `R$ ${subtotal.toFixed(2)}`;
     document.getElementById('val-total').textContent = `R$ ${totalFinal.toFixed(2)}`;
@@ -229,10 +230,15 @@ function finalizarVenda() {
         return;
     }
 
-    window.showAppConfirm('Deseja realmente finalizar esta venda?', submeterVenda);
+    if (!atualizarPagamentos()) return;
+    const dinheiro = lerPagamentos().valores.Dinheiro;
+    if (dinheiro > 0 && (!cashPayment || cashPayment.portion !== dinheiro)) { abrirPagamentoDinheiro(); return; }
+    const resumo = dinheiro > 0 ? `\nDinheiro: ${moedaBRL(dinheiro)}\nRecebido: ${moedaBRL(cashPayment.received)}\nTroco: ${moedaBRL(cashPayment.received - dinheiro)}` : '';
+    window.showAppConfirm(`Total da venda: ${moedaBRL(totalVendaCentavos())}${resumo}\n\nDeseja finalizar esta venda?`, submeterVenda);
 }
 
 function submeterVenda() {
+    if (!atualizarPagamentos()) return;
     const obsInput = document.getElementById('obs-input');
     const inputObs = document.getElementById('input-obs');
     if (obsInput && inputObs) {
@@ -240,4 +246,197 @@ function submeterVenda() {
     }
 
     document.getElementById('form-venda').submit();
+}
+// Cash values use integer cents so the displayed change has no floating-point residue.
+function valorEmCentavos(value) {
+    const normalized = String(value).trim().replace(/\s/g, '');
+    if (!/^(?:\d{1,3}(?:\.\d{3})+|\d+)(?:,\d{1,2})?$/.test(normalized) && !/^\d+(?:\.\d{1,2})?$/.test(normalized)) return null;
+    const grouped = /^\d{1,3}(?:\.\d{3})+(?:,\d{1,2})?$/.test(normalized);
+    const number = Number(normalized.includes(',') || grouped ? normalized.replace(/\./g, '').replace(',', '.') : normalized);
+    const cents = Math.round(number * 100);
+    return Number.isSafeInteger(cents) && cents >= 0 ? cents : null;
+}
+function totalVendaCentavos() {
+    const subtotal = carrinho.reduce((sum, item) => sum + item.preco * item.quantidade, 0);
+    const discount = clienteAtual.associado ? descontoAssociadoPercent : 0;
+    return Math.round(Math.max(0, subtotal * (1 - discount / 100)) * 100);
+}
+const moedaBRL = cents => (cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+let cashTotal = 0;
+let cashPayment = null;
+function atualizarTroco() {
+    const withChange = document.getElementById('cash-with-change').checked;
+    const exact = document.getElementById('cash-without-change').checked;
+    const input = document.getElementById('cash-change-amount');
+    document.getElementById('cash-change-field').hidden = !withChange;
+    input.disabled = !withChange;
+    input.required = withChange;
+    const change = exact ? 0 : valorEmCentavos(input.value);
+    const pagamentos = lerPagamentos();
+    const outros = pagamentos.pago - pagamentos.valores.Dinheiro;
+    cashTotal = Math.max(0, totalVendaCentavos() - outros);
+    const invalid = !pagamentos.valido || cashTotal <= 0 || (!exact && !withChange) || change === null || (withChange && change <= 0) || !Number.isSafeInteger(cashTotal + change);
+    const error = document.getElementById('cash-error');
+    error.hidden = !invalid || (!withChange && !exact) || (withChange && input.value.trim() === '');
+    error.textContent = cashTotal <= 0 ? 'Não há saldo restante para pagar em dinheiro.' : 'Informe um valor de troco válido e maior que zero, ou selecione que não haverá troco.';
+    document.getElementById('cash-confirm').disabled = invalid;
+    return invalid ? null : cashTotal + change;
+}
+function abrirPagamentoDinheiro() {
+    const pagamentos = lerPagamentos();
+    cashTotal = Math.max(0, totalVendaCentavos() - (pagamentos.pago - pagamentos.valores.Dinheiro));
+    document.getElementById('cash-total').textContent = moedaBRL(cashTotal);
+    const change = cashPayment ? cashPayment.received - cashPayment.portion : null;
+    document.getElementById('cash-with-change').checked = change !== null && change > 0;
+    document.getElementById('cash-without-change').checked = change === 0;
+    document.getElementById('cash-change-amount').value = change > 0 ? (change / 100).toFixed(2).replace('.', ',') : '';
+    atualizarTroco();
+    document.getElementById('cash-dialog').showModal();
+    document.getElementById(change > 0 ? 'cash-change-amount' : 'cash-with-change').focus();
+}
+function initPagamentoDinheiro() {
+    const dialog = document.getElementById('cash-dialog');
+    if (!dialog) return;
+    const cancel = () => dialog.close();
+    document.getElementById('cash-close').addEventListener('click', cancel);
+    document.getElementById('cash-cancel').addEventListener('click', cancel);
+    document.getElementById('cash-change-amount').addEventListener('input', atualizarTroco);
+    ['cash-with-change', 'cash-without-change'].forEach(id => {
+        document.getElementById(id).addEventListener('change', () => {
+            atualizarTroco();
+            if (id === 'cash-with-change') document.getElementById('cash-change-amount').focus();
+        });
+    });
+    document.getElementById('cash-form').addEventListener('submit', event => {
+        event.preventDefault();
+        const received = atualizarTroco();
+        if (received === null) return;
+        cashPayment = { portion: cashTotal, received };
+        document.getElementById('payment-dinheiro').value = (cashTotal / 100).toFixed(2).replace('.', ',');
+        dialog.close();
+        atualizarPagamentos();
+    });
+}
+
+function lerPagamentos() {
+    const valores = {};
+    let valido = true;
+    document.querySelectorAll('.payment-amount').forEach(input => {
+        const cents = input.value.trim() === '' ? 0 : valorEmCentavos(input.value);
+        if (cents === null) valido = false;
+        valores[input.dataset.method] = cents ?? 0;
+    });
+    const pago = Object.values(valores).reduce((sum, cents) => sum + cents, 0);
+    return { valores, pago, valido: valido && Number.isSafeInteger(pago) };
+}
+function atualizarPagamentos() {
+    const { valores, pago, valido } = lerPagamentos();
+    const total = totalVendaCentavos();
+    const restante = total - pago;
+    const pixConfirmado = !valores.PIX || document.getElementById('input-pix-recebido').value === 'true';
+    const fechado = carrinho.length > 0 && valido && restante === 0 && pixConfirmado;
+    document.getElementById('payment-total').textContent = moedaBRL(total);
+    document.getElementById('payment-paid').textContent = moedaBRL(pago);
+    document.getElementById('payment-balance-label').textContent = restante < 0 ? 'Valor excedente' : 'Saldo restante';
+    document.getElementById('payment-remaining').textContent = moedaBRL(Math.abs(restante));
+    const summary = document.getElementById('cash-payment-summary');
+    summary.hidden = !valores.Dinheiro;
+    summary.textContent = cashPayment && valores.Dinheiro ? `Dinheiro: ${moedaBRL(valores.Dinheiro)} | Recebido: ${moedaBRL(cashPayment.received)} | Troco: ${moedaBRL(cashPayment.received - valores.Dinheiro)}` : '';
+    const message = document.getElementById('payment-message');
+    message.textContent = !pixConfirmado ? 'Confira o recebimento do PIX no banco antes de finalizar.' : !valido ? 'Informe valores monetários válidos.' : fechado ? 'Pagamento completo. Você pode finalizar.' : restante < 0 ? 'A soma excede o total. Ajuste os valores; o troco é informado na etapa de dinheiro.' : 'Informe os valores até quitar o saldo restante.';
+    message.classList.toggle('is-complete', fechado);
+    document.getElementById('btn-finalizar').disabled = !fechado;
+    document.getElementById('input-pagamentos').value = JSON.stringify(valores);
+    document.querySelectorAll('.pagamento-btn').forEach(button => {
+        button.classList.toggle('selected', valores[button.dataset.value] > 0);
+        button.setAttribute('aria-pressed', String(valores[button.dataset.value] > 0));
+    });
+    return fechado;
+}
+
+let pixGerado = null;
+let pixRequest = null;
+function invalidarPix() {
+    pixRequest?.abort();
+    pixGerado = null;
+    document.getElementById('pix-code-area').hidden = true;
+    document.getElementById('pix-received').checked = false;
+    document.getElementById('pix-confirm').disabled = true;
+}
+function abrirPagamentoPix() {
+    invalidarPix();
+    const pagamentos = lerPagamentos();
+    const remaining = Math.max(0, totalVendaCentavos() - (pagamentos.pago - pagamentos.valores.PIX));
+    document.getElementById('pix-amount').value = (remaining / 100).toFixed(2).replace('.', ',');
+    document.getElementById('pix-error').hidden = true;
+    document.getElementById('pix-dialog').returnValue = '';
+    document.getElementById('pix-dialog').showModal();
+    gerarCodigoPix();
+}
+async function gerarCodigoPix() {
+    invalidarPix();
+    const amount = valorEmCentavos(document.getElementById('pix-amount').value);
+    const pagamentos = lerPagamentos();
+    const available = totalVendaCentavos() - (pagamentos.pago - pagamentos.valores.PIX);
+    const error = document.getElementById('pix-error');
+    error.hidden = true;
+    if (!pagamentos.valido || amount === null || amount <= 0 || amount > available) {
+        error.textContent = 'Informe um valor PIX maior que zero e dentro do saldo restante.';
+        error.hidden = false;
+        return;
+    }
+    const controller = new AbortController();
+    pixRequest = controller;
+    const button = document.getElementById('pix-generate');
+    button.disabled = true;
+    button.textContent = 'Gerando...';
+    try {
+        const response = await fetch('/pdv/pix/qr', {
+            method: 'POST', body: new URLSearchParams({ valor_centavos: String(amount) }), signal: controller.signal
+        });
+        if (!response.ok || !response.headers.get('content-type')?.includes('application/json')) throw new Error('QR indisponivel');
+        const data = await response.json();
+        if (controller.signal.aborted || !document.getElementById('pix-dialog').open) return;
+        pixGerado = data.valor_centavos;
+        document.getElementById('pix-total').textContent = moedaBRL(pixGerado);
+        document.getElementById('pix-qr-image').src = data.qr_code;
+        document.getElementById('pix-copy-code').value = data.codigo;
+        document.getElementById('pix-code-area').hidden = false;
+    } catch (exc) {
+        if (exc.name !== 'AbortError') {
+            error.textContent = 'Não foi possível gerar o PIX. Confira a configuração ou tente novamente.';
+            error.hidden = false;
+        }
+    } finally {
+        if (pixRequest === controller) { button.disabled = false; button.textContent = 'Gerar QR Code'; }
+    }
+}
+function initPagamentoPix() {
+    const dialog = document.getElementById('pix-dialog');
+    ['pix-close', 'pix-cancel'].forEach(id => document.getElementById(id).addEventListener('click', () => dialog.close()));
+    dialog.addEventListener('close', () => {
+        if (dialog.returnValue !== 'registrado') {
+            document.getElementById('payment-pix').value = '';
+            document.getElementById('input-pix-recebido').value = 'false';
+            atualizarPagamentos();
+        }
+        invalidarPix();
+    });
+    document.getElementById('pix-amount').addEventListener('input', invalidarPix);
+    document.getElementById('pix-generate').addEventListener('click', gerarCodigoPix);
+    document.getElementById('pix-received').addEventListener('change', event => {
+        document.getElementById('pix-confirm').disabled = !event.target.checked || pixGerado === null;
+    });
+    document.getElementById('pix-confirm').addEventListener('click', () => {
+        if (pixGerado === null || !document.getElementById('pix-received').checked) return;
+        document.getElementById('payment-pix').value = (pixGerado / 100).toFixed(2).replace('.', ',');
+        document.getElementById('input-pix-recebido').value = 'true';
+        atualizarPagamentos();
+        dialog.close('registrado');
+    });
+    document.getElementById('pix-copy').addEventListener('click', async event => {
+        const code = document.getElementById('pix-copy-code');
+        try { await navigator.clipboard.writeText(code.value); event.target.textContent = 'Código copiado'; }
+        catch { code.focus(); code.select(); event.target.textContent = 'Selecione e copie o código'; }
+    });
 }

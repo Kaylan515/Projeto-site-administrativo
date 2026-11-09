@@ -14,9 +14,12 @@
     <!-- Estilo atualizado com a subpasta CSS de usuários -->
     <link rel="stylesheet" href="/static/css/dashboard.css">
     <link rel="stylesheet" href="/static/css/usuarios/usuarios.css">
-    <script src="/static/js/ui.js" defer></script>
+    <script src="/static/js/ui.js?v=20261109-manual-nav" defer></script>
     <link rel="stylesheet" href="/static/css/admin.css">
     <link rel="stylesheet" href="/static/css/typography.css">
+    <link rel="stylesheet" href="/static/css/background.css">
+    <link rel="stylesheet" href="/static/css/visual-effects.css?v=20261109-mouse">
+    <script src="/static/js/visual-effects.js?v=20261109-mouse" defer></script>
 </head>
 
 <body data-role="{{ usuario.role if usuario else 'admin' }}" class="admin-page">
@@ -157,22 +160,19 @@
                     <span class="pagination-info">Página {{ pagina }} de {{ total_paginas }} ({{ total_usuarios }} usuários)</span>
                     {% set total_registros = total_usuarios %}
                     {% if total_paginas > 1 %}
-                    <nav class="pagination" aria-label="Paginação">
-                        <span>Página {{ pagina }} de {{ total_paginas }} ({{ total_registros }} registros)</span>
+                    <nav class="pagination app-pagination" aria-label="Paginação">
                         {% if pagina > 1 %}
-                        <a href="{{ request.url.include_query_params(pagina=pagina - 1) }}">Anterior</a>
+                        <a href="{{ request.url.include_query_params(pagina=pagina - 1) }}" rel="prev">Anterior</a>
                         {% endif %}
-                        {% if pagina < total_paginas %}
-                        <a href="{{ request.url.include_query_params(pagina=pagina + 1) }}">Próxima</a>
+                        <span class="pagination-current" aria-current="page" aria-label="Página atual: {{ pagina }}">{{ pagina }}</span>
+                {% if pagina < total_paginas %}
+                        <a href="{{ request.url.include_query_params(pagina=pagina + 1) }}" rel="next">Próxima</a>
                         {% endif %}
                     </nav>
                     {% endif %}
                 </div>
             </div>
 
-            <div class="back-link-wrap" style="margin-top: 2rem;">
-                <a href="/" class="back-dashboard-link">Voltar ao dashboard</a>
-            </div>
         </main>
     </div>
 

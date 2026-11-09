@@ -11,8 +11,11 @@
     
     <!-- Script opcional para a página -->
     <script src="/static/js/pdv/comprovante.js" defer></script>
-    <script src="/static/js/ui.js" defer></script>
+    <script src="/static/js/ui.js?v=20261109-manual-nav" defer></script>
     <link rel="stylesheet" href="/static/css/typography.css">
+    <link rel="stylesheet" href="/static/css/background.css">
+    <link rel="stylesheet" href="/static/css/visual-effects.css?v=20261109-mouse">
+    <script src="/static/js/visual-effects.js?v=20261109-mouse" defer></script>
 </head>
 
 <body>
@@ -67,6 +70,16 @@
                 <span>TOTAL</span>
                 <span>R$ {{ "%.2f"|format(venda.total_liquido) }}</span>
             </div>
+
+            <hr class="linha-sep">
+            <div class="receipt-payment-title">Formas de pagamento</div>
+            {% if venda.pagamentos %}
+            {% for forma, centavos in venda.pagamentos.items() %}
+            <div class="item-linha"><span>{{ forma }}</span><span>R$ {{ "%.2f"|format(centavos / 100) }}</span></div>
+            {% endfor %}
+            {% else %}
+            <div class="item-desc">Não informado nesta venda.</div>
+            {% endif %}
 
             {% if venda.observacao %}
             <hr class="linha-sep">

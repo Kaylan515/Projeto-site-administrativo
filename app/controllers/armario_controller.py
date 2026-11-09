@@ -222,6 +222,7 @@ def form_editar_armario(
 @router.post("/{armario_id}/editar")
 def editar_armario(
     armario_id: int,
+    request: Request,
     numero: str      = Form(...),
     localizacao: str = Form(""),
     observacao: str  = Form(""),
@@ -244,7 +245,7 @@ def editar_armario(
             request,
             "armarios/form.html",
             {
-                "request":  None,
+                "request":  request,
                 "usuario":  admin,
                 "editando": editando,
                 "erro":     f"Armário {numero.upper()} já existe.",

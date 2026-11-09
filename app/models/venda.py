@@ -7,7 +7,7 @@
 # o mesmo padrão usado em qualquer sistema comercial real.
 # ============================================================
 
-from sqlalchemy import Column, Integer, Float, String, DateTime, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, Float, String, DateTime, ForeignKey, Boolean, JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
@@ -40,6 +40,9 @@ class Venda(Base):
     # (mesmo que o preço do produto mude, a venda permanece correta)
     total_bruto  = Column(Float, nullable=False, default=0.0)
     total_liquido = Column(Float, nullable=False, default=0.0)
+
+    # Historical payment allocation in integer cents; older sales remain unknown.
+    pagamentos = Column(JSON, nullable=True)
 
     # Observação opcional do operador
     observacao = Column(String(255), nullable=True)

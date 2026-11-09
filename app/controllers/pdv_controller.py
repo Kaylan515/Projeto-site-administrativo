@@ -11,12 +11,13 @@
 import json
 import math
 from datetime import datetime, time, timedelta
-from fastapi import APIRouter, Depends, Request, Form
+from fastapi import APIRouter, Depends, Request, Form, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from sqlalchemy import String, func, or_
 
+from app.services.pix import gerar_pix
 from app.database import get_db
 from app.models.venda import Venda, ItemVenda
 from app.models.produto import Produto
@@ -65,12 +66,22 @@ def tela_pdv(
     )
 
 
+@router.post("/pix/qr")
+def codigo_pix(valor_centavos: int = Form(...), usuario=Depends(get_usuario_logado)):
+    try:
+        return gerar_pix(valor_centavos)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
 @router.post("/finalizar")
 def finalizar_venda(
     request: Request,
     carrinho_json: str = Form(...),  # JSON serializado pelo JS
     cliente_id: int    = Form(0),    # 0 = sem cliente identificado
     observacao: str    = Form(""),
+    pagamentos_json: str = Form(""),
+    pix_recebido: bool = Form(False),
     db: Session        = Depends(get_db),
     usuario            = Depends(get_usuario_logado)
 ):
@@ -88,8 +99,19 @@ def finalizar_venda(
     except (json.JSONDecodeError, ValueError):
         return RedirectResponse(url="/pdv?erro=json", status_code=302)
 
+    if not isinstance(itens, list):
+        return RedirectResponse(url="/pdv?erro=json", status_code=302)
     if not itens:
         return RedirectResponse(url="/pdv?erro=vazio", status_code=302)
+
+    for item in itens:
+        if not isinstance(item, dict) or type(item.get("produto_id")) is not int or item["produto_id"] <= 0:
+            return RedirectResponse(url="/pdv?erro=json", status_code=302)
+        if type(item.get("quantidade")) is not int or item["quantidade"] <= 0:
+            return RedirectResponse(url="/pdv?erro=quantidade", status_code=302)
+    ids = [item["produto_id"] for item in itens]
+    if len(ids) != len(set(ids)):
+        return RedirectResponse(url="/pdv?erro=json", status_code=302)
 
     # Busca o cliente e verifica se é associado
     cliente             = None
@@ -145,6 +167,23 @@ def finalizar_venda(
     desconto_valor = total_bruto * (desconto_percentual / 100)
     total_liquido  = total_bruto - desconto_valor
 
+    # Payment amounts arrive as integer cents and must cover the server total exactly.
+    try:
+        pagamentos = json.loads(pagamentos_json)
+        formas = {"PIX", "Dinheiro", "Cartão de Débito", "Cartão de Crédito"}
+        if not isinstance(pagamentos, dict) or not pagamentos or not set(pagamentos).issubset(formas):
+            raise ValueError("Formas de pagamento invalidas")
+        if any(type(valor) is not int or valor < 0 or valor > 9007199254740991 for valor in pagamentos.values()):
+            raise ValueError("Valores invalidos")
+        if sum(pagamentos.values()) != round(round(total_liquido, 2) * 100):
+            raise ValueError("Pagamento nao fecha o total")
+    except (ValueError, TypeError):
+        return RedirectResponse(url="/pdv?erro=pagamento", status_code=302)
+
+    # Operator attestation only; automatic settlement requires a banking integration.
+    if pagamentos.get("PIX", 0) > 0 and not pix_recebido:
+        return RedirectResponse(url="/pdv?erro=pix_pendente", status_code=302)
+
     # ── Persiste tudo em uma única transação
     venda = Venda(
         cliente_id          = cliente_id or None,
@@ -153,6 +192,7 @@ def finalizar_venda(
         total_bruto         = round(total_bruto, 2),
         total_liquido       = round(total_liquido, 2),
         observacao          = observacao or None,
+        pagamentos          = {forma: valor for forma, valor in pagamentos.items() if valor > 0},
     )
     db.add(venda)
     db.flush()  # gera o venda.id sem commitar ainda

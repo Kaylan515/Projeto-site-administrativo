@@ -5,6 +5,123 @@
     will-change: transform;
 }
 .ambient-light.is-visible { opacity: 1; }
-.admin-page .ambient-light { background: radial-gradient(circle, rgba(240,174,84,.045), transparent 65%); }
+.admin-page .ambient-light { background: radial-gradient(circle, rgba(240,174,84,.085), transparent 65%); }
 @media (prefers-reduced-motion: reduce), (hover: none) { .ambient-light { display: none; } }
 @media print { .ambient-light { display: none; } }
+
+/* Bring the existing interactions into the same visual language. */
+body.admin-page {
+    background-image: radial-gradient(ellipse at 85% 0%, rgba(240,174,84,.065), transparent 48%);
+    background-attachment: fixed;
+}
+.admin-page .sidebar { background: linear-gradient(175deg, #1b1a18 0%, #151619 48%); }
+.admin-page .sidebar .nav-link { transition: background .2s, color .2s, border-color .2s; }
+.admin-page .sidebar .nav-link.active { background: linear-gradient(100deg, #42301d, #2a2520); box-shadow: inset 3px 0 #f0ae54; }
+.admin-page .sidebar .nav-link:hover { background: #292725; color: #f5d6a6; }
+.admin-page .user-avatar { background: #34291c; box-shadow: 0 0 18px #f0ae5412; }
+.admin-page, .welcome-page, .auth-page { accent-color: #f0ae54; }
+.dashboard-page .card { background: linear-gradient(145deg, #222226, #191a1d 75%); border-color: #38383e; }
+.dashboard-page .card .card-icon { filter: none; background: #32291f; }
+.dashboard-page .card.green .card-icon { background: #203029; }
+.dashboard-page .card.red .card-icon { background: #392225; }
+.dashboard-page .card:hover { background: linear-gradient(145deg, #2b2824, #1c1d21 75%); box-shadow: 0 8px 24px #0002; }
+.dashboard-page .card:hover .card-link { color: #f0ae54; }
+.admin-page .section-header { background: linear-gradient(100deg, #f0ae5408, transparent); }
+.dashboard-page .stock-pie { box-shadow: 0 0 30px #f0ae5409; }
+.admin-page tbody tr { transition: background-color .18s; }
+.admin-page tbody tr:hover { background-color: #f0ae5407; }
+.access-feature { background: linear-gradient(145deg, #25221ee8, #191a1de8); }
+.auth-page .auth-box { box-shadow: 0 20px 70px #0004, 0 0 50px #f0ae5405; }
+.has-click-feedback { position: relative; overflow: hidden; isolation: isolate; }
+.ui-ripple { position: absolute; pointer-events: none; border-radius: 50%; background: currentColor; opacity: 0; transform: translate(-50%, -50%) scale(0); animation: clickFeedback .55s ease-out; }
+@keyframes clickFeedback {
+    from { opacity: .18; transform: translate(-50%, -50%) scale(0); }
+    to { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .dashboard-page .card { transition: transform .2s, border-color .2s, box-shadow .2s; }
+    .dashboard-page .card:hover { transform: translateY(-3px); }
+    .produto-card { transition: transform .2s, border-color .2s; }
+    .produto-card:not(.sem-estoque):hover { transform: translateY(-3px); border-color: #f0ae54; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .ui-ripple { display: none; }
+    .access-feature:hover, .btn-primary:hover { transform: none; }
+}
+@media print {
+    body.admin-page { background: white; }
+    .ui-ripple { display: none; }
+}
+
+/* Shared animated backdrop, kept behind the complete document. */
+body.has-ambient-background { isolation: isolate; background-color: #111214; }
+.site-backdrop { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; background: linear-gradient(145deg, #141519, #111214 55%, #17151a); }
+.backdrop-orb { position: absolute; width: min(850px, 85vw); height: min(850px, 85vw); border-radius: 50%; pointer-events: none; }
+.backdrop-orb-amber { top: -28%; right: -14%; background: radial-gradient(circle, #d5913030, #d5913012 38%, transparent 68%); }
+.backdrop-orb-blue { bottom: -35%; left: -20%; background: radial-gradient(circle, #647bb925, #647bb90b 40%, transparent 68%); }
+.backdrop-grid { position: absolute; inset: 0; opacity: .32; background-image: linear-gradient(#ffffff07 1px, transparent 1px), linear-gradient(90deg, #ffffff07 1px, transparent 1px); background-size: 72px 72px; mask-image: linear-gradient(180deg, black, transparent 90%); }
+body.has-ambient-background::before { display: none; }
+body.has-ambient-background > .spotlight { display: none; }
+@media (max-width: 760px) {
+    .backdrop-orb { width: 650px; height: 650px; }
+    .backdrop-orb-amber { right: -350px; top: -200px; }
+    .backdrop-orb-blue { left: -400px; bottom: -250px; }
+    .backdrop-grid { background-size: 48px 48px; opacity: .2; }
+}
+@media print {
+    .site-backdrop { display: none !important; }
+    body.has-ambient-background { background: white !important; }
+}
+
+/* Mouse-driven depth is independent of the slow orb animation. */
+.site-backdrop { --drift-x: 0px; --drift-y: 0px; }
+.backdrop-orb-amber { translate: var(--drift-x) var(--drift-y); background: radial-gradient(circle, #e7a34345, #d591301c 38%, transparent 68%); }
+.backdrop-orb-blue { translate: calc(var(--drift-x) * -.65) calc(var(--drift-y) * -.65); background: radial-gradient(circle, #647bb936, #647bb913 40%, transparent 68%); }
+.backdrop-grid { inset: -40px; translate: calc(var(--drift-x) * .2) calc(var(--drift-y) * .2); }
+.backdrop-mouse {
+    position: absolute; top: 0; left: 0; width: 900px; height: 900px;
+    background: radial-gradient(circle, #f0ae5426, #d591300c 40%, transparent 68%);
+    transform: translate3d(var(--pointer-x, 50vw), var(--pointer-y, 40vh), 0) translate(-50%, -50%);
+    opacity: 0; transition: opacity .5s; pointer-events: none;
+}
+.site-backdrop.is-tracking .backdrop-mouse { opacity: 1; }
+@media (prefers-reduced-motion: reduce), (hover: none) {
+    .backdrop-mouse { display: none; }
+    .backdrop-orb, .backdrop-grid { translate: none; }
+}
+@media print { .site-backdrop, .ambient-light { display: none !important; } }
+
+/* Native same-origin page transitions keep navigation and forms intact. */
+@view-transition { navigation: auto; }
+::view-transition-old(root) {
+    animation: pageDeparture .2s ease-out both;
+}
+::view-transition-new(root) {
+    animation: pageArrival .36s cubic-bezier(.2,.7,.3,1) both;
+}
+@keyframes pageDeparture {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+@keyframes pageArrival {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+    @view-transition { navigation: none; }
+    ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+}
+
+/* Hover, selected states and focus share a consistent rhythm. */
+.has-ambient-background :is(.pagamento-btn, .dropdown-option, .dropdown-selected, .stock-pie-item, .resumo-card, .stat-mini-card) { transition: background-color .2s, border-color .2s, box-shadow .2s, color .2s; }
+.has-ambient-background .stock-pie-item:hover { background-color: #f0ae5408; }
+.has-ambient-background :is(.resumo-card, .stat-mini-card):hover { border-color: #66513a; box-shadow: 0 6px 20px #0002; }
+@media (prefers-reduced-motion: reduce) {
+    .has-ambient-background *, .has-ambient-background *::before, .has-ambient-background *::after {
+        animation-duration: .01ms !important;
+        animation-delay: 0ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

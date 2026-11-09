@@ -1,6 +1,6 @@
 {# Shared navigation uses only the authenticated account supplied by the controller. #}
 {% set current_path = request.url.path %}
-{% set nav_items = [('/', '⊞', 'Dashboard', false), ('/produtos', '📦', 'Produtos', false), ('/categorias', '🏷', 'Categorias', true), ('/movimentacoes', '▤', 'Movimentações', true), ('/armarios', '🔒', 'Armários', false), ('/clientes', '👥', 'Clientes', true), ('/pdv', '🛒', 'Ponto de venda', false), ('/pdv/historico', '📋', 'Histórico de vendas', false), ('/pdv/extrato', '🧾', 'Extrato', false)] %}
+{% set nav_items = [('/dashboard', '⊞', 'Dashboard', false), ('/produtos', '📦', 'Produtos', false), ('/categorias', '🏷', 'Categorias', true), ('/movimentacoes', '▤', 'Movimentações', true), ('/armarios', '🔒', 'Armários', false), ('/clientes', '👥', 'Clientes', true), ('/pdv', '🛒', 'Ponto de venda', false)] %}
 <aside class="sidebar" aria-label="Menu principal">
     <div class="sidebar-logo">
         <div class="logo-tag">Sistema</div>
@@ -11,7 +11,7 @@
         <div class="nav-section">Principal</div>
         {% for href, emoji, label, admin_only in nav_items %}
         {% if not admin_only or (usuario and usuario.role == 'admin') %}
-        {% set active = current_path == href or (href != '/' and current_path.startswith(href + '/') and not (href == '/pdv' and (current_path.startswith('/pdv/historico') or current_path.startswith('/pdv/extrato')))) %}
+        {% set active = current_path == href or (href == '/dashboard' and current_path == '/') or (href != '/' and current_path.startswith(href + '/')) %}
         <a href="{{ href }}" class="nav-link{{ ' active' if active else '' }}" title="{{ label }}" aria-label="{{ label }}"{% if active %} aria-current="page"{% endif %}><span class="icon" aria-hidden="true">{{ emoji }}</span><span class="nav-label">{{ label }}</span></a>
         {% endif %}
         {% endfor %}

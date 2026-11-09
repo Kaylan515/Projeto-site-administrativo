@@ -188,3 +188,12 @@ body {
     .titulo { color: black; }
     .linha-sep { border-color: #ccc; }
 }
+@media screen {
+    :root { --bg-color: #111214; --card-bg: #191a1d; --surface-2: #222327; --border-color: #303136; --primary-color: #f0ae54; --primary-hover: #f6be74; --text-muted: #adaeb6; }
+    .cupom { box-shadow: 0 16px 50px #0003; }
+    .btn-print { background: #f0ae54; color: #191a1d; box-shadow: none; }
+    .btn { min-height: 44px; border-radius: 9px; }
+    .btn:focus-visible { outline: 2px solid #f0ae54; outline-offset: 4px; }
+}
+
+.receipt-payment-title { font-size: 12px; font-weight: 700; margin-bottom: 12px; }

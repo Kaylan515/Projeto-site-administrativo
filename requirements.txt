@@ -11,3 +11,4 @@ python-jose[cryptography]
 pytest
 httpx
 httpx2
+qrcode==8.2

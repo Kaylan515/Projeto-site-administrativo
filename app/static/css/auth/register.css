@@ -241,3 +241,17 @@ body {
     display: flex;
     gap: 0.5rem;
 }
+/* Registration retains the shared public-page appearance. */
+:root { --bg-color: #111214; --card-bg: #191a1d; --surface-2: #222327; --border-color: #303136; --text-muted: #adaeb6; --primary-color: #f0ae54; --primary-hover: #f6be74; }
+body { color-scheme: dark; }
+.auth-box { box-shadow: 0 16px 50px #0003; border-radius: 16px; }
+.btn-primary { background: #f0ae54; color: #191a1d; box-shadow: none; min-height: 44px; }
+a:focus-visible, button:focus-visible { outline: 2px solid #f0ae54; outline-offset: 4px; }
+@media (max-width: 700px) {
+    .auth-page-wrapper { padding: 24px 20px; }
+    .auth-box { padding: 24px 20px; }
+    .site-header, .welcome-footer { flex-wrap: wrap; gap: 20px; }
+    .welcome-footer { flex-direction: column; align-items: flex-start; }
+    .nav-brand { font-size: 12px; }
+    input { max-width: 100%; font-size: 16px; }
+}
