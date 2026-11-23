@@ -69,7 +69,7 @@ def _dados_dashboard(db: Session) -> dict:
     )
     itens_grafico = (
         db.query(Produto)
-        .filter(Produto.ativo == True)
+        .filter(Produto.ativo == True, Produto.estoque_atual > 0)
         .order_by(Produto.estoque_atual.desc(), Produto.nome)
         .limit(5)
         .all()
@@ -80,12 +80,13 @@ def _dados_dashboard(db: Session) -> dict:
     grafico_estoque = []
     partes_pizza = []
     for indice, item in enumerate(itens_grafico):
-        percentual = round(item.estoque_atual / total_itens_grafico * 100, 2) if total_itens_grafico else 0
-        inicio = acumulado
-        acumulado += percentual
+        percentual = round(item.estoque_atual / total_itens_grafico * 100, 2)
+        inicio = acumulado / total_itens_grafico
+        acumulado += item.estoque_atual
+        fim = acumulado / total_itens_grafico
         cor = cores_grafico[indice]
         grafico_estoque.append({"nome": item.nome, "quantidade": item.estoque_atual, "percentual": percentual, "cor": cor})
-        partes_pizza.append(f"{cor} {inicio}% {acumulado}%")
+        partes_pizza.append(f"{cor} {inicio:.2%} {fim:.2%}")
     grafico_pizza = ", ".join(partes_pizza) or "#443633 0 100%"
     total_armarios = db.query(Armario).filter(Armario.ativo == True).count()
     total_clientes = db.query(Cliente).filter(Cliente.ativo == True).count()

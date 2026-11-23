@@ -578,8 +578,8 @@ tr:hover td { background: rgba(217, 119, 6, 0.04); }
 }
 
 /* Ícones via Material Symbols */
-.icon, .card-icon { font-size: 0; line-height: 1; }
-.icon::after, .card-icon::after { font-family: 'Material Symbols Rounded'; font-size: 20px; line-height: 1; vertical-align: middle; }
+.icon { font-size: 0; line-height: 1; }
+.icon::after { font-family: 'Material Symbols Rounded'; font-size: 20px; line-height: 1; vertical-align: middle; }
 .nav-link .icon { display: inline-grid; place-items: center; width: 20px; height: 20px; flex: 0 0 20px; font-size: 0 !important; }
 .nav-link .icon::after { color: currentColor; }
 .card-icon { display: block; height: 24px; margin-bottom: 14px; color: var(--primary-color); }
@@ -592,12 +592,6 @@ a[href='/armarios'] .icon::after { content: 'lock'; }
 a[href='/clientes'] .icon::after { content: 'groups'; }
 a[href='/pdv'] .icon::after { content: 'point_of_sale'; }
 
-.cards-grid .card:nth-child(1) .card-icon::after { content: 'inventory_2'; }
-.cards-grid .card:nth-child(2) .card-icon::after { content: 'category'; }
-.cards-grid .card:nth-child(3) .card-icon::after { content: 'lock'; }
-.cards-grid .card:nth-child(4) .card-icon::after { content: 'warning'; }
-.cards-grid .card:nth-child(5) .card-icon::after { content: 'groups'; }
-.cards-grid .card:nth-child(6) .card-icon::after { content: 'point_of_sale'; }
 
 /* ==========================================================================
    ANIMAÇÕES E RESPONSIVIDADE

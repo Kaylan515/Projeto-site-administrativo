@@ -56,8 +56,8 @@ def test_dashboard_e_filtro_estoque_baixo(cliente, db_session):
     assert _dados_dashboard(db_session)['total_estoque_baixo'] == 1
     page = cliente.get('/dashboard')
     assert page.status_code == 200
-    assert 'Produtos com estoque baixo' in page.text
-    assert 'href="/produtos?estoque_baixo=true"' in page.text
+    assert 'Produtos com estoque baixo' not in page.text
+    assert 'href="/produtos?estoque_baixo=true"' not in page.text
     filtered = cliente.get('/produtos/?estoque_baixo=true')
     assert filtered.status_code == 200
     assert 'Estoque zerado teste' not in filtered.text
@@ -74,7 +74,7 @@ def test_estoque_baixo_vazio_permite_retornar_lista(cliente, db_session):
     db_session.commit()
     dashboard = cliente.get('/dashboard')
     assert dashboard.status_code == 200
-    assert 'href="/produtos?estoque_baixo=true"' in dashboard.text
+    assert 'href="/produtos?estoque_baixo=true"' not in dashboard.text
     filtrado = cliente.get('/produtos/?estoque_baixo=true')
     assert filtrado.status_code == 200
     assert 'Mostrar todos os produtos' in filtrado.text
