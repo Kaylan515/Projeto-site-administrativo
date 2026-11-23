@@ -125,3 +125,15 @@ body.has-ambient-background > .spotlight { display: none; }
         scroll-behavior: auto !important;
     }
 }
+
+.admin-page .nav-link:focus-visible { outline: 2px solid #f0ae54; outline-offset: -2px; }
+
+@media (prefers-reduced-motion: no-preference) {
+    .admin-page .sidebar .nav-link,
+    .dashboard-page .dashboard-action {
+        transition: background-color .18s, color .18s, border-color .18s, scale .14s ease-out;
+    }
+
+    .admin-page .sidebar .nav-link:active,
+    .dashboard-page :is(a.card, .dashboard-action):active { scale: .98; }
+}

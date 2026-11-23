@@ -778,3 +778,63 @@ a[href='/pdv'] .icon::after { content: 'point_of_sale'; }
     outline: 2px solid rgba(217, 119, 6, 0.7);
     outline-offset: 2px;
 }
+
+/* Dashboard controls */
+.dashboard-page .movement-filter {
+    margin-inline: auto 0;
+    color: var(--text-muted);
+    font-size: .8rem;
+}
+
+.dashboard-page .movement-filter select {
+    margin-inline-start: .35rem;
+    padding: .35rem .5rem;
+    color: var(--text-main);
+    background: #242225;
+    border: 1px solid #575052;
+    border-radius: 6px;
+    font: inherit;
+    color-scheme: dark;
+}
+
+.dashboard-page #movement-filter-empty:empty { display: none; }
+
+.dashboard-page button.stock-pie-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    width: 100%;
+    padding-inline: .5rem;
+    border: 0;
+    border-bottom: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-dim);
+    font-family: inherit;
+    text-align: start;
+    cursor: pointer;
+}
+
+.dashboard-page button.stock-pie-item:hover,
+.dashboard-page button.stock-pie-item[aria-pressed='true'] {
+    background: #f0ae5414;
+    box-shadow: inset 3px 0 var(--stock-color);
+}
+
+.dashboard-page :is(.movement-filter select, button.stock-pie-item):focus-visible {
+    outline: 2px solid #f0ae54;
+    outline-offset: 2px;
+}
+
+.stock-pie-percentage { color: var(--text-muted); font-size: .75rem; min-width: 4ch; text-align: end; }
+.stock-pie-share {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    color: var(--stock-color, var(--text-main));
+    font: 700 1.4rem var(--font-head);
+    pointer-events: none;
+}
+
+.dashboard-page tbody tr.is-clickable { cursor: pointer; }

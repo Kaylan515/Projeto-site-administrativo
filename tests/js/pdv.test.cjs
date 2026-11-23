@@ -76,13 +76,13 @@ test('PIX sem confirmacao nao libera a venda mesmo com soma exata', () => {
     assert.equal(run('atualizarPagamentos()'), false);
     get('input-pix-recebido').value = 'true'; assert.equal(run('atualizarPagamentos()'), true);
 });
-test('fechar PIX cancela valor e confirmacao', () => {
-    const { get } = setup(); get('payment-pix').value = '100,00';
+test('fechar o dialogo preserva o PIX ja registrado', () => {
+    const { get, run } = setup(); get('payment-pix').value = '100,00';
     get('input-pix-recebido').value = 'true';
     get('pix-close').listeners.click();
-    assert.equal(get('payment-pix').value, '');
-    assert.equal(get('input-pix-recebido').value, 'false');
-    assert.equal(get('btn-finalizar').disabled, true);
+    assert.equal(get('payment-pix').value, '100,00');
+    assert.equal(get('input-pix-recebido').value, 'true');
+    assert.equal(run('atualizarPagamentos()'), true);
 });
 test('PIX so registra apos QR gerado e recebimento conferido', async () => {
     const { get, context, run } = setup();
@@ -107,4 +107,12 @@ test('falha de rede PIX nao libera confirmacao', async () => {
     assert.equal(get('pix-error').hidden, false);
     assert.equal(get('pix-confirm').disabled, true);
     assert.equal(get('pix-generate').disabled, false);
+});
+
+test('dinheiro explica quando outra forma ja cobre o saldo', () => {
+    const { get, run } = setup();
+    get('payment-debito').value = '100,00';
+    run('abrirPagamentoDinheiro()');
+    assert.equal(get('cash-confirm').disabled, true);
+    assert.equal(get('cash-error').hidden, false);
 });

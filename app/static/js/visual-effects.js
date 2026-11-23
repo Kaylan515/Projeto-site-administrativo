@@ -96,7 +96,7 @@
 
     // Shared click feedback for buttons and pagination, including public pages.
     document.addEventListener('click', (event) => {
-        const target = event.target.closest('button, a[class*="btn-"], .dashboard-action, .app-pagination a');
+        const target = event.target.closest('button, a[class*="btn-"], .dashboard-action, .app-pagination a, .admin-page .nav-link, .dashboard-page a.card');
         if (!target || target.disabled || target.getAttribute('aria-disabled') === 'true' || motion.matches) return;
         const bounds = target.getBoundingClientRect();
         const ripple = document.createElement('span');

@@ -7,13 +7,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,1,0&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/dashboard.css?v=20261123">
+    <link rel="stylesheet" href="/static/css/dashboard.css?v=20261123-interacoes">
     <script src="/static/js/ui.js?v=20261109-manual-nav" defer></script>
     <link rel="stylesheet" href="/static/css/admin.css?v=20261123">
     <link rel="stylesheet" href="/static/css/typography.css">
     <link rel="stylesheet" href="/static/css/background.css">
-    <link rel="stylesheet" href="/static/css/visual-effects.css?v=20261109-mouse">
-    <script src="/static/js/visual-effects.js?v=20261109-mouse" defer></script>
+    <link rel="stylesheet" href="/static/css/visual-effects.css?v=20261123-interacoes">
+    <script src="/static/js/visual-effects.js?v=20261123-interacoes" defer></script>
 </head>
 <body class="admin-page dashboard-page" data-role="{{ usuario.role }}">
 
@@ -68,6 +68,16 @@
                 <div class="section admin-only">
                     <div class="section-header">
                         <h2 class="section-title">Movimentações recentes</h2>
+                        {% if movimentacoes_recentes %}
+                        <label class="movement-filter" hidden>
+                            Tipo
+                            <select id="movement-type">
+                                <option value="">Todos</option>
+                                <option value="entrada">Entradas</option>
+                                <option value="saida">Saídas</option>
+                            </select>
+                        </label>
+                        {% endif %}
                         <a href="/movimentacoes" class="section-link">Ver todas</a>
                     </div>
                     {% if movimentacoes_recentes %}
@@ -78,7 +88,7 @@
                             </thead>
                             <tbody>
                                 {% for m in movimentacoes_recentes %}
-                                <tr>
+                                <tr data-movement-type="{{ m.tipo.value }}">
                                     <td><a href="/produtos/{{ m.produto_id }}" class="td-name">{{ m.produto.nome }}</a></td>
                                     <td>
                                         {% if m.tipo.value == 'entrada' %}
@@ -94,6 +104,7 @@
                             </tbody>
                         </table>
                     </div>
+                    <p id="movement-filter-empty" class="empty-state" role="status"></p>
                     {% else %}
                     <div class="empty-state">Nenhuma movimentação registrada ainda.</div>
                     {% endif %}
@@ -107,10 +118,12 @@
                         </div>
                         {% if grafico_estoque %}
                         <div class="pie-chart-wrap">
-                            <div class="stock-pie" role="img" aria-label="Distribuição do estoque entre os produtos listados na legenda" style="background: conic-gradient({{ grafico_pizza }});"></div>
+                            <div class="stock-pie" role="img" aria-label="Distribuição do estoque entre os produtos listados na legenda" style="background: conic-gradient({{ grafico_pizza }});">
+                                <span class="stock-pie-share" aria-hidden="true"></span>
+                            </div>
                             <div class="stock-pie-legend">
                                 {% for item in grafico_estoque %}
-                                <div class="stock-pie-item">
+                                <div class="stock-pie-item" data-percentual="{{ item.percentual }}" style="--stock-color: {{ item.cor }}">
                                     <span><i class="legend-dot" style="background: {{ item.cor }}"></i><em>{{ item.nome }}</em></span>
                                     <strong>{{ item.quantidade }}</strong>
                                 </div>
@@ -126,6 +139,6 @@
         </main>
     </div>
 
-    <script src="/static/js/dashboard.js" defer></script>
+    <script src="/static/js/dashboard.js?v=20261123-interacoes" defer></script>
 </body>
 </html>

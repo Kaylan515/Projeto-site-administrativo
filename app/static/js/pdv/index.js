@@ -17,6 +17,22 @@ document.addEventListener('DOMContentLoaded', () => {
     initPagamentoDinheiro();
     initPagamentoPix();
     document.querySelectorAll('.payment-amount').forEach(input => input.addEventListener('input', atualizarPagamentos));
+    document.querySelectorAll('[data-remove-payment]').forEach(button => {
+        button.addEventListener('click', () => {
+            const pix = button.dataset.removePayment === 'PIX';
+            const remover = () => {
+                document.getElementById(pix ? 'payment-pix' : 'payment-dinheiro').value = '';
+                if (pix) document.getElementById('input-pix-recebido').value = 'false';
+                else cashPayment = null;
+                atualizarPagamentos();
+            };
+            if (pix) {
+                window.showAppConfirm('Remover o PIX desta venda? Isso não estorna um valor já recebido no banco.', remover);
+            } else {
+                remover();
+            }
+        });
+    });
     atualizarPagamentos();
 });
 
@@ -277,7 +293,7 @@ function atualizarTroco() {
     cashTotal = Math.max(0, totalVendaCentavos() - outros);
     const invalid = !pagamentos.valido || cashTotal <= 0 || (!exact && !withChange) || change === null || (withChange && change <= 0) || !Number.isSafeInteger(cashTotal + change);
     const error = document.getElementById('cash-error');
-    error.hidden = !invalid || (!withChange && !exact) || (withChange && input.value.trim() === '');
+    error.hidden = cashTotal > 0 && (!invalid || (!withChange && !exact) || (withChange && input.value.trim() === ''));
     error.textContent = cashTotal <= 0 ? 'Não há saldo restante para pagar em dinheiro.' : 'Informe um valor de troco válido e maior que zero, ou selecione que não haverá troco.';
     document.getElementById('cash-confirm').disabled = invalid;
     return invalid ? null : cashTotal + change;
@@ -342,12 +358,19 @@ function atualizarPagamentos() {
     const summary = document.getElementById('cash-payment-summary');
     summary.hidden = !valores.Dinheiro;
     summary.textContent = cashPayment && valores.Dinheiro ? `Dinheiro: ${moedaBRL(valores.Dinheiro)} | Recebido: ${moedaBRL(cashPayment.received)} | Troco: ${moedaBRL(cashPayment.received - valores.Dinheiro)}` : '';
+    const pixSummary = document.getElementById('pix-payment-summary');
+    pixSummary.hidden = !valores.PIX;
+    pixSummary.textContent = valores.PIX ? 'PIX: ' + moedaBRL(valores.PIX) : '';
+    document.querySelectorAll('[data-remove-payment]').forEach(button => {
+        button.parentElement.hidden = !valores[button.dataset.removePayment];
+    });
     const message = document.getElementById('payment-message');
-    message.textContent = !pixConfirmado ? 'Confira o recebimento do PIX no banco antes de finalizar.' : !valido ? 'Informe valores monetários válidos.' : fechado ? 'Pagamento completo. Você pode finalizar.' : restante < 0 ? 'A soma excede o total. Ajuste os valores; o troco é informado na etapa de dinheiro.' : 'Informe os valores até quitar o saldo restante.';
+    message.textContent = !carrinho.length ? 'Adicione produtos ao carrinho para escolher o pagamento.' : !pixConfirmado ? 'Confira o recebimento do PIX no banco antes de finalizar.' : !valido ? 'Informe valores monetários válidos.' : fechado ? 'Pagamento completo. Você pode finalizar.' : restante < 0 ? 'A soma excede o total. Ajuste os valores; o troco é informado na etapa de dinheiro.' : 'Informe os valores até quitar o saldo restante.';
     message.classList.toggle('is-complete', fechado);
     document.getElementById('btn-finalizar').disabled = !fechado;
     document.getElementById('input-pagamentos').value = JSON.stringify(valores);
     document.querySelectorAll('.pagamento-btn').forEach(button => {
+        button.disabled = carrinho.length === 0;
         button.classList.toggle('selected', valores[button.dataset.value] > 0);
         button.setAttribute('aria-pressed', String(valores[button.dataset.value] > 0));
     });
@@ -394,9 +417,15 @@ async function gerarCodigoPix() {
         const response = await fetch('/pdv/pix/qr', {
             method: 'POST', body: new URLSearchParams({ valor_centavos: String(amount) }), signal: controller.signal
         });
-        if (!response.ok || !response.headers.get('content-type')?.includes('application/json')) throw new Error('QR indisponivel');
+        if (!response.headers.get('content-type')?.includes('application/json')) throw new Error('QR indisponivel');
         const data = await response.json();
         if (controller.signal.aborted || !document.getElementById('pix-dialog').open) return;
+        if (response.status === 400 && data.detail === 'A chave PIX ainda nao foi configurada.') {
+            error.textContent = 'A chave PIX do recebedor ainda não foi configurada no servidor.';
+            error.hidden = false;
+            return;
+        }
+        if (!response.ok) throw new Error('QR indisponivel');
         pixGerado = data.valor_centavos;
         document.getElementById('pix-total').textContent = moedaBRL(pixGerado);
         document.getElementById('pix-qr-image').src = data.qr_code;
@@ -414,14 +443,7 @@ async function gerarCodigoPix() {
 function initPagamentoPix() {
     const dialog = document.getElementById('pix-dialog');
     ['pix-close', 'pix-cancel'].forEach(id => document.getElementById(id).addEventListener('click', () => dialog.close()));
-    dialog.addEventListener('close', () => {
-        if (dialog.returnValue !== 'registrado') {
-            document.getElementById('payment-pix').value = '';
-            document.getElementById('input-pix-recebido').value = 'false';
-            atualizarPagamentos();
-        }
-        invalidarPix();
-    });
+    dialog.addEventListener('close', invalidarPix);
     document.getElementById('pix-amount').addEventListener('input', invalidarPix);
     document.getElementById('pix-generate').addEventListener('click', gerarCodigoPix);
     document.getElementById('pix-received').addEventListener('change', event => {
