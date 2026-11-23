@@ -7,28 +7,12 @@
     const backdrop = document.createElement('div');
     backdrop.className = 'site-backdrop';
     backdrop.setAttribute('aria-hidden', 'true');
-    backdrop.innerHTML = '<div class="backdrop-orb backdrop-orb-amber"></div><div class="backdrop-orb backdrop-orb-blue"></div><div class="backdrop-grid"></div><div class="backdrop-mouse"></div>';
+    backdrop.innerHTML = '<div class="backdrop-orb backdrop-orb-amber"></div><div class="backdrop-orb backdrop-orb-blue"></div><div class="backdrop-orb backdrop-orb-violet"></div><div class="backdrop-grid"></div><div class="backdrop-mouse"></div>';
     document.body.prepend(backdrop);
-    const backgroundAnimations = [];
-    backdrop.querySelectorAll('.backdrop-orb').forEach((orb, index) => {
-        if (typeof orb.animate !== 'function') return;
-        const animation = orb.animate([
-            { transform: 'translate3d(0, 0, 0) scale(1)' },
-            { transform: `translate3d(${index ? -50 : 65}px, ${index ? 45 : -35}px, 0) scale(1.12)` }
-        ], { duration: index ? 24000 : 18000, iterations: Infinity, direction: 'alternate', easing: 'ease-in-out' });
-        backgroundAnimations.push(animation);
-    });
     function syncBackground() {
-        backdrop.classList.toggle('is-paused', motion.matches || document.hidden);
-        backgroundAnimations.forEach(animation => {
-            if (motion.matches || document.hidden) animation.pause();
-            else animation.play();
-        });
+        backdrop.classList.toggle('is-paused', document.hidden);
     }
-    motion.addEventListener('change', syncBackground);
     document.addEventListener('visibilitychange', syncBackground);
-    window.addEventListener('beforeprint', () => backgroundAnimations.forEach(animation => animation.pause()));
-    window.addEventListener('afterprint', syncBackground);
     syncBackground();
     const light = document.createElement('div');
     light.className = 'ambient-light';
@@ -50,8 +34,8 @@
         light.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
         backdrop.style.setProperty('--pointer-x', `${x}px`);
         backdrop.style.setProperty('--pointer-y', `${y}px`);
-        backdrop.style.setProperty('--drift-x', `${(x / Math.max(window.innerWidth, 1) - .5) * 64}px`);
-        backdrop.style.setProperty('--drift-y', `${(y / Math.max(window.innerHeight, 1) - .5) * 48}px`);
+        backdrop.style.setProperty('--drift-x', `${(x / Math.max(window.innerWidth, 1) - .5) * 24}px`);
+        backdrop.style.setProperty('--drift-y', `${(y / Math.max(window.innerHeight, 1) - .5) * 18}px`);
         if (Math.abs(targetX - x) + Math.abs(targetY - y) > .5) frame = requestAnimationFrame(render);
         else frame = 0;
     }
